@@ -10,6 +10,30 @@ it was built from.
 
 ---
 
+## v1.1 — names are saved
+
+### Fixed
+
+- **Preset and MIDI track names are now written back.** They were shown, and a
+  newly added MIDI track was named automatically, but the name never made it
+  into the saved file. It does now.
+
+  Only names that actually changed are written, so a pattern you have not
+  touched still saves back byte-for-byte identical to what came off the device.
+
+### Note
+
+There is still no way to *type* a preset name in the editor — the names shown
+come from the device. What changed is that when SYXGRID does set a name (adding
+a MIDI track), that name now survives a save. An editable field is on the list.
+
+### Unchanged
+
+The v1.0 limitations still apply: parameter locks are not decoded, and sound
+parameters and presets are not part of a pattern dump.
+
+---
+
 ## v1.0 — first stable release
 
 Everything in v0.1, plus the work that made it worth calling stable: track

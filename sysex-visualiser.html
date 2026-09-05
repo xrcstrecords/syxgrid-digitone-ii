@@ -384,6 +384,35 @@
                     BARS -- 16 steps is one bar. Every rung lands on an exact
                     LEN_STEPS code. Rungs are bold and cyan; the fine
                     intermediate values are muted and state their step count.
+  v22.33 2026-09-04 Preset and MIDI track names are written on save.
+                  - Backlog item 2. The names were parsed, displayed, and
+                    set in memory by addTracks() -- a new MIDI track was
+                    named "MIDI <n>" -- but buildSyxForPattern() never
+                    wrote those tables, so the name never reached the
+                    file. Only the PATTERN name was ever written, which is
+                    what made the gap easy to miss.
+                  - CORRECTION to the earlier note (v22.30) that a user
+                    "can type a preset name, see it accepted, save, and
+                    lose it silently": there is no UI for editing preset or
+                    MIDI names, so nothing typed was being lost. The real
+                    loss was internal and narrower -- the automatic
+                    "MIDI <n>" on track creation was discarded on save.
+                  - Writes are GUARDED by _presetNames0 / _midiNames0
+                    snapshots taken at parse time: only names that actually
+                    changed are touched. Rewriting all 32 unconditionally
+                    would normalise names we had no reason to touch and
+                    destroy any trailing bytes past the terminator that we
+                    do not model. Same rule that stopped v22.23 corrupting
+                    the MIDI channel-enable byte: PRESERVE, never derive.
+                  - test_v22_names_write.js, 10 checks. The load-bearing
+                    one is NOT "a changed name is written" but "an
+                    untouched pattern still re-encodes byte-for-byte".
+                  - Also: renew.sh now declares all three certificate names
+                    and verifies the SERVED cert after renewal, failing
+                    loudly if one is missing. `renew --cert-name` was
+                    already safe; a manual `certonly` from its single -d
+                    flag would have silently dropped www and xrcst.com.
+
   v22.32 2026-09-04 v1.0 release build.
                   - GITHUB BUTTON in the toolbar, next to Support. The
                     source, the issue tracker and the format map now have
@@ -1354,16 +1383,16 @@ option:disabled{color:#39414f}
 // ═══════════════════════════════════════════════════════════════════
 // Version — single source of truth (mirrored in the header changelog)
 // ═══════════════════════════════════════════════════════════════════
-const VIZ_VERSION = 'v22.32';
+const VIZ_VERSION = 'v22.33';
 const VIZ_DATE    = '2026-09-02';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v1.0';
+const VIZ_PUBLIC  = 'v1.1';
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'v1.0 release build -- GitHub link in the toolbar, public changelog brought up to date, and the editor moves to the root URL';
+const VIZ_NOTE    = 'Preset and MIDI track names are now written back on save -- only the ones that actually changed, so an untouched dump still re-encodes byte-for-byte';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -1741,6 +1770,34 @@ function buildSyxForPattern(p){
   const pn=(p.patternName||'').slice(0,16);
   for(let i=0;i<NAME_LEN;i++){
     dec[PAT_NAME_OFFSET+i]=(i<pn.length)?pn.charCodeAt(i):0x00;
+  }
+
+  // Preset and MIDI track names. Until v22.33 these were parsed, displayed and
+  // editable in the UI, but never written — a user could rename a preset, see
+  // it accepted, save, and lose it silently. That is worse than not offering
+  // the edit at all.
+  //
+  // Same rule as the MIDI channel bytes (v22.24): write ONLY the names the user
+  // actually changed. Comparing against the snapshot taken at parse time means
+  // an untouched dump re-encodes byte-for-byte, including any trailing bytes
+  // after the terminator that we do not model. Rewriting all 32 names
+  // unconditionally would "normalise" names we never had a reason to touch.
+  {
+    const writeName = (off, s) => {
+      const v = (s || '').slice(0, NAME_LEN);
+      for (let i = 0; i < NAME_LEN; i++)
+        dec[off + i] = (i < v.length) ? (v.charCodeAt(i) & 0x7F) : 0x00;
+    };
+    for (let i = 0; i < PRESET_COUNT; i++) {
+      const now = (p.presetNames && p.presetNames[i]) || '';
+      if (p._presetNames0 && now === p._presetNames0[i]) continue;   // untouched
+      writeName(PRESET_NAME_BASE + i * PRESET_NAME_STRIDE, now);
+    }
+    for (let i = 0; i < MIDI_COUNT; i++) {
+      const now = (p.midiNames && p.midiNames[i]) || '';
+      if (p._midiNames0 && now === p._midiNames0[i]) continue;       // untouched
+      writeName(MIDI_NAME_BASE + i * MIDI_NAME_STRIDE, now);
+    }
   }
 
   // Track machine — the byte at PRESET+232 is an ENUM (0..4), not a
@@ -2145,6 +2202,11 @@ function parseMessage(msg,label){
   p.kitName    =readName(dec,KIT_NAME_OFFSET);
   p.presetNames=[]; for(let i=0;i<PRESET_COUNT;i++) p.presetNames.push(readName(dec,PRESET_NAME_BASE+i*PRESET_NAME_STRIDE));
   p.midiNames  =[]; for(let i=0;i<MIDI_COUNT;i++)   p.midiNames.push(readName(dec,MIDI_NAME_BASE+i*MIDI_NAME_STRIDE));
+  // Snapshots of the names AS READ. The write path compares against these so it
+  // only touches names the user actually edited, leaving every other name's
+  // bytes exactly as the device wrote them (same rule as the MIDI channels).
+  p._presetNames0 = p.presetNames.slice();
+  p._midiNames0   = p.midiNames.slice();
 
   // Track type — decoded, not inferred. See the TRACK_TYPE_* block above.
   p.trackTypeMask = (dec[TRACK_TYPE_MASK_HI]<<8) | dec[TRACK_TYPE_MASK_LO];
@@ -4641,8 +4703,9 @@ function showHelp(){
           ${M('WAVETONE',1)} and ${M('SWARMER',3)} are identified, but their parameters live in
           preset data. Only audio ↔ ${M('MIDI',4)} can be changed.</td></tr>
         <tr><td>sound parameters</td><td>filter, amp, FX and LFO settings are not decoded</td></tr>
-        <tr><td>presets and kits</td><td>names are shown and editable; the sounds themselves live in
-          the project's preset pool, which is not part of a pattern dump</td></tr>
+        <tr><td>presets and kits</td><td>names are shown, and preset and MIDI track names are
+          written back when they change; the sounds themselves live in the project's preset pool,
+          which is not part of a pattern dump</td></tr>
       </table>
 
       <h4>Keyboard</h4>

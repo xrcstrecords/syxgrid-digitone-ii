@@ -165,7 +165,7 @@ Sending to the device requires the Digitone II to be in **SysEx receive** mode.
 | parameter locks | not decoded, and on a trig that still plays its note not even detectable — the step encodes only whether the trig sounds. Locked values sit in a separate sparse table and are carried through untouched |
 | synth machine choice | ${M('FM TONE',0)}, ${M('FM DRUM',2)}, ${M('WAVETONE',1)} and ${M('SWARMER',3)} are identified, but their parameters live in preset data. Only audio ↔ ${M('MIDI',4)} can be changed. |
 | sound parameters | filter, amp, FX and LFO settings are not decoded |
-| presets and kits | names are shown and editable; the sounds themselves live in the project's preset pool, which is not part of a pattern dump |
+| presets and kits | names are shown, and preset and MIDI track names are written back when they change; the sounds themselves live in the project's preset pool, which is not part of a pattern dump |
 
 ### Keyboard
 
@@ -228,7 +228,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v22.32)`, so any copy of the file can be traced back to the
+`v0.1 (dev v22.33)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md).
