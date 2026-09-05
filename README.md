@@ -228,7 +228,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v22.34)`, so any copy of the file can be traced back to the
+`v0.1 (dev v22.35)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md).

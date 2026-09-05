@@ -10,6 +10,51 @@ it was built from.
 
 ---
 
+## v1.3 — the editor now sends the pattern you edited
+
+### Fixed: the wrong pattern was sent to the device
+
+**This is the important one.**
+
+If you edited a pattern and sent it, the editor could send a **different
+pattern** — usually the next one along. Your edits stayed on screen while an
+unedited pattern went to the Digitone II.
+
+On the device this looked like tracks losing their trigs: some tracks had
+notes, others were empty. Nothing was being dropped — it was simply a different
+pattern, so its trigs were wherever that pattern happened to have them.
+
+The cause was an internal numbering mismatch: the send dialog numbered patterns
+one way and read that number back another way. The two only disagreed when a
+loaded file contained a non-pattern message, which every full project dump does.
+
+The same mismatch is fixed in the multi-pattern send list and in the MIDI import
+preview, which could describe the wrong destination pattern's track lengths and
+trig counts.
+
+### Still to verify
+
+If you saw **tracks missing after receiving** from the device, please retest.
+That report could not be reproduced here — received dumps keep every track — and
+it may have been this same bug seen from the other side.
+
+---
+
+### Before you use it
+
+**Back up your projects.** This writes to real hardware and overwrites the
+pattern selected on your device.
+
+Sending and receiving need Chrome or another Chromium browser (Web MIDI).
+
+### Known limitations
+
+Parameter locks are not decoded. Sound parameters and presets are not part of a
+pattern dump. Receiving a pattern replaces the loaded project — receiving into a
+chosen slot is on the list.
+
+---
+
 ## v1.2 — sending now goes where you expect
 
 ### Fixed: edits sent to the device appeared to do nothing

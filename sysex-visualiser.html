@@ -384,6 +384,31 @@
                     BARS -- 16 steps is one bar. Every rung lands on an exact
                     LEN_STEPS code. Rungs are bold and cyan; the fine
                     intermediate values are muted and state their step count.
+  v22.35 2026-09-05 MAJOR: the send dialog sent the WRONG PATTERN.
+                  - ROOT CAUSE: two index conventions for one value. The send
+                    dialog built its <option value> from the FILTERED list
+                    (PATTERNS.filter(x=>!x.notPattern)) while the `selected`
+                    test compared that index against getCurPatternIdx(), which
+                    indexes the UNFILTERED PATTERNS array. Any non-pattern
+                    message earlier in the list shifted the two apart, so the
+                    dialog preselected -- and SENT -- a neighbour of the
+                    pattern on screen.
+                  - Measured: editor showing A05, dialog sending A06, and the
+                    edit made in A05 nowhere on the wire.
+                  - On hardware this reads as "some tracks have their trigs and
+                    others do not": it is a DIFFERENT pattern, so its trigs sit
+                    wherever that pattern happens to have them. The user's
+                    edits never left the editor.
+                  - Same mismatch found and fixed in four more places: the
+                    multi-send checkbox list, pickSendPatterns(),
+                    refreshImportInfo() (the import preview described the wrong
+                    destination pattern) and both TESTLAB diagnostics
+                    stepStateDiag()/comparePayloads().
+                  - ONE CONVENTION NOW: every pattern-selector value in the app
+                    is an index into PATTERNS. Non-patterns are SKIPPED, never
+                    renumbered. No code path indexes a filtered list.
+                  - test_v22_send_index.js (14 checks) guards the whole class;
+                    proved RED by reintroducing the original line.
   v22.34 2026-09-04 MAJOR: edited notes were never heard on the device.
                   - ROOT CAUSE: the send path stamped a DESTINATION SLOT the
                     device does not honour. sendPatternToPort() wrote the
@@ -1436,16 +1461,16 @@ option:disabled{color:#39414f}
 // ═══════════════════════════════════════════════════════════════════
 // Version — single source of truth (mirrored in the header changelog)
 // ═══════════════════════════════════════════════════════════════════
-const VIZ_VERSION = 'v22.34';
+const VIZ_VERSION = 'v22.35';
 const VIZ_DATE    = '2026-09-02';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v1.2';
+const VIZ_PUBLIC  = 'v1.3';
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'MAJOR FIX: the send path stamped a destination slot the device ignores, so edits landed on whatever pattern the DN2 had selected. Select the destination on the device now';
+const VIZ_NOTE    = 'the send dialog sent the wrong pattern — every pattern selector now indexes PATTERNS, not the filtered list';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -4131,9 +4156,13 @@ function showImportDialog(){
     const tLen=effectiveTrackLength(cp,defTrack);
     const curTrigs=(cp.tracks&&cp.tracks[defTrack]?cp.tracks[defTrack].length:0);
 
-    // Build pattern selector
-    const patOnly=PATTERNS.filter(x=>!x.notPattern);
-    let patOpts=patOnly.map((p,i)=>{
+    // Pattern selector: the value is an index into PATTERNS (the unfiltered
+    // array), matching every other pattern selector in the app. v22.35 made
+    // refreshImportInfo() agree — it was indexing the FILTERED list with this
+    // unfiltered value, so with a non-pattern earlier in the list the import
+    // preview described the wrong pattern.
+    let patOpts=PATTERNS.map((p,i)=>{
+    if (p.notPattern) return '';
     const n = p.records ? p.records.length : 0;
     const emb = p.ok && p.patternName ? p.patternName : '';
     let nm = p.slot ? p.slot : (p.label || ('P'+(i+1)));
@@ -4264,8 +4293,7 @@ function refreshImportInfo(){
   const pi=+document.getElementById('impPatSel')?.value||0;
   const ti=+document.getElementById('impTrkSel')?.value||1;
 
-  const patOnly=PATTERNS.filter(x=>!x.notPattern);
-  const p=patOnly[pi];
+  const p=PATTERNS[pi];   // v22.35: impPatSel now carries a PATTERNS index
   const tLen=p?effectiveTrackLength(p,ti):16;
   const curTrigs=(p&&p.tracks&&p.tracks[ti]?p.tracks[ti].length:0);
 
@@ -5430,9 +5458,21 @@ document.body.addEventListener('drop',e=>{e.preventDefault(); loadFiles(e.dataTr
 
 // ── Send menu ────────────────────────────────────────────────
 function showSendMenu(){
-  // Build lists
-  const patOnly=PATTERNS.filter(x=>!x.notPattern);
-  let patOpts=patOnly.map((p,i)=>{
+  // Build lists.
+  //
+  // MAJOR BUG (v22.35): the option VALUE used to be the index into the FILTERED
+  // patOnly array, while the `selected` test compared it against
+  // getCurPatternIdx() — an index into the UNFILTERED PATTERNS array. Any
+  // non-pattern message earlier in the list shifted the two apart, so the
+  // dialog preselected — and then SENT — a different pattern than the one on
+  // screen. The user's edits stayed in the editor while an unedited neighbour
+  // went down the wire, which reads on the device as "some tracks have their
+  // trigs and others don't".
+  //
+  // One convention now, end to end: every pattern-selector value in this app is
+  // an index into PATTERNS. Non-patterns are skipped, never renumbered.
+  let patOpts=PATTERNS.map((p,i)=>{
+    if(p.notPattern) return '';
     // Match the main pattern selector exactly: PATTID · PATTNAME (n trigs),
     // or just PATTID (n trigs) when no pattern name is set.
     const n = p.ok ? (p.records ? p.records.length : 0) : 0;
@@ -5499,7 +5539,7 @@ function showSendMenu(){
         '<button onclick="pickSendPatterns(\'trigs\')" style="font-size:10px;padding:2px 8px">With trigs</button>'+
       '</div>'+
       '<div class="notelist" style="max-height:200px;overflow-y:auto;margin-bottom:10px">'+
-        patOnly.map((p,i)=>{ const n=p.ok?(p.records?p.records.length:0):0; const emb=p.ok&&p.patternName?p.patternName:''; const has=p.ok&&Object.keys(p.tracks||{}).length; return '<label class="trkpick" style="cursor:pointer"><input type="checkbox" class="sendPatChk" value="'+i+'"'+(has?' checked':'')+'> <b>'+esc(p.slot||('P'+(i+1)))+'</b> <span>'+esc(emb||'')+'</span> <i>'+n+' trigs</i></label>'; }).join('')+
+        PATTERNS.map((p,i)=>{ if(p.notPattern) return ''; const n=p.ok?(p.records?p.records.length:0):0; const emb=p.ok&&p.patternName?p.patternName:''; const has=p.ok&&Object.keys(p.tracks||{}).length; return '<label class="trkpick" style="cursor:pointer"><input type="checkbox" class="sendPatChk" value="'+i+'"'+(has?' checked':'')+'> <b>'+esc(p.slot||('P'+(i+1)))+'</b> <span>'+esc(emb||'')+'</span> <i>'+n+' trigs</i></label>'; }).join('')+
       '</div>'+
       '<div class="ctl" style="margin-bottom:8px;display:block"><label style="font-size:11px;color:var(--trigless)">DESTINATION</label>'+
         '<div class="helpnote" style="color:var(--trigless);border-left:2px solid var(--trigless);padding-left:8px;margin:4px 0 0">'+
@@ -5533,8 +5573,11 @@ async function sendPatternToPort(portIdx, pi, ti, di){
   if(!outs[portIdx]){ alert('MIDI port not found.'); return; }
   const out=outs[portIdx];
 
-  const p=PATTERNS.filter(x=>!x.notPattern)[pi];
-  if(!p||!p.ok){ alert('Pattern not found.'); return; }
+  // pi is an index into PATTERNS (see showSendMenu). It used to index the
+  // FILTERED list while the dialog produced an unfiltered index — the v22.35
+  // mismatch that sent the wrong pattern.
+  const p=PATTERNS[pi];
+  if(!p||!p.ok||p.notPattern){ alert('Pattern not found.'); return; }
 
   // Show progress — keep dialog open
   const prog=document.getElementById('sendProgress');
@@ -5678,13 +5721,12 @@ async function matchingInputFor(out){
 // the next until cancelled, so we stream a queue back-to-back. Between patterns
 // we either wait a fixed GAP, or (ACK-wait) wait for the device's SysEx reply
 // with a timeout fallback so a silent RECEIVE mode still makes progress.
-// queue: [{pi, di}]  (pi = index into patOnly, di = destination slot 0-127)
+// queue: [{pi, di}]  (pi = index into PATTERNS, di = kept for logging only)
 async function sendPatternSequence(portIdx, queue, opts){
   if(!MIDI_ACCESS) await ensureMidi();
   const outs=[...MIDI_ACCESS.outputs.values()];
   if(!outs[portIdx]){ alert('MIDI port not found.'); return; }
   const out=outs[portIdx];
-  const patOnly=PATTERNS.filter(x=>!x.notPattern);
   const useAck=!!opts.useAck, delayMs=opts.delayMs, timeoutMs=opts.timeoutMs;
   const inPort=useAck ? await matchingInputFor(out) : null;
 
@@ -5715,7 +5757,7 @@ async function sendPatternSequence(portIdx, queue, opts){
     for(let k=0;k<queue.length;k++){
       if(SEND_ABORT){ slog('\u23f9 Aborted after '+sent+' pattern(s).'); break; }
       const {pi,di}=queue[k];
-      const p=patOnly[pi];
+      const p=PATTERNS[pi];   // v22.35: PATTERNS index, not the filtered one
       if(phase) phase.textContent='sending '+(k+1)+'/'+queue.length+'\u2026';
       if(fill) fill.style.width=Math.round(k/queue.length*100)+'%';
       if(!p||!p.ok){ slog('\u2717 #'+(k+1)+' skipped \u2014 not decodable'); failed++; continue; }
@@ -5802,9 +5844,8 @@ function onSendHandshakeChange(){
   if(lbl) lbl.textContent=ack?'TIMEOUT (ms)':'GAP (ms)';
 }
 function pickSendPatterns(which){
-  const patOnly=PATTERNS.filter(x=>!x.notPattern);
   document.querySelectorAll('.sendPatChk').forEach(c=>{
-    const p=patOnly[+c.value];
+    const p=PATTERNS[+c.value];   // v22.35: checkbox value is a PATTERNS index
     if(which==='all') c.checked=true;
     else if(which==='none') c.checked=false;
     else if(which==='trigs') c.checked=!!(p&&p.ok&&Object.keys(p.tracks||{}).length);
@@ -5818,8 +5859,7 @@ function pickSendPatterns(which){
 // distinct odd/even trig and idle encodings the loaded dump actually uses,
 // so a wrong fallback (the 0x90 bug) is visible without a device.
 function stepStateDiag(pi){
-  const patOnly=PATTERNS.filter(x=>!x.notPattern);
-  const p=(pi===undefined)?curPattern():patOnly[pi];
+  const p=(pi===undefined)?curPattern():PATTERNS[pi];   // v22.35: PATTERNS index
   if(!p||!p.ok||!p._rawMsg){ alert('Load a decodable pattern first.'); return null; }
   const dec=unpack7(p._rawMsg,PACK_START,PACK_END);
   const hx=v=>v===undefined?'--':'0x'+v.toString(16).padStart(2,'0');
@@ -5886,8 +5926,7 @@ function showStepStateDiag(){
 // the device (dump = A), save the app-edited all-16 as .syx and load it (= B),
 // then compare. Every byte the device sets that the app doesn't will show here.
 function comparePayloads(ai, bi){
-  const patOnly=PATTERNS.filter(x=>!x.notPattern);
-  const A=patOnly[ai], B=patOnly[bi];
+  const A=PATTERNS[ai], B=PATTERNS[bi];   // v22.35: PATTERNS indices
   if(!A||!A.ok||!A._rawMsg||!B||!B.ok||!B._rawMsg){ alert('Pick two decodable patterns.'); return; }
   const da=unpack7(A._rawMsg,PACK_START,PACK_END);
   // B is the app's REBUILT payload (what Send would transmit), not B._rawMsg
@@ -5959,7 +5998,7 @@ function comparePayloads(ai, bi){
 function showComparePicker(){
   const patOnly=PATTERNS.filter(x=>x.ok&&x._rawMsg);
   if(patOnly.length<2){ alert('Load at least two decodable patterns/files to compare.'); return; }
-  const opt=(sel)=>patOnly.map((p,i)=>{ const gi=PATTERNS.filter(x=>!x.notPattern).indexOf(p); const nm=(p.slot||p.label||('P'+(i+1)))+(p.patternName?' \u00b7 '+p.patternName:''); return '<option value="'+gi+'"'+(sel===i?' selected':'')+'>'+esc(nm)+'</option>'; }).join('');
+  const opt=(sel)=>patOnly.map((p,i)=>{ const gi=PATTERNS.indexOf(p); const nm=(p.slot||p.label||('P'+(i+1)))+(p.patternName?' \u00b7 '+p.patternName:''); return '<option value="'+gi+'"'+(sel===i?' selected':'')+'>'+esc(nm)+'</option>'; }).join('');
   showModal('Compare payloads',
     'Pick two patterns. Tip: A = device-native capture, B = app-generated (save .syx then reload).',
     [{label:'Compare', desc:'', fn:()=>{ const a=+document.getElementById('cmpA').value, b=+document.getElementById('cmpB').value; closeModal(); comparePayloads(a,b); }},
