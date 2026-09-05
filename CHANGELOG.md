@@ -10,6 +10,55 @@ it was built from.
 
 ---
 
+## v1.2 — sending now goes where you expect
+
+### Fixed: edits sent to the device appeared to do nothing
+
+**This is the important one.** The send dialog offered a "destination slot", but
+the Digitone II does not accept a destination over SysEx — it stores a received
+pattern into **whatever pattern is selected on the device**.
+
+So if you edited A01, sent it "to slot 5", then looked at slot 5, nothing had
+changed — and your edit had in fact overwritten whichever pattern the DN2 had
+selected at the time.
+
+**What changed:** the fake destination picker is gone. The dialog now tells you
+plainly that the pattern lands in the slot selected on the device, so:
+
+> **Select the destination pattern on the Digitone II before you send.**
+
+When sending several patterns, they land consecutively from there.
+
+### Fixed: editing a note on a yellow (trigless) trig did nothing
+
+A trigless trig carries parameter locks and plays no note. The editor let you
+change its note and stored the change correctly — but the device stayed silent,
+because the step was still marked "plays no note".
+
+Editing a note there now turns the step into an ordinary sounding trig, keeping
+its locks. The grid also *shows* notes on those steps now, as hollow yellow
+dots, instead of hiding them — and the note editor warns you first.
+
+### Help
+
+- A **backup warning** and a plain **disclaimer**: SYXGRID is experimental, not
+  affiliated with or endorsed by Elektron, provided without warranty, and its
+  authors accept no liability. Back up your projects.
+- Two hardware behaviours are now written down:
+  - a **retrig** set as a parameter lock makes MIDI/Ableton export inaccurate
+    for that step — the editor cannot see the lock, so it exports one note where
+    the device retriggers
+  - a **single-pattern receive** can take several seconds to start, and
+    **replaces** whatever is loaded in the editor
+
+### Known limitations (unchanged)
+
+Parameter locks are not decoded. Sound parameters and presets are not part of a
+pattern dump. Receiving a pattern replaces the loaded project — being able to
+receive into a chosen slot is on the list.
+
+---
+
 ## v1.1 — names are saved
 
 ### Fixed

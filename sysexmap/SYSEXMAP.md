@@ -1,6 +1,6 @@
 # DN2 SysEx Mapping Reference
 
-**Map version 1.13.0** · generated from `mappings.json` for app **v22.33** (2026-09-01)
+**Map version 1.13.0** · generated from `mappings.json` for app **v22.34** (2026-09-01)
 
 > Generated file — do not edit by hand. Edit `mappings.json` and run `node sysexmap/build_map.js`.
 
@@ -59,7 +59,7 @@ raw message  ──unpack7(msg, 10, 114113)──▶  decoded payload
 | **Product byte — Digitone II** | `raw` | `4` | 0x15 | 🔵 B | `PRODUCT_DN2` |
 | **Product byte — Digitone 1 (rejected)** ⚠️ | `raw` | `4` | 0x0D | 🟡 C | `PRODUCT_DN1` |
 | **Message type** | `raw` | `6` | 0x50 = PATTERN, 0x54 = project trailer | 🔵 B | `MSG_PATTERN / MSG_TRAILER` |
-| **Destination pattern slot on receive** | `raw` | `9` | 0-127 (0 = A01 … 127 = H16) | 🟢 A | `—` |
+| **Slot index in a dumped pattern message (NOT a destination)** | `raw` | `9` | 0-127 (0 = A01 … 127 = H16), as written BY the device in its own dumps | 🟢 A | `—` |
 | **7-bit packed body range** | `raw` | `10 .. 114113` | 8-byte groups: 1 control byte + 7 payload bytes | 🔵 B | `PACK_START / PACK_END` |
 | **Checksum (hi, lo)** | `raw` | `114113, 114114` | sum(bytes[10..114113)) % 16384, split into two 7-bit values | 🔵 B | `recomputeChecksum()` |
 | **Step-state table geometry** | `decoded` | `4 + 1187*(track-1) + 2*(step-1)` | 2 bytes per step, 16 tracks x 128 steps | 🟢 A | `SS_BASE / SS_TRACK_STRIDE / SS_ENTRY` |
@@ -107,12 +107,12 @@ raw message  ──unpack7(msg, 10, 114113)──▶  decoded payload
 
 ### 🟢 A — Hardware-confirmed
 
-#### Destination pattern slot on receive
+#### Slot index in a dumped pattern message (NOT a destination)
 
 - **Where:** `raw` offset `9`
-- **Value:** 0-127 (0 = A01 … 127 = H16)
-- **Evidence:** Send path stamps this byte and the DN2 stores the pattern in the addressed slot; exercised by sequential send and the regression lab.
-- **Note:** Must be written BEFORE recomputeChecksum(). buildSyxForPattern() always emits 0 here; the transport overwrites it.
+- **Value:** 0-127 (0 = A01 … 127 = H16), as written BY the device in its own dumps
+- **Evidence:** In a whole-project dump the device writes byte 9 = the pattern's own slot index: A01->0, A02->1 ... verified across 116 patterns of FrozenPhotonsTest1.syx. It is descriptive on READ. On WRITE the device IGNORES it - see SYSEX_RECEIVE_SLOT. v22.34 removed the send path's slot stamping, which had produced a destination picker the hardware never honoured.
+- **Note:** Outside the checksum range [10,114113), so changing it does not invalidate the message. buildSyxForPattern() emits 0 and the transport must NOT overwrite it: stamping a slot here misleads the user into thinking they chose a destination.
 
 #### Step-state table geometry
 

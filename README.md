@@ -75,7 +75,7 @@ Sending to the device requires the Digitone II to be in **SysEx receive** mode.
 | ${K('Get .syx from device')} | receive a dump live over Web MIDI. Arm the listener, then start SYSEX DUMP on the device. A project dump ends on its own; otherwise press ${K('Dump done')}. |
 | ${K('↶ Undo')} | revert the last edit. One level — see *Undo* below. |
 | ${K('Save .syx')} | write the dump back to a file, repacked with correct checksums. Offers the whole project or the current pattern alone. |
-| ${K('Send to device')} | send the current pattern or the whole project back over Web MIDI. The DN2 must be in SYSEX RECEIVE mode. The dialog exposes a **GAP** in milliseconds — raise it if a large dump loses trigs in transit. |
+| ${K('Send to device')} | send the current pattern or the whole project back over Web MIDI. The DN2 must be in SYSEX RECEIVE mode. **The pattern lands in the slot selected on the device** — this app cannot choose it, so select the destination pattern on the DN2 first. A queue lands consecutively from there. The dialog exposes a **GAP** in milliseconds — raise it if a large dump loses trigs in transit. |
 | ${K('Import…')} / ${K('Export…')} | .mid and .alc, per track. See *Import and export* below. |
 | ${K('PATTERN')} / ${K('TRACK')} | pick the pattern to edit and which track to show. ${K('All active')} draws every track that has trigs. |
 | ${K('LANES')} | show or hide the Note, Velocity, Length and Micro lanes. Hiding a lane only affects drawing. |
@@ -162,7 +162,7 @@ Sending to the device requires the Digitone II to be in **SysEx receive** mode.
 | | |
 |---|---|
 | ${triglessD} trigless trigs | the trig is shown and preserved; the parameter locks it carries are not decoded |
-| parameter locks | not decoded, and on a trig that still plays its note not even detectable — the step encodes only whether the trig sounds. Locked values sit in a separate sparse table and are carried through untouched |
+| parameter locks | not decoded, and on a trig that still plays its note not even detectable — the step encodes only whether the trig sounds. Locked values sit in a separate sparse table and are carried through untouched. **One consequence worth knowing:** a **retrig** set as a lock makes the device play a step several times, and the editor cannot see it — so ${K('Export…')} writes a single note for that step. Exports of retrigged patterns are not accurate. Nothing is lost in the file itself. |
 | synth machine choice | ${M('FM TONE',0)}, ${M('FM DRUM',2)}, ${M('WAVETONE',1)} and ${M('SWARMER',3)} are identified, but their parameters live in preset data. Only audio ↔ ${M('MIDI',4)} can be changed. |
 | sound parameters | filter, amp, FX and LFO settings are not decoded |
 | presets and kits | names are shown, and preset and MIDI track names are written back when they change; the sounds themselves live in the project's preset pool, which is not part of a pattern dump |
@@ -228,7 +228,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v22.33)`, so any copy of the file can be traced back to the
+`v0.1 (dev v22.34)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md).

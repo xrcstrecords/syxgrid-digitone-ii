@@ -384,6 +384,54 @@
                     BARS -- 16 steps is one bar. Every rung lands on an exact
                     LEN_STEPS code. Rungs are bold and cyan; the fine
                     intermediate values are muted and state their step count.
+  v22.34 2026-09-04 MAJOR: edited notes were never heard on the device.
+                  - ROOT CAUSE: the send path stamped a DESTINATION SLOT the
+                    device does not honour. sendPatternToPort() wrote the
+                    chosen slot into header byte 9, recomputed the checksum,
+                    and the dialog offered a "DESTINATION SLOT" dropdown.
+                    Manual OS1.10D 13.5.2 p.77: "PATTERN will store a
+                    received pattern to the SELECTED pattern slot." The
+                    regression lab confirmed it on hardware on 2026-09-01
+                    (patterns sent "to C01..C04" all landed at the armed
+                    slot A01 onwards), and buildSyxForPattern() already
+                    carried a comment saying byte 9 is left at 0 FOR
+                    EXACTLY THIS REASON. The send path contradicted a fact
+                    the codebase already knew.
+                  - So: edit A01, send it "to slot 5", check slot 5, hear
+                    nothing changed -- while the edit HAD landed, on
+                    whatever pattern the device had selected, overwriting
+                    it. Every byte was correct; the destination was
+                    fiction. That is why it survived: the encoding, the
+                    checksum (matches the device's own on every fixture),
+                    the round-trip and the single out.send() were all fine.
+                  - FIXED: byte 9 is never written by the transport. Both
+                    send paths (single and sequential) leave it at 0. The
+                    dialog now states plainly that the pattern lands in the
+                    slot SELECTED ON THE DEVICE and that the app cannot
+                    choose it; the dropdown is gone. Help says the same.
+                  - Two existing tests REQUIRED the stamping line and so
+                    pinned the bug in place. They are now inverted into
+                    guards that fail if byte 9 is ever stamped again. A
+                    test that asserts current behaviour is a lock, not a
+                    test.
+                  - sysexmap: SLOT_BYTE claimed level A for "the DN2 stores
+                    the pattern in the addressed slot", directly
+                    contradicting SYSEX_RECEIVE_SLOT. Rewritten -- byte 9
+                    is DESCRIPTIVE on read (the device writes each
+                    pattern's own slot index; verified across 116 patterns)
+                    and IGNORED on write.
+                  - Separately, editing a note on a TRIGLESS step (0x78 =
+                    sounds no note) also produced silence. saveNotes() now
+                    clears the flag and the write path rewrites the step;
+                    the note lane draws those notes as hollow yellow dots
+                    instead of hiding them, and the editor warns first.
+                  - Help: added the BACKUP warning and a disclaimer (no
+                    Elektron affiliation, no warranty, no liability), plus
+                    two hardware behaviours -- a retrig set as a p-lock
+                    makes MIDI/ALC export inaccurate for that step, and a
+                    single-pattern receive is slow to start and REPLACES
+                    what is loaded. Backlog items 4 and 5.
+
   v22.33 2026-09-04 Preset and MIDI track names are written on save.
                   - Backlog item 2. The names were parsed, displayed, and
                     set in memory by addTracks() -- a new MIDI track was
@@ -1148,6 +1196,11 @@ td.ttedit:hover{text-decoration:underline dotted;filter:brightness(1.25)}
    trig. Deliberately smaller and unglowing so it reads as "occupied but
    silent" next to a full note trig. */
 .dot.devtrigless{background:var(--trigless);box-shadow:none;width:6px;height:6px}
+/* A note that exists on a trigless step: shown in trigless yellow and hollow,
+   so it reads as "stored, but silent" rather than as an ordinary note. */
+.dot.notetrigless{background:transparent;border:1.5px solid var(--trigless);
+  box-shadow:none;width:7px;height:7px}
+.dot.notetrigless.chord{box-shadow:0 0 0 2px rgba(255,210,63,.35)}
 .ghost.devtrigless{border-color:var(--trigless);opacity:.5}
 td.devtrigless{background:rgba(255,210,63,.06)}
 /* Microtiming direction: < early, > late, <> chord spanning both (strum). */
@@ -1383,16 +1436,16 @@ option:disabled{color:#39414f}
 // ═══════════════════════════════════════════════════════════════════
 // Version — single source of truth (mirrored in the header changelog)
 // ═══════════════════════════════════════════════════════════════════
-const VIZ_VERSION = 'v22.33';
+const VIZ_VERSION = 'v22.34';
 const VIZ_DATE    = '2026-09-02';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v1.1';
+const VIZ_PUBLIC  = 'v1.2';
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'Preset and MIDI track names are now written back on save -- only the ones that actually changed, so an untouched dump still re-encodes byte-for-byte';
+const VIZ_NOTE    = 'MAJOR FIX: the send path stamped a destination slot the device ignores, so edits landed on whatever pattern the DN2 had selected. Select the destination on the device now';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -1661,8 +1714,20 @@ function buildSyxForPattern(p){
   for(let t=1;t<=MAX_TRACK;t++){
     for(let s=1;s<=MAX_STEP;s++){
       const want=!!wantTrig[t+':'+s];
-      if(want===wasTrig(t,s)) continue;               // unchanged → keep device bytes verbatim
       const o=ssOffset(t,s);
+      // A step that WAS trigless and is no longer must be rewritten even
+      // though its on/off state did not change: 0x78 and 0x03 are both "on",
+      // so the want===wasTrig test below sees no difference and would leave
+      // the silencing byte in place. That is the v22.34 bug — the note was
+      // stored correctly and the device played nothing.
+      const wasTriglessHere = ssOrig[o]===TRIGLESS_BYTE_A;
+      const nowTrigless = !!(p.triglessAt && p.triglessAt[t] && p.triglessAt[t].includes(s));
+      if(wasTriglessHere && !nowTrigless && want){
+        const pair=trigFor(s);
+        dec[o]=pair[0]; dec[o+1]=pair[1];
+        continue;
+      }
+      if(want===wasTrig(t,s)) continue;               // unchanged → keep device bytes verbatim
       const pair=want?trigFor(s):idleFor(s);
       dec[o]=pair[0]; dec[o+1]=pair[1];
     }
@@ -3263,7 +3328,18 @@ function openNoteEditor(track,step){
         (100 and 1, dragged +27, become 127 and 28).</span>
     </div>`;
   if(!notes.length) html+='<div class="sub">No notes on this step.</div>';
+  // A trigless step accepts edits that the device will never play unless the
+  // trig is made to sound. Say so before the edit, not after it fails on
+  // hardware — this was the invisible half of the "edited notes not received"
+  // bug. Saving a change now converts the step automatically.
+  const triglessHere = !!(p.isTrigless && p.isTrigless(track,step));
+  const triglessNote = triglessHere
+    ? `<p class="helpnote" style="color:var(--trigless);border-left:2px solid var(--trigless);padding-left:8px">`+
+      `<b>This is a trigless trig.</b> It carries parameter locks and plays <b>no note</b> on the device. `+
+      `Saving a note change here will turn it into an ordinary sounding trig; its locks are kept.</p>`
+    : '';
   showModal(`Track ${track} \u00b7 step ${step}`,
+    triglessNote+
     `${notes.length} note(s), highest pitch first. Note name and number stay in sync. Blank velocity = inherit track default. `+
     `Drag any number field up/down to change it, or click to type. `+
     `Length: named lengths are <b style="color:var(--len)">highlighted</b> — hold <b>SHIFT</b> as you open the list to show only those. `+
@@ -3480,20 +3556,49 @@ function removeNote(track,step,i){
 function saveNotes(track,step){
   const p=curPattern();
   const arr=(p.notesAt[track]&&p.notesAt[track][step])||[];
+  let touched=false;
   document.querySelectorAll('#nl input, #nl select').forEach(inp=>{
     const f=inp.dataset.f;
     if(!f) return;                               // selection checkboxes etc.
     const r=arr[+inp.dataset.i]; if(!r) return;
     if(f==='noteName') return;                   // the number field is authoritative
     const raw=String(inp.value).trim();
-    if(f==='len'){ r.len = raw===''?INHERIT:Math.max(0,Math.min(127,parseInt(raw,10)||0)); return; }
+    if(f==='len'){ const v=raw===''?INHERIT:Math.max(0,Math.min(127,parseInt(raw,10)||0));
+                   if(r.len!==v) touched=true; r.len=v; return; }
     // Microtiming is signed (-23..+23). The 0..127 clamp below would turn every
     // negative offset into 0 and silently drop it.
-    if(f==='micro'){ r.micro = clampMicro(raw); return; }
+    if(f==='micro'){ const v=clampMicro(raw); if(r.micro!==v) touched=true; r.micro=v; return; }
     const v = raw===''?INHERIT:Math.max(0,Math.min(127,parseInt(raw,10)||0));
+    if(r[f]!==v) touched=true;
     r[f]=v;
   });
+
+  // MAJOR BUG (v22.34): editing a note on a TRIGLESS step wrote the record
+  // correctly and changed nothing on the device. 0x78 means "this trig sounds
+  // no note", so the DN2 played silence no matter what note was stored — from
+  // the user's chair, "edited notes are not received".
+  //
+  // Giving a step a note is an unambiguous request for it to sound, so clear
+  // the trigless flag. The alternative (refusing the edit) is worse: the note
+  // editor already shows the note and accepts the change.
+  if(touched && p.isTrigless && p.isTrigless(track,step)) makeStepSound(p,track,step);
+
   markDirty(); closeModal(); render();
+}
+
+// Turn a trigless step into an ordinary sounding trig.
+//
+// Only the step-state changes: the trigger record already exists and keeps its
+// note, velocity, length and microtiming. The parameter locks the step carries
+// are stored elsewhere and are not touched, so they survive — we simply stop
+// telling the device to stay silent.
+function makeStepSound(p,track,step){
+  if(!p.triglessAt || !p.triglessAt[track]) return false;
+  const i=p.triglessAt[track].indexOf(step);
+  if(i<0) return false;
+  p.triglessAt[track].splice(i,1);
+  if(!p.triglessAt[track].length) delete p.triglessAt[track];
+  return true;
 }
 
 
@@ -4537,6 +4642,11 @@ function showHelp(){
             ${K('Send to device')} pushes it over Web MIDI — put the DN2 in SYSEX RECEIVE
             first.</li>
       </ol>
+      <p class="helpnote"><b>Two things about receiving.</b> A single-pattern dump can take several
+      seconds to start — the device appears to prepare the whole project either way, so a long pause
+      before the first bytes is normal, not a hung transfer. And receiving currently <b>replaces</b>
+      whatever is loaded in the editor: save your work before pulling a pattern off the device.</p>
+
       <p class="helpnote">Web MIDI needs Chrome (or another Chromium browser) on
       <b>https</b> or <b>localhost</b>. Firefox and Safari do not implement it; everything
       except send and receive still works.</p>
@@ -4557,8 +4667,11 @@ function showHelp(){
         <tr><td>${K('Save .syx')}</td><td>write the dump back to a file, repacked with correct
           checksums. Offers the whole project or the current pattern alone.</td></tr>
         <tr><td>${K('Send to device')}</td><td>send the current pattern or the whole project
-          back over Web MIDI. The DN2 must be in SYSEX RECEIVE mode. The dialog exposes a
-          <b>GAP</b> in milliseconds — raise it if a large dump loses trigs in transit.</td></tr>
+          back over Web MIDI. The DN2 must be in SYSEX RECEIVE mode.
+          <b>The pattern lands in the slot selected on the device</b> — this app cannot choose it,
+          so select the destination pattern on the DN2 first. A queue lands consecutively from
+          there. The dialog exposes a <b>GAP</b> in milliseconds — raise it if a large dump loses
+          trigs in transit.</td></tr>
         <tr><td>${K('Import…')} / ${K('Export…')}</td><td>.mid and .alc, per track. See
           <i>Import and export</i> below.</td></tr>
         <tr><td>${K('PATTERN')} / ${K('TRACK')}</td><td>pick the pattern to edit and which
@@ -4603,6 +4716,22 @@ function showHelp(){
         <tr><td><b>Inherit defaults</b></td><td>Note C5 (60), Velocity 100, Length 1/16 step.
           Leaving a field blank in the note editor uses these.</td></tr>
       </table>
+      <p class="helpnote" style="color:var(--trigless);border-left:2px solid var(--trigless);padding-left:8px">
+      <b>Back up your projects before you edit or send.</b> This app writes real
+      data to real hardware, and sending <b>overwrites the pattern currently selected on the
+      device</b> — the app cannot choose the slot, so whatever the DN2 is sitting on is what
+      gets replaced.
+      Dump your project to your computer first — from the device, or with
+      ${K('Get .syx from device')} followed by ${K('Save .syx')}.</p>
+
+      <p class="helpnote"><b>Disclaimer.</b> SYXGRID is an independent, experimental
+      tool. It is <b>not affiliated with, endorsed by, or supported by Elektron</b>.
+      The Digitone II SysEx format is undocumented and was reverse-engineered by
+      observation, so parts of it are still unknown. The software is provided
+      <b>as is, without warranty of any kind</b>, and its authors accept
+      <b>no liability</b> for lost patterns, projects or work. You use it at your
+      own risk — which is why the line above matters.</p>
+
       <p class="helpnote"><b>On parameter locks.</b> The Digitone II marks only one thing in the
       step itself: whether a trig <i>sounds</i>. So a <b>trigless</b> trig is identified reliably
       (it is the yellow one), but a p-locked trig that still plays its note is byte-identical to
@@ -4698,7 +4827,11 @@ function showHelp(){
           locks it carries are not decoded</td></tr>
         <tr><td>parameter locks</td><td>not decoded, and on a trig that still plays its note not
           even detectable — the step encodes only whether the trig sounds. Locked values sit in a
-          separate sparse table and are carried through untouched</td></tr>
+          separate sparse table and are carried through untouched.
+          <b>One consequence worth knowing:</b> a <b>retrig</b> set as a lock makes the device play
+          a step several times, and the editor cannot see it — so ${K('Export…')} writes a single
+          note for that step. Exports of retrigged patterns are not accurate. Nothing is lost in the
+          file itself.</td></tr>
         <tr><td>synth machine choice</td><td>${M('FM TONE',0)}, ${M('FM DRUM',2)},
           ${M('WAVETONE',1)} and ${M('SWARMER',3)} are identified, but their parameters live in
           preset data. Only audio ↔ ${M('MIDI',4)} can be changed.</td></tr>
@@ -5130,11 +5263,18 @@ function render(){
           const nn=notesFor(s);
           const devTrigless=!!(p.isTrigless&&p.isTrigless(t,s));
           const chord=nn.length>1?' chord':'';
-          // A trigless trig stores note 60 but never sounds it. Showing that
-          // note was the phantom C5 — present it as "no note" instead.
+          // A trigless trig stores a note but never sounds it. Showing that
+          // note as an ordinary note dot was the phantom C5. Showing NOTHING,
+          // though, hid the fact that the step carries a note at all — so an
+          // edit there looked like it had done nothing, which is half of why
+          // "edited notes are not received" was so hard to see. Show the note,
+          // in trigless yellow, and say plainly that it will not sound.
           if(devTrigless){
-            html+=`<td class="${cls.join(' ')}" title="${esc(`T${t} step ${s} — trigless trig: parameter automation, no note`)}" onclick="openNoteEditor(${t},${s})">`
-                + `<span class="ghost devtrigless"></span></td>`;
+            const lbl = nn.length
+              ? `T${t} step ${s} · ${nn.map(r=>noteName(r.note)).join(', ')} — TRIGLESS: stored but NOT played. Edit the note to make this step sound.`
+              : `T${t} step ${s} — trigless trig: parameter automation, no note`;
+            html+=`<td class="${cls.join(' ')} devtrigless" title="${esc(lbl)}" onclick="openNoteEditor(${t},${s})">`
+                + (nn.length?`<span class="dot notetrigless${chord}"></span>`:`<span class="ghost devtrigless"></span>`)+`</td>`;
             continue;
           }
           const tip=nn.length?`T${t} step ${s} · ${nn.map(r=>noteName(r.note)+(r.vel!==INHERIT?` v${r.vel}`:'')).join(', ')} — click to edit`
@@ -5350,7 +5490,7 @@ function showSendMenu(){
     '<div id="sendSingleControls">'+
       '<div class="ctl" style="margin-bottom:10px"><label style="font-size:11px;color:var(--muted)">SOURCE PATTERN</label><select id="sendPatSel">'+patOpts+'</select></div>'+
       '<div class="ctl" style="margin-bottom:10px"><label style="font-size:11px;color:var(--muted)">TRACK</label><select id="sendTrkSel">'+trkOpts+'</select></div>'+
-      '<div class="ctl" style="margin-bottom:10px"><label style="font-size:11px;color:var(--muted)">DESTINATION SLOT</label><select id="sendSlotSel">'+slotOpts+'</select></div>'+
+      '<div class="ctl" style="margin-bottom:10px;display:block"><label style="font-size:11px;color:var(--trigless)">DESTINATION</label>'+'<div class="helpnote" style="color:var(--trigless);border-left:2px solid var(--trigless);padding-left:8px;margin:4px 0 0">'+'The pattern lands in the slot <b>selected on the Digitone II</b> \u2014 this app cannot choose it. '+'<b>Select the destination pattern on the device first</b>, then send. '+'(Manual OS1.10D \u00a713.5.2: PATTERN stores a received pattern to the SELECTED pattern slot.)</div></div>'+'<select id="sendSlotSel" style="display:none">'+slotOpts+'</select>'+
     '</div>'+
     '<div id="sendMultiControls" style="display:none">'+
       '<div style="display:flex;gap:6px;margin-bottom:6px">'+
@@ -5361,11 +5501,11 @@ function showSendMenu(){
       '<div class="notelist" style="max-height:200px;overflow-y:auto;margin-bottom:10px">'+
         patOnly.map((p,i)=>{ const n=p.ok?(p.records?p.records.length:0):0; const emb=p.ok&&p.patternName?p.patternName:''; const has=p.ok&&Object.keys(p.tracks||{}).length; return '<label class="trkpick" style="cursor:pointer"><input type="checkbox" class="sendPatChk" value="'+i+'"'+(has?' checked':'')+'> <b>'+esc(p.slot||('P'+(i+1)))+'</b> <span>'+esc(emb||'')+'</span> <i>'+n+' trigs</i></label>'; }).join('')+
       '</div>'+
-      '<div class="ctl" style="margin-bottom:8px"><label style="font-size:11px;color:var(--muted)">DESTINATION</label>'+
-        '<label style="font-size:11px;margin-right:12px"><input type="radio" name="sendDestMode" value="own" checked onchange="onSendDestModeChange()"> Original slot</label>'+
-        '<label style="font-size:11px"><input type="radio" name="sendDestMode" value="seq" onchange="onSendDestModeChange()"> Sequential from\u2026</label>'+
-      '</div>'+
-      '<div class="ctl" id="sendStartSlotWrap" style="margin-bottom:8px;opacity:.4"><label style="font-size:11px;color:var(--muted)">START SLOT</label><select id="sendMultiStartSlot" disabled>'+slotOpts+'</select></div>'+
+      '<div class="ctl" style="margin-bottom:8px;display:block"><label style="font-size:11px;color:var(--trigless)">DESTINATION</label>'+
+        '<div class="helpnote" style="color:var(--trigless);border-left:2px solid var(--trigless);padding-left:8px;margin:4px 0 0">'+
+          'Patterns land consecutively from the slot <b>selected on the Digitone II</b> \u2014 this app cannot choose it. '+
+          '<b>Select the first destination pattern on the device</b>, then send.</div></div>'+
+      '<div id="sendStartSlotWrap" style="display:none"><input type="radio" name="sendDestMode" value="own" checked><select id="sendMultiStartSlot">'+slotOpts+'</select></div>'+
       '<div class="ctl" style="margin-bottom:8px"><label style="font-size:11px;color:var(--muted)">HANDSHAKE</label>'+
         '<label style="font-size:11px;margin-right:12px"><input type="radio" name="sendHandshake" value="fixed" checked onchange="onSendHandshakeChange()"> Fixed delay</label>'+
         '<label style="font-size:11px"><input type="radio" name="sendHandshake" value="ack" onchange="onSendHandshakeChange()"> Wait for device ACK</label>'+
@@ -5416,12 +5556,25 @@ async function sendPatternToPort(portIdx, pi, ti, di){
   try{
     // Build
     const bytes=buildSyxForPattern(p);
-    // Set destination slot
-    bytes[9]=di&0x7F;
-    recomputeChecksum(bytes); // recalc after slot change
+    // MAJOR BUG (v22.34): this used to write `bytes[9]=di` and recompute the
+    // checksum, presenting a "destination slot" the device does not honour.
+    //
+    // MANUAL (OS1.10D §13.5.2, p.77): "PATTERN will store a received pattern
+    // to the SELECTED pattern slot." Byte 9 does NOT place the pattern — the
+    // slot armed on the DEVICE does. The regression lab confirmed this on
+    // hardware on 2026-09-01: patterns sent "to C01..C04" all landed at the
+    // armed slot A01 onwards.
+    //
+    // So the picker was actively misleading: a user editing A01, sending it
+    // "to slot 5", and then checking slot 5 heard no change — while their
+    // edit had in fact overwritten whatever slot the device had selected.
+    // From the chair: "edited notes not received on HW".
+    //
+    // buildSyxForPattern leaves byte 9 at 0 deliberately; do not touch it.
     const kB=(bytes.length/1024).toFixed(1);
     slog('1 message · '+bytes.length+' bytes ('+kB+' kB)');
-    slog('Destination slot: '+((di>>4)&7?'Bank '+String.fromCharCode(65+(di>>4)):'Bank A')+'/'+String(di%16+1).padStart(2,'0')+' (slot '+di+')');
+    slog('\u26a0 Lands in the slot SELECTED ON THE DEVICE, not a slot chosen here.');
+    slog('   Select the destination pattern on the DN2 before sending.');
 
     // Round-trip verification: does the payload we're about to send reproduce
     // the device's own dump? (Slot + checksum are ignored by design.)
@@ -5569,14 +5722,17 @@ async function sendPatternSequence(portIdx, queue, opts){
       const nm=(p.slot||p.label||('P'+(pi+1)))+(p.patternName?' \u00b7 '+p.patternName:'');
       try{
         const bytes=buildSyxForPattern(p);
-        bytes[9]=di&0x7F;
-        recomputeChecksum(bytes);
+        // Byte 9 is NOT a destination (see sendPatternToPort). The device
+        // stores each received pattern to its currently SELECTED slot and
+        // advances from there, so a queue lands consecutively from whatever
+        // the DN2 is sitting on. Writing a slot here achieved nothing except
+        // making the log claim a destination that was not honoured.
         const rt=roundTripReport(p);
         if(!rt.ok && !rt.error) warned++;
         const flag=rt.error?' \u26a0(check skipped)':(rt.ok?'':' \u26a0('+rt.total+'B differ)');
         out.send(bytes);
         sent++;
-        slog('\u2192 #'+(k+1)+'/'+queue.length+'  '+nm+'  \u2192 slot '+slotLabel(di)+flag);
+        slog('\u2192 #'+(k+1)+'/'+queue.length+'  '+nm+flag);
       }catch(e){ failed++; slog('\u2717 #'+(k+1)+' '+nm+' \u2014 ERROR: '+(e.message||String(e))); }
 
       if(k<queue.length-1){

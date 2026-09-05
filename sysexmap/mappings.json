@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "mapVersion": "1.13.0",
-  "appVersion": "v22.33",
+  "appVersion": "v22.34",
   "generated": "2026-09-01",
   "device": {
     "name": "Elektron Digitone II",
@@ -68,15 +68,15 @@
     },
     {
       "id": "SLOT_BYTE",
-      "field": "Destination pattern slot on receive",
+      "field": "Slot index in a dumped pattern message (NOT a destination)",
       "space": "raw",
       "offset": 9,
-      "value": "0-127 (0 = A01 … 127 = H16)",
+      "value": "0-127 (0 = A01 … 127 = H16), as written BY the device in its own dumps",
       "confidence": "A",
-      "evidence": "Send path stamps this byte and the DN2 stores the pattern in the addressed slot; exercised by sequential send and the regression lab.",
+      "evidence": "In a whole-project dump the device writes byte 9 = the pattern's own slot index: A01->0, A02->1 ... verified across 116 patterns of FrozenPhotonsTest1.syx. It is descriptive on READ. On WRITE the device IGNORES it - see SYSEX_RECEIVE_SLOT. v22.34 removed the send path's slot stamping, which had produced a destination picker the hardware never honoured.",
       "constant": "—",
       "uncertain": false,
-      "note": "Must be written BEFORE recomputeChecksum(). buildSyxForPattern() always emits 0 here; the transport overwrites it."
+      "note": "Outside the checksum range [10,114113), so changing it does not invalidate the message. buildSyxForPattern() emits 0 and the transport must NOT overwrite it: stamping a slot here misleads the user into thinking they chose a destination."
     },
     {
       "id": "PACK_RANGE",
