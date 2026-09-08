@@ -384,6 +384,23 @@
                     BARS -- 16 steps is one bar. Every rung lands on an exact
                     LEN_STEPS code. Rungs are bold and cyan; the fine
                     intermediate values are muted and state their step count.
+  v22.36 2026-09-05 Send dialog cleaned up; site split public/dev.
+                  - The send dialog no longer offers "Diagnose step-state" or
+                    "Compare payloads". Both were DUPLICATES of entries in the
+                    dev-only Tools menu, and neither is part of sending.
+                    stepStateDiag()/comparePayloads()/roundTripReport() are all
+                    preserved -- TESTLAB.md requires them.
+                  - Deployment is now an explicit two-file split:
+                    index.html            = PUBLIC release build, Tools stripped,
+                                            indexable, VIZ_PUBLIC set.
+                    syxgridbeta1984.html  = DEV build, Tools menu intact,
+                                            noindex, for hardware testing.
+                    Previously the "staging" URL served the same stripped build
+                    as index.html, so there was no way to reach the dev tools
+                    online at all.
+                  - scripts/deploy_site.py builds and uploads both, and VERIFIES
+                    the served bytes: public must have no Tools button, dev must
+                    have one, and neither may contain credentials.
   v22.35 2026-09-05 MAJOR: the send dialog sent the WRONG PATTERN.
                   - ROOT CAUSE: two index conventions for one value. The send
                     dialog built its <option value> from the FILTERED list
@@ -1255,6 +1272,13 @@ table.names tr.act td.tn{font-weight:700}
 
 .status{padding:5px 12px;background:var(--panel);border-top:1px solid var(--border);
         font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;flex-shrink:0}
+/* Browser-regression banner. Hidden by default and only revealed by the
+   version check at the end of the script, so it disappears by itself the day
+   Chromium fixes this rather than needing anyone to remember to remove it. */
+.browserwarn{display:none;background:var(--danger);color:#000;font-weight:600;
+     font-size:12px;line-height:1.45;padding:9px 14px;text-align:center}
+.browserwarn a{color:#000;text-decoration:underline}
+.browserwarn code{background:rgba(0,0,0,.18);padding:1px 5px;border-radius:3px}
 .err{background:rgba(255,107,107,.12);border:1px solid var(--danger);color:var(--danger);
      padding:11px 14px;border-radius:7px;margin-bottom:14px}
 .legend{display:flex;gap:14px;font-size:10px;color:var(--muted);margin-top:9px;flex-wrap:wrap}
@@ -1379,6 +1403,14 @@ option:disabled{color:#39414f}
 </style>
 </head>
 <body>
+<div class="browserwarn" id="browserWarn">
+  <b>Chrome&nbsp;152 and Edge&nbsp;152 cannot receive SysEx dumps from a USB device on macOS.</b>
+  You are on <span id="bwVer">this version</span>, so <b>receiving will not work</b> — the device sends, and nothing arrives.
+  Sending to the device is unaffected, as is everything that does not touch MIDI.
+  Use <b>Brave&nbsp;151</b> or another Chromium browser still on 151, or
+  <a href="https://googlechromelabs.github.io/chrome-for-testing/" target="_blank" rel="noopener">Chrome&nbsp;for&nbsp;Testing&nbsp;151</a>.
+  This is a browser bug, not a fault in this app — Chrome&nbsp;151 works on the same machine and hardware.
+</div>
 
 <div class="toolbar">
   <!-- XRCST logotype, inlined as SVG so the app stays a single self-contained
@@ -1461,16 +1493,16 @@ option:disabled{color:#39414f}
 // ═══════════════════════════════════════════════════════════════════
 // Version — single source of truth (mirrored in the header changelog)
 // ═══════════════════════════════════════════════════════════════════
-const VIZ_VERSION = 'v22.35';
+const VIZ_VERSION = 'v22.36';
 const VIZ_DATE    = '2026-09-02';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v1.3';
+const VIZ_PUBLIC  = 'v1.4';
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'the send dialog sent the wrong pattern — every pattern selector now indexes PATTERNS, not the filtered list';
+const VIZ_NOTE    = 'payload diagnostics are dev-only; site split into public index.html and dev beta URL';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -5521,8 +5553,9 @@ function showSendMenu(){
     [
       {label:'Send', desc:'Repack and send (single or the whole queue).',
        fn:()=>{ startSendFromDialog(); }},
-      {label:'Diagnose step-state', desc:'Raw byte pairs per step \u2014 confirms odd 03 81 / even 03 91.', fn:()=>{ showStepStateDiag(); }},
-      {label:'Compare payloads (A vs B)', desc:'Byte-diff two loaded patterns \u2014 capture device truth vs app build.', fn:()=>{ showComparePicker(); }},
+      // v22.36: the two payload diagnostics were removed from the SEND dialog —
+      // they are developer tools, not part of sending, and both still live in
+      // the dev-only Tools menu (showToolsMenu, stripped from public builds).
       {label:'Cancel', desc:'', fn:()=>{ closeModal(); document.getElementById('sendBtn').disabled=false; }},
     ],
     '<div class="ctl" style="margin-bottom:10px"><label style="font-size:11px;color:var(--muted)">OUTPUT PORT</label><select id="sendPortSel">'+portOpts+'</select></div>'+
@@ -6813,6 +6846,24 @@ function verifyRoundTrip(){
     console.warn('Round-trip FAILED — edits may produce bad files');
 }
 
+// Chromium 152 regression: SysEx from a USB MIDI device never arrives, while
+// the same build receives SysEx fine through a virtual port and short messages
+// from the same device fine. Confirmed by bisection -- 151.0.7922.138 works,
+// 152.0.7977.82 does not, same Mac, same device, minutes apart. Affects Edge
+// identically because it is the same engine. Warn rather than let it look like
+// this app is broken, which is exactly how it presents.
+// Remove this block once a fixed Chromium ships and the range is known.
+(function(){
+  const m=/Chrom(?:e|ium)\/(\d+)/.exec(navigator.userAgent||'');
+  if(!m) return;                       // not Chromium: no Web MIDI at all anyway
+  const major=+m[1];
+  if(major<152) return;                // 151 and earlier are fine
+  const el=document.getElementById('browserWarn');
+  if(!el) return;
+  const v=document.getElementById('bwVer');
+  if(v) v.textContent='Chromium '+major;
+  el.style.display='block';
+})();
 document.getElementById('verBadge').textContent=versionLabel();
 document.getElementById('verBadge').title=`${VIZ_VERSION} (${VIZ_DATE}) — ${VIZ_NOTE}`;
 document.title=`SYXGRID ${versionLabel()} — Digitone II pattern editor`;

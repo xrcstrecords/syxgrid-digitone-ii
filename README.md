@@ -7,6 +7,27 @@ pattern grid — or talk to the hardware directly over Web MIDI.
 
 > https://syxgrid.xrcst.com
 
+
+> ## ⚠️ Chrome 152 / Edge 152 break SysEx receive on macOS
+>
+> **Receiving a dump from the device does not work in Chrome 152 or Edge 152.**
+> The device sends and nothing arrives. Sending *to* the device is unaffected,
+> as is everything that does not touch MIDI.
+>
+> **Use Brave 151, or any Chromium browser still on 151** — or
+> [Chrome for Testing 151](https://googlechromelabs.github.io/chrome-for-testing/),
+> which installs alongside your normal browser and does not auto-update.
+>
+> This is a browser regression, not a fault in this app: **Chrome 151.0.7922.138
+> works and 152.0.7977.82 does not**, on the same machine, same device, minutes
+> apart. Edge fails identically because it is the same engine. Windows is
+> unaffected. The app shows a banner if it detects an affected browser.
+>
+> Narrowed by bisection on 2026-09-08 against a Digitone II (OS 1.10E) and a
+> Digitakt II. SysEx through a *virtual* MIDI port works fine on 152, and short
+> messages from the same device arrive fine, so it is specific to reassembling
+> multi-packet SysEx from a USB source.
+
 ---
 
 ## What it does
@@ -201,6 +222,50 @@ after it stops being true.
 
 ---
 
+## Credits and prior work
+
+SYXGRID's decoding was derived independently from hardware captures, but it did
+not happen in a vacuum. Everything below either contributed code or shaped the
+work, and it is listed here because a format map that hides where it came from
+is worth less than one that shows its sources.
+
+**Code**
+
+- **[elk-herd](https://forge.glyphic.com/mark/elk-herd)** — Mark Lentczner.
+  BSD-2-Clause, Copyright (c) 2017 – 2025 Mark Lentczner. Its Elektron 7-bit
+  SysEx codec and `F0 00 20 3C` framing were ported to Python for this
+  project's research tooling — device-agnostic parts only, since elk-herd does
+  not support the Digitone family. **No elk-herd-derived code is in the editor
+  itself**; the port lives in the development repository's research tree.
+
+**Inspiration and reference** — no code taken, but each of these informed the
+work:
+
+- **[digi-roll](https://github.com/zooloo303/digi-roll)** — zooloo303. Its
+  [DN2 pattern-format documentation](https://github.com/zooloo303/digi-roll/blob/main/docs/dn2-pattern-format.md)
+  is the most thorough public description of this format anywhere, and it
+  reaches past where this project had got: the p-lock pool with a measured
+  paramId table, trig conditions, swing, and the fact that velocity, length and
+  micro-timing are stored per *note* rather than per trig. Found late, after
+  most of the reverse engineering here was already done — but it helped
+  enormously, and several things listed below as limitations are fixable
+  because of it.
+- **[digitone-syx-toolkit](https://github.com/emnyeca/digitone-syx-toolkit)** —
+  emnyeca. Used as a cross-reference while checking step-word encodings.
+- **[dn-deobfuscator](https://github.com/zerubeus/dn-deobfuscator)** — zerubeus.
+  Consulted during the `.dn2prj` project-file research.
+- **[libanalogrytm](https://github.com/bsp2/libanalogrytm)** — bsp2. Reference
+  for Elektron container structure and checksums.
+- **[elektroid](https://github.com/dagargo/elektroid)** — David García Goñi.
+  Reference for Elektron device transfer over USB.
+- The **Elektronauts** [Digitone 2 pattern manager thread](https://www.elektronauts.com/t/digitone-2-pattern-manager/253425)
+  — community groundwork on Web MIDI and dump sizes.
+
+Where this project and another disagree, the disagreement is noted in
+`sysexmap/` with the evidence, rather than quietly resolved in one direction.
+
+---
+
 ## Licence
 
 | | |
@@ -228,7 +293,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v22.35)`, so any copy of the file can be traced back to the
+`v0.1 (dev v22.36)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md).

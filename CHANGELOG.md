@@ -10,6 +10,32 @@ it was built from.
 
 ---
 
+## v1.4 — warns you when your browser can't receive
+
+### Chrome 152 and Edge 152 cannot receive dumps on macOS
+
+If you are on **Chrome 152 or Edge 152 on macOS**, receiving a dump from the
+Digitone II does not work. The device sends, the transfer light blinks, and
+nothing arrives. Sending *to* the device still works, and so does everything
+that does not touch MIDI.
+
+**This is a bug in the browser, not in the editor.** Chrome 151 works on the
+same machine, with the same Digitone II, minutes apart. Edge fails in exactly
+the same way because it is the same engine underneath. Windows is unaffected.
+
+**What to do:** use **Brave**, or any Chromium browser still on 151. If you
+would rather not change browsers, [Chrome for Testing 151](https://googlechromelabs.github.io/chrome-for-testing/)
+installs alongside your normal Chrome and does not auto-update.
+
+The editor now shows a red banner when it detects an affected browser, so you
+find out before a transfer silently fails rather than after. If you are on a
+working browser you will never see it.
+
+Nothing else changed in this release. There was no way to fix this from inside
+the app — the only honest thing it can do is tell you.
+
+---
+
 ## v1.3 — the editor now sends the pattern you edited
 
 ### Fixed: the wrong pattern was sent to the device
