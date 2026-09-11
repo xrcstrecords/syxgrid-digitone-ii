@@ -6,12 +6,26 @@
   Pattern and sequence editor for the Elektron Digitone II.
   ══════════════════════════════════════════════════════════════════════
 
-  Copyright (c) 2026 XRCST — https://syxgrid.xrcst.com
-  Licensed under the MIT License.
+  Copyright (C) 2026 XRCST — https://syxgrid.xrcst.com
+
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or (at
+  your option) any later version. This program is distributed WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE — see the GNU Affero General Public License, in
+  the LICENSE file or at <https://www.gnu.org/licenses/>, for details.
+
+  Relicensed from MIT to AGPLv3 in v22.46 (2026-09-11) — see CHANGELOG.md.
+  Every earlier tagged version remains available under MIT; this and every
+  later version is AGPLv3 only.
 
   This notice lives INSIDE the file on purpose: the editor travels as a
   single loose HTML document, so a LICENSE file sitting beside it in a
   repository is lost the first time somebody emails a copy to a friend.
+  AGPLv3 §13 applies to this app as deployed at https://syxgrid.xrcst.com —
+  the "GitHub" button in the toolbar IS the required Source link; it must
+  keep pointing at the actual source of whatever version is running there.
 
   The DN2 SysEx format documentation (sysexmap/) is a separate work,
   licensed CC BY 4.0 — see sysexmap/LICENSE.
@@ -384,6 +398,47 @@
                     BARS -- 16 steps is one bar. Every rung lands on an exact
                     LEN_STEPS code. Rungs are bold and cyan; the fine
                     intermediate values are muted and state their step count.
+  v22.46 2026-09-11 Relicensed from MIT to AGPLv3.
+                  - The app is AGPLv3 from this version on; every tagged
+                    release through v22.37 remains available under MIT,
+                    unaffected retroactively. sysexmap/ stays CC BY 4.0 --
+                    unrelated to this change: the format knowledge is meant
+                    to spread into closed tools too, the editor no longer is.
+                  - Why: MIT let a fork close the source and sell it, with no
+                    obligation to share changes back. AGPLv3 additionally
+                    closes the gap plain GPL leaves open for a browser app --
+                    a modified version run as a hosted service is treated the
+                    same as a distributed copy (S13), so "fork it, host it as
+                    a paid closed product" now carries the same
+                    source-sharing obligation shipping a file would.
+                  - The GitHub button already in the toolbar is now also the
+                    AGPLv3 S13 compliance mechanism for this app's own
+                    deployment at syxgrid.xrcst.com -- it must keep pointing
+                    at the actual source of whatever version is running
+                    there. Nothing else in the UI needed to change.
+                  - LICENSE carries the unmodified canonical AGPLv3 text
+                    (verified byte-for-byte against gnu.org/licenses/agpl-3.0.txt)
+                    plus the project's own filled-in notice below it --
+                    AGPLv3 forbids altering the licence text itself.
+                  - Version jumps v22.37 -> v22.46, not v22.38: this repo
+                    shares one version line across branches (see ROADMAP.md),
+                    and v22.38-v22.45 are already the syxgrid2 feature
+                    branch's own dev history under different, unmerged
+                    content. Reusing one of those numbers for different
+                    content on main would recreate the exact numbering
+                    collision this project was set up to avoid.
+  v22.37 2026-09-08 Warns on Chromium 152+, which cannot receive dumps.
+                  - Chrome 152.0.7977.82 never delivers a multi-packet SysEx
+                    dump from a USB MIDI device on macOS. 151.0.7922.138 works
+                    on the same machine, same Digitone II, minutes apart. Edge
+                    fails identically; Windows is unaffected; SysEx over a
+                    VIRTUAL port arrives intact even on 152.
+                  - Nothing here can fix a browser bug, so the app says so: a
+                    red banner, shown only when the Chromium major is >= 152.
+                    Brave 151 or Chrome for Testing 151 both work.
+                  - The gate is >= and not == 152 deliberately: until the
+                    regression is known fixed, a later version is more likely
+                    to still carry it than not.
   v22.36 2026-09-05 Send dialog cleaned up; site split public/dev.
                   - The send dialog no longer offers "Diagnose step-state" or
                     "Compare payloads". Both were DUPLICATES of entries in the
@@ -1493,16 +1548,16 @@ option:disabled{color:#39414f}
 // ═══════════════════════════════════════════════════════════════════
 // Version — single source of truth (mirrored in the header changelog)
 // ═══════════════════════════════════════════════════════════════════
-const VIZ_VERSION = 'v22.36';
-const VIZ_DATE    = '2026-09-02';
+const VIZ_VERSION = 'v22.46';
+const VIZ_DATE    = '2026-09-11';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v1.4';
+const VIZ_PUBLIC  = 'v1.5';
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'payload diagnostics are dev-only; site split into public index.html and dev beta URL';
+const VIZ_NOTE    = 'relicensed from MIT to AGPLv3 — every tagged release through v22.37 remains MIT';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants

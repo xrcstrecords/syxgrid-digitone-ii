@@ -270,18 +270,29 @@ Where this project and another disagree, the disagreement is noted in
 
 | | |
 |---|---|
-| The application | **MIT** — see [`LICENSE`](LICENSE) |
+| The application | **AGPLv3** — see [`LICENSE`](LICENSE) (MIT through v22.37) |
 | `sysexmap/` documentation | **CC BY 4.0** — see [`sysexmap/LICENSE`](sysexmap/LICENSE) |
 
 ```
-Copyright (c) 2026 XRCST — https://syxgrid.xrcst.com
+Copyright (C) 2026 XRCST — https://syxgrid.xrcst.com
 ```
 
 The split is deliberate. Creative Commons
 [recommends against using CC licences for software](https://creativecommons.org/faq/#can-i-apply-a-creative-commons-license-to-software)
 — they carry no patent grant, no source/binary distinction and no warranty
-disclaimer — so the program is MIT. The format map is a documentation work, and
-CC BY is the right fit there. Both require attribution.
+disclaimer — so the program uses a proper software licence and the format map
+stays CC BY, the right fit for a documentation work. Both require attribution.
+
+The application relicensed from MIT to AGPLv3 as of v22.46 (see
+[`CHANGELOG.md`](CHANGELOG.md)): any modified version run as a network
+service — including a fork deployed as a hosted, closed-source product —
+must offer its users the modified source, not just a copy handed out on
+request. Every tagged release through v22.37 remains available under MIT;
+that permission is not retroactively withdrawn, only not extended forward.
+
+AGPLv3 §13 applies to this app as deployed at https://syxgrid.xrcst.com: the
+**GitHub** button in the toolbar is the required Source link for anyone
+interacting with the live site.
 
 The editor travels as a single loose HTML file, so the copyright notice lives
 **inside the file** as well as here — email it to someone and the attribution
@@ -293,7 +304,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v22.36)`, so any copy of the file can be traced back to the
+`v0.1 (dev v22.46)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md).

@@ -5,8 +5,8 @@ Copyright (c) 2026 XRCST — https://syxgrid.xrcst.com
 This licence covers the Digitone II SysEx format documentation in this
 directory: `mappings.json`, `SYSEXMAP.md`, and the prose describing the
 format. The scripts in this directory (`build_map.js`, `probe_mappings.js`,
-`test_map_sync.js`) are software and are covered by the MIT licence in the
-repository root.
+`test_map_sync.js`) are software and are covered by the AGPLv3 licence in the
+repository root (MIT through v22.44; see the root LICENSE and CHANGELOG.md).
 
 
 ATTRIBUTION
