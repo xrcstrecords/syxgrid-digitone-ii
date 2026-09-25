@@ -10,6 +10,61 @@ it was built from.
 
 ---
 
+## v1.5 — the editor is now AGPLv3
+
+### The licence changed: MIT → AGPLv3
+
+**Nothing changes if you just use the editor.** Open it, load a dump, edit,
+save, send it to your Digitone II — exactly as before. No feature is gated, and
+there is nothing new to agree to.
+
+This matters if you **fork it, or host a modified copy for other people**.
+
+Under MIT, anyone could take this editor, change it, close the source and sell
+it as a hosted product without sharing anything back. AGPLv3 closes that off —
+and in particular it closes the gap plain GPL leaves open for a browser app:
+under §13, running a modified version **as a network service** counts the same
+as handing someone a copy. Either way, the people using it are owed an offer of
+your modified source.
+
+So — fork it, change it, host it, charge for it: all still allowed. Doing that
+without publishing your changes is not.
+
+**Earlier versions are unaffected.** Every tagged release through **v22.37**
+remains available under MIT. That permission has not been withdrawn
+retroactively, only not extended forward: this release and every later one are
+AGPLv3. (The dev numbers between v22.37 and v22.46 belong to a separate
+development branch and were never released publicly.)
+
+### The format documentation stays CC BY 4.0
+
+`sysexmap/` — the documented SysEx mappings and the evidence behind them — is
+deliberately untouched by this, and stays CC BY 4.0. That knowledge is meant to
+spread, including into closed-source tools. The editor is what became copyleft;
+the format map did not.
+
+### Where the licence lives
+
+- `LICENSE` carries the full, unaltered AGPLv3 text, with this project's own
+  copyright notice below it.
+- The notice is also **inside `sysex-visualiser.html`**, as it always has been.
+  The file travels on its own, so a LICENSE sitting beside it in a repository is
+  lost the first time somebody emails a copy to a friend.
+- On the hosted editor at https://syxgrid.xrcst.com, the **GitHub** button in
+  the toolbar is the source link §13 requires.
+
+### Nothing else changed
+
+No functional code changed in this release. The only executable difference from
+v1.4 is the version string itself — parser, encoder, grid and MIDI transport are
+byte-identical.
+
+The Chrome 152 / Edge 152 receive problem described under v1.4 still applies,
+and the editor still warns you about it. That is a browser regression, and
+nothing in this release could fix it.
+
+---
+
 ## v1.4 — warns you when your browser can't receive
 
 ### Chrome 152 and Edge 152 cannot receive dumps on macOS
