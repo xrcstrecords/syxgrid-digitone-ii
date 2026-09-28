@@ -684,6 +684,12 @@ Section 13 of this License applies to https://syxgrid.xrcst.com — the "GitHub"
 button in the app's own toolbar is that Source link, and it must keep pointing
 at the actual source of whatever version is running there.
 
+Licence history: this program was under MIT through v22.37 and was relicensed
+to the GNU Affero General Public License v3 in v22.46 (2026-09-11). Every
+tagged release through v22.37 remains available under MIT — that permission is
+not withdrawn retroactively, only not extended forward. This and every later
+version is AGPLv3 only.
+
 ---
 
 The format documentation in `sysexmap/` is NOT covered by this licence.
