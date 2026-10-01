@@ -398,6 +398,10 @@
                     BARS -- 16 steps is one bar. Every rung lands on an exact
                     LEN_STEPS code. Rungs are bold and cyan; the fine
                     intermediate values are muted and state their step count.
+  v22.47 2026-10-01 The Chromium SysEx banner shows on 152 only.
+                  - Chromium 153 and later receive SysEx again (operator,
+                    2026-10-01), so the banner no longer shows there, and on
+                    152 it says to update. Nothing else changes.
   v22.46 2026-09-11 Relicensed from MIT to AGPLv3.
                   - The app is AGPLv3 from this version on; every tagged
                     release through v22.37 remains available under MIT,
@@ -1462,9 +1466,8 @@ option:disabled{color:#39414f}
   <b>Chrome&nbsp;152 and Edge&nbsp;152 cannot receive SysEx dumps from a USB device on macOS.</b>
   You are on <span id="bwVer">this version</span>, so <b>receiving will not work</b> — the device sends, and nothing arrives.
   Sending to the device is unaffected, as is everything that does not touch MIDI.
-  Use <b>Brave&nbsp;151</b> or another Chromium browser still on 151, or
-  <a href="https://googlechromelabs.github.io/chrome-for-testing/" target="_blank" rel="noopener">Chrome&nbsp;for&nbsp;Testing&nbsp;151</a>.
-  This is a browser bug, not a fault in this app — Chrome&nbsp;151 works on the same machine and hardware.
+  <b>Update to Chromium&nbsp;153 or later</b>, which receives again, or use a Chromium browser still on 151.
+  This is a browser bug, not a fault in this app.
 </div>
 
 <div class="toolbar">
@@ -1548,8 +1551,8 @@ option:disabled{color:#39414f}
 // ═══════════════════════════════════════════════════════════════════
 // Version — single source of truth (mirrored in the header changelog)
 // ═══════════════════════════════════════════════════════════════════
-const VIZ_VERSION = 'v22.46';
-const VIZ_DATE    = '2026-09-11';
+const VIZ_VERSION = 'v22.47';
+const VIZ_DATE    = '2026-10-01';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
@@ -1557,7 +1560,7 @@ const VIZ_PUBLIC  = 'v1.5';
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'relicensed from MIT to AGPLv3 — every tagged release through v22.37 remains MIT';
+const VIZ_NOTE    = 'the Chromium SysEx banner shows on 152 only — 153 receives again';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -6907,12 +6910,13 @@ function verifyRoundTrip(){
 // 152.0.7977.82 does not, same Mac, same device, minutes apart. Affects Edge
 // identically because it is the same engine. Warn rather than let it look like
 // this app is broken, which is exactly how it presents.
-// Remove this block once a fixed Chromium ships and the range is known.
+// FIXED IN 153 (operator, 2026-10-01: Chromium 153+ receives SysEx again), so
+// the range is known and the warning is for 152 alone.
 (function(){
   const m=/Chrom(?:e|ium)\/(\d+)/.exec(navigator.userAgent||'');
   if(!m) return;                       // not Chromium: no Web MIDI at all anyway
   const major=+m[1];
-  if(major<152) return;                // 151 and earlier are fine
+  if(major!==152) return;              // 151 and earlier, and 153 and later, are fine
   const el=document.getElementById('browserWarn');
   if(!el) return;
   const v=document.getElementById('bwVer');

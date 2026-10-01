@@ -8,25 +8,12 @@ pattern grid — or talk to the hardware directly over Web MIDI.
 > https://syxgrid.xrcst.com
 
 
-> ## ⚠️ Chrome 152 / Edge 152 break SysEx receive on macOS
+> ## ⚠️ Chrome 152 / Edge 152 break SysEx receive on macOS — fixed in 153
 >
-> **Receiving a dump from the device does not work in Chrome 152 or Edge 152.**
-> The device sends and nothing arrives. Sending *to* the device is unaffected,
-> as is everything that does not touch MIDI.
->
-> **Use Brave 151, or any Chromium browser still on 151** — or
-> [Chrome for Testing 151](https://googlechromelabs.github.io/chrome-for-testing/),
-> which installs alongside your normal browser and does not auto-update.
->
-> This is a browser regression, not a fault in this app: **Chrome 151.0.7922.138
-> works and 152.0.7977.82 does not**, on the same machine, same device, minutes
-> apart. Edge fails identically because it is the same engine. Windows is
-> unaffected. The app shows a banner if it detects an affected browser.
->
-> Narrowed by bisection on 2026-09-08 against a Digitone II (OS 1.10E) and a
-> Digitakt II. SysEx through a *virtual* MIDI port works fine on 152, and short
-> messages from the same device arrive fine, so it is specific to reassembling
-> multi-packet SysEx from a USB source.
+> **Receiving a dump from the device does not work in Chrome 152 or Edge 152**
+> on macOS: the device sends and nothing arrives. Sending *to* the device is
+> unaffected. **Chromium 153 and later receive again** — update, or use a
+> Chromium browser still on 151. The app shows a banner on 152 only.
 
 ---
 
@@ -304,7 +291,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v22.46)`, so any copy of the file can be traced back to the
+`v0.1 (dev v22.47)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md).
