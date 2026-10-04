@@ -10,6 +10,58 @@ it was built from.
 
 ---
 
+## v2.0 — whole projects: the sequence, the sounds and the +Drive
+
+v1 edited the sequencer of one pattern from a SysEx dump. v2 works on the whole
+project.
+
+### Projects in and out
+
+- **Read a project straight off the +Drive**, in seconds: Device Read → +Drive
+  read → Quick index, pick one, Read project. Nothing on the device changes.
+- **Write a whole project back** into a +Drive slot (Device Write → A whole
+  project). It is read back and verified; a project it replaces is saved to your
+  computer first.
+- **Send patterns into the slots you choose**, or into the pattern playing now.
+- **Backup** saves every project on the +Drive as one `.zip`; **Restore** puts
+  them back. The **+Drive** button manages projects, kits and presets.
+- Opens `.dn2prj` files from Transfer, projects from OS 1.10E, 1.11 and 1.12, and
+  Digitone I projects (converted the way the device converts them).
+- Every read and write shows a progress bar.
+
+### Editing
+
+- **Sounds**: every preset page the device shows, with knobs; swap and save
+  presets; a MIDI clip into a preset's arp.
+- **P-locks**, decoded and editable, with lanes you can open as curves.
+- **Trig conditions, probability, fills, retrigs and preset locks.**
+- **Kits**: the Kit tab, kit setup (levels, layering, voices), FX and mixer.
+- **Keyboard setup, scales and chord memory**; a click can place a chord from
+  the pattern's scale, voice-led from the previous trig; transpose.
+- Copy, paste and swap tracks across patterns; clickable mutes.
+- **100 levels of undo**, across patterns.
+
+### MIDI and the DAW
+
+- Export `.mid` or Ableton `.alc` with p-locks as CC, trig conditions played
+  out, retrigs as notes, probability kept (`.alc`), or all 16 tracks in one
+  type-1 file. Import brings probability back from Live.
+
+### Also new
+
+- **Live Control** (off by default): knob moves both ways, and the step the
+  device is playing lit on screen.
+- A light theme, a rewritten Help, and a toolbar that fits one row.
+
+### Good to know
+
+- Back up before writing to the device — the Backup button does it in one go.
+- Talking to the device needs Chrome, Edge, Brave or Opera.
+- Found a bug? Help → Report a bug… opens a GitHub issue with your version and
+  browser ready to paste.
+
+---
+
 ## v1.4 — warns you when your browser can't receive
 
 ### Chrome 152 and Edge 152 cannot receive dumps on macOS

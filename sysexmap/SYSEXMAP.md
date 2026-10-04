@@ -1,6 +1,6 @@
 # DN2 SysEx Mapping Reference
 
-**Map version 1.13.0** · generated from `mappings.json` for app **v22.47** (2026-09-01)
+**Map version 1.13.0** · generated from `mappings.json` for app **v24.20** (2026-09-01)
 
 > Generated file — do not edit by hand. Edit `mappings.json` and run `node sysexmap/build_map.js`.
 
@@ -78,7 +78,7 @@ raw message  ──unpack7(msg, 10, 114113)──▶  decoded payload
 | **Record byte 3 — velocity** | `decoded` | `TRIG_BASE + 6*i + 3` | 0-127, or 0xFF = inherit track default | 🟢 A | `INHERIT` |
 | **Record byte 4 — length** | `decoded` | `TRIG_BASE + 6*i + 4` | index into LEN_LABEL/LEN_STEPS, or 0xFF = inherit | 🟢 A | `INHERIT` |
 | **Record byte 5 — unknown** | `decoded` | `TRIG_BASE + 6*i + 5` | signed 8-bit two's complement, unit 1/384 note, range -23..+23, centre 0x00 | 🟢 A | `—` |
-| **End of record list** | `decoded` | `first unused record slot` | a slot is EMPTY when its IDENTITY fields (track, step, note = bytes 0,1,2) are all 0xFF; skip it and continue scanning | 🟢 A | `—` |
+| **Free record slot** | `decoded` | `any record slot` | a slot is FREE when its TRACK byte (byte 0) is 0xFF; skip it and continue scanning. Nothing terminates the table - it is a fixed array of 8192 slots. | 🟢 A | `—` |
 | **Chord record ordering** | `decoded` | `TRIG_BASE` | all primaries first, then all chord extras | 🟢 A | `buildSyxForPattern()` |
 | **Pattern name** ⚠️ | `decoded` | `88788` | 16 bytes, null-padded ASCII | 🟡 C | `PAT_NAME_OFFSET / NAME_LEN` |
 | **Kit name** | `decoded` | `89096` | 16 bytes, null-padded ASCII | 🔵 B | `KIT_NAME_OFFSET` |
@@ -209,12 +209,12 @@ raw message  ──unpack7(msg, 10, 114113)──▶  decoded payload
 - **Evidence:** Three device dumps (microtest1, microtestchords, microtestchords2) with microtiming set by hand on the DN2. All 12 requested values decoded exactly: 0->0x00, +23->0x17, -23->0xE9, +12->0x0C, -12->0xF4, +4->0x04, -4->0xFC, +1->0x01. A dead-centre control track in the same dump read 0x00 on every record, and a full block diff showed byte 6 as the only difference between the offset track and the control track.
 - **Note:** PER-RECORD, not per-step: two notes on the SAME step can carry different offsets, which is how chord strum is stored (proven in microtestchords2: step 1 holds C5 at -23 and C6 at +23). The 7x128 per-track lane region stayed entirely 0xFF in every microtiming dump, ruling out a per-step lane. One 16th step = 24 ticks, so +-23 nudges almost a full step without reaching it.
 
-#### End of record list
+#### Free record slot
 
-- **Where:** `decoded` offset `first unused record slot`
-- **Value:** a slot is EMPTY when its IDENTITY fields (track, step, note = bytes 0,1,2) are all 0xFF; skip it and continue scanning
-- **Evidence:** v22.13. The old rule ('first five bytes 0xFF ends the record list') is WRONG in two ways, both proven by device dumps. (1) It ends the scan too early on a legitimate record: vel and len may BOTH be INHERIT (0xFF), making a live record read 0xFF in fields 3 and 4. (2) The DN2 leaves DELETED slots BETWEEN live records - identity fields blanked but byte 6 (microtiming) left stale - so a rule that BREAKS rather than CONTINUES loses every record after the first gap. In microtestchords the strum dump has deleted slots at positions 4-7 with track 2's records after them; breaking there made track 2 look recordless, which was written up as real device state before the occupancy invariant caught it.
-- **Note:** Do NOT break on a blank slot - CONTINUE. When rebuilding an unedited pattern, replay the original slot table verbatim so the gaps survive; compacting them changes bytes in a file that was only read.
+- **Where:** `decoded` offset `any record slot`
+- **Value:** a slot is FREE when its TRACK byte (byte 0) is 0xFF; skip it and continue scanning. Nothing terminates the table - it is a fixed array of 8192 slots.
+- **Evidence:** v22.40, measured over nine .dn2prj projects and their SysEx dumps. Deleting a record stamps 0xFF over the TRACK byte only and leaves the rest of the slot as it was, so free slots read `ff 3f 45 64 33 00` as readily as `ff ff ff ff ff ff`, and a table that was never used is filled with `ff 00 00 00 00 00`. The previous rule - track, step AND note all 0xFF (v22.13) - was right about the two things it was written to fix, but still too narrow: it turned every partially-blanked slot into a phantom record on track 256, 62,951 of them in testlab/RPC/DN2-dump-20260829-2054.syx. Under the track-byte rule, no record in any corpus project names a track outside 1..16 or a step outside 1..128. The two facts the old rule encoded still hold and still matter: vel and len may BOTH be INHERIT (0xFF) on a LIVE record, so bytes 3-4 say nothing about occupancy; and deleted slots sit BETWEEN live records - in microtestchords the strum dump has them at positions 4-7 with track 2's records after - so a rule that BREAKS rather than CONTINUES loses every record after the first gap.
+- **Note:** Do NOT break on a free slot - CONTINUE. A live record's track byte is 0..15, so this rule cannot drop real data. When rebuilding an unedited pattern, replay the original slot table verbatim so the gaps survive; compacting them changes bytes in a file that was only read.
 
 #### Chord record ordering
 

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "mapVersion": "1.13.0",
-  "appVersion": "v22.47",
+  "appVersion": "v24.20",
   "generated": "2026-09-01",
   "device": {
     "name": "Elektron Digitone II",
@@ -291,15 +291,15 @@
     },
     {
       "id": "TRIG_TERMINATOR",
-      "field": "End of record list",
+      "field": "Free record slot",
       "space": "decoded",
-      "offset": "first unused record slot",
-      "value": "a slot is EMPTY when its IDENTITY fields (track, step, note = bytes 0,1,2) are all 0xFF; skip it and continue scanning",
+      "offset": "any record slot",
+      "value": "a slot is FREE when its TRACK byte (byte 0) is 0xFF; skip it and continue scanning. Nothing terminates the table - it is a fixed array of 8192 slots.",
       "confidence": "A",
-      "evidence": "v22.13. The old rule ('first five bytes 0xFF ends the record list') is WRONG in two ways, both proven by device dumps. (1) It ends the scan too early on a legitimate record: vel and len may BOTH be INHERIT (0xFF), making a live record read 0xFF in fields 3 and 4. (2) The DN2 leaves DELETED slots BETWEEN live records - identity fields blanked but byte 6 (microtiming) left stale - so a rule that BREAKS rather than CONTINUES loses every record after the first gap. In microtestchords the strum dump has deleted slots at positions 4-7 with track 2's records after them; breaking there made track 2 look recordless, which was written up as real device state before the occupancy invariant caught it.",
+      "evidence": "v22.40, measured over nine .dn2prj projects and their SysEx dumps. Deleting a record stamps 0xFF over the TRACK byte only and leaves the rest of the slot as it was, so free slots read `ff 3f 45 64 33 00` as readily as `ff ff ff ff ff ff`, and a table that was never used is filled with `ff 00 00 00 00 00`. The previous rule - track, step AND note all 0xFF (v22.13) - was right about the two things it was written to fix, but still too narrow: it turned every partially-blanked slot into a phantom record on track 256, 62,951 of them in testlab/RPC/DN2-dump-20260829-2054.syx. Under the track-byte rule, no record in any corpus project names a track outside 1..16 or a step outside 1..128. The two facts the old rule encoded still hold and still matter: vel and len may BOTH be INHERIT (0xFF) on a LIVE record, so bytes 3-4 say nothing about occupancy; and deleted slots sit BETWEEN live records - in microtestchords the strum dump has them at positions 4-7 with track 2's records after - so a rule that BREAKS rather than CONTINUES loses every record after the first gap.",
       "constant": "—",
       "uncertain": false,
-      "note": "Do NOT break on a blank slot - CONTINUE. When rebuilding an unedited pattern, replay the original slot table verbatim so the gaps survive; compacting them changes bytes in a file that was only read."
+      "note": "Do NOT break on a free slot - CONTINUE. A live record's track byte is 0..15, so this rule cannot drop real data. When rebuilding an unedited pattern, replay the original slot table verbatim so the gaps survive; compacting them changes bytes in a file that was only read."
     },
     {
       "id": "TRIG_ORDER",
