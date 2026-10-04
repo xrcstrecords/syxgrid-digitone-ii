@@ -967,6 +967,9 @@ select.mini{background:var(--panel2);color:var(--fg);border:1px solid var(--bord
        font-size:10px;color:var(--muted);line-height:1.5}
 .rxlog div{white-space:nowrap}
 #midiBadge{color:var(--vel);border-color:var(--vel)}
+.toolbar > button.midipill{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:var(--muted)}
+.toolbar > button.midipill.midiok{color:var(--vel);border-color:color-mix(in srgb,var(--vel) 55%,var(--border))}
+.toolbar > button.midipill.midibad{color:#ff6b6b;border-color:#c62828}
 input[type=number],input.nname{background:var(--panel);color:var(--fg);border:1px solid var(--border);
   padding:4px 7px;border-radius:4px;font-size:12px;font-family:ui-monospace,Menlo,monospace}
 .noterow input.nname{width:56px;color:var(--note)}
@@ -1053,6 +1056,7 @@ option:disabled{color:var(--opt-off)}
   <button id="sendBtn" onclick="showSendMenu()" style="display:none" title="send the current pattern or whole project to the Digitone II over Web MIDI" disabled>Send to device</button>
   <span class="spacer"></span>
   <span class="dev" id="midiBadge" style="display:none">◉ MIDI</span>
+  <button id="midiPortBtn" class="midipill" onclick="showMidiPorts()" title="the MIDI port every read, write and +Drive operation uses: click to choose">MIDI</button>
   <span class="demobadge" id="demoBadge" style="display:none">DEMO<button class="demoreset" onclick="loadDemo()" title="discard changes and reload the pristine demo">reload</button></span>
   <span class="dev filebadge" id="fileBadge">no file</span>
   <button onclick="window.open('https://xrcst.com/support/index.html','_blank','noopener')" title="support this project">Support Me</button>
@@ -1127,12 +1131,12 @@ function setTheme(t){
 function toggleTheme(){ setTheme(currentTheme() === 'light' ? 'dark' : 'light'); }
 document.addEventListener('DOMContentLoaded', themeLabel);
 
-const VIZ_VERSION = 'v24.20';
+const VIZ_VERSION = 'v24.21';
 const VIZ_DATE    = '2026-10-04';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v2.0';
+const VIZ_PUBLIC  = 'v2.1';
 // v24.20 (the operator): bugs go to GitHub's issue tracker. reportBug() copies
 // the facts a report needs -- version, browser, what is loaded -- and opens the
 // bug-report form (.github/ISSUE_TEMPLATE/bug_report.md) to paste them into.
@@ -1158,7 +1162,7 @@ async function reportBug(){
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'report a bug from Help';
+const VIZ_NOTE    = 'one MIDI port for everything';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -14633,6 +14637,78 @@ const MSG_PATTERN = 0x50, MSG_TRAILER = 0x54;
 const PATTERN_BYTES = 114118;
 
 let MIDI_ACCESS=null, MIDI_INPUT=null;
+// v24.21 (the operator): ONE MIDI port choice for the whole app. Every read,
+// write, +Drive operation and Live Control uses it, and every dialog's own
+// port lists start from it (and change it when changed there). Unset = auto:
+// the first port whose name contains "Digitone". Remembered in this browser.
+let MIDI_PIN = (() => { try{ return JSON.parse(localStorage.getItem('syxgrid.midiPort') || 'null'); }catch(e){ return null; } })();
+function midiPinSave(p){
+  MIDI_PIN = p && (p.out || p.in) ? {out: p.out || '', in: p.in || ''} : null;
+  try{ MIDI_PIN ? localStorage.setItem('syxgrid.midiPort', JSON.stringify(MIDI_PIN)) : localStorage.removeItem('syxgrid.midiPort'); }catch(e){}
+  midiPill();
+}
+function portIndex(ports, kind){
+  if(!ports || !ports.length) return -1;
+  const want = MIDI_PIN && MIDI_PIN[kind];
+  if(want){ const i = ports.findIndex(p => p.name === want); if(i >= 0) return i; }
+  const d = ports.findIndex(p => /digitone/i.test(p.name || ''));
+  return d >= 0 ? d : 0;
+}
+function portOptions(ports, kind){
+  const s = portIndex(ports, kind);
+  return ports.map((p, n) => `<option value="${n}"${n === s ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+}
+// The ports an operation without a dialog of its own uses.
+function pickPort(kind){
+  const ps = [...(kind === 'out' ? MIDI_ACCESS.outputs : MIDI_ACCESS.inputs).values()];
+  {
+    const want = MIDI_PIN && MIDI_PIN[kind];
+    if(want){ const k = ps.findIndex(p => p.name === want);
+      if(k < 0) throw new Error(`the chosen MIDI ${kind === 'out' ? 'output' : 'input'} "${want}" is not connected — connect it, or pick another with the MIDI button in the toolbar`);
+      return ps[k]; }
+    const k = ps.findIndex(p => /digitone/i.test(p.name || ''));
+    if(k < 0) throw new Error(`no MIDI ${kind === 'out' ? 'output' : 'input'} named Digitone — connect the Digitone II over USB and close Transfer and Overbridge, or pick the port with the MIDI button in the toolbar`);
+    return ps[k];
+  }
+}
+function pickPorts(){ return {out: pickPort('out'), inp: pickPort('in')}; }
+function midiPill(){
+  const b = document.getElementById('midiPortBtn'); if(!b) return;
+  let txt = MIDI_PIN ? (MIDI_PIN.out || MIDI_PIN.in) : 'auto', ok = null;
+  if(MIDI_ACCESS){
+    try{ const pr = pickPorts(); ok = true; if(!MIDI_PIN) txt = pr.out.name; }catch(e){ ok = false; }
+  }
+  // The toolbar has no room for a port name (one row at 1440 px): the button
+  // says MIDI, its colour says connected (green) or not (red), the tip names it.
+  b.textContent = 'MIDI';
+  b.classList.toggle('midiok', ok === true); b.classList.toggle('midibad', ok === false);
+  b.title = 'MIDI port: ' + txt + (MIDI_PIN ? ' (chosen)' : ' (auto: the port named Digitone)')
+          + (ok === false ? ' — NOT CONNECTED' : '') + '. Every read, write, +Drive operation and Live Control uses it; click to choose.';
+}
+async function showMidiPorts(){
+  try{ await ensureMidi(); }catch(e){ showModal('MIDI unavailable', esc(e.message || e), [{label: 'Close', desc: '', fn: () => closeModal()}]); return; }
+  const o = [...MIDI_ACCESS.outputs.values()], i = [...MIDI_ACCESS.inputs.values()];
+  const sel = (ps, kind) => `<option value="">Auto — the port named Digitone</option>` + ps.map(p =>
+    `<option${MIDI_PIN && MIDI_PIN[kind] === p.name ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  let now = ''; try{ const pr = pickPorts(); now = `In use now: <b>${esc(pr.out.name)}</b> out, <b>${esc(pr.inp.name)}</b> in.`; }catch(e){ now = `<b class="dirty">${esc(e.message)}</b>`; }
+  showModal('MIDI port', 'The port every read, write, +Drive operation and Live Control uses. The dialogs with their own port lists start from it. '
+    + 'Leave it on <b>Auto</b> with one Digitone II; choose a port if you have two, or if yours is named differently. Remembered in this browser.',
+    [{label: 'Use these', desc: '', fn: () => { midiPinSave({out: document.getElementById('mpOut').value, in: document.getElementById('mpIn').value}); closeModal(); saveStatus('MIDI port: ' + (MIDI_PIN ? (MIDI_PIN.out || MIDI_PIN.in) : 'auto')); }},
+     {label: 'Back to auto', desc: 'the first port named Digitone', fn: () => { midiPinSave(null); closeModal(); }},
+     {label: 'Cancel', desc: '', fn: () => closeModal()}],
+    `<div class="ctl" style="margin:6px 0"><label style="font-size:11px;color:var(--muted)">OUTPUT</label> <select id="mpOut">${sel(o, 'out')}</select></div>`
+    + `<div class="ctl" style="margin:6px 0"><label style="font-size:11px;color:var(--muted)">INPUT</label> <select id="mpIn">${sel(i, 'in')}</select></div>`
+    + `<div class="rnote">${now}</div>`);
+}
+// A port picked in any dialog becomes the app's choice, so they stay in step.
+if(typeof document !== 'undefined' && typeof document.addEventListener === 'function') document.addEventListener('change', ev => {
+  const t = ev.target; if(!t || t.tagName !== 'SELECT') return;
+  const m = /^(rpc|sb|dw|dreq)(Out|In)$/.exec(t.id || '') || (t.id === 'midiPort' ? [0, 'x', 'In'] : null);
+  if(!m || !t.selectedOptions[0] || t.value === '') return;
+  const kind = m[2] === 'Out' ? 'out' : 'in', name = t.selectedOptions[0].textContent;
+  const cur = MIDI_PIN || {out: '', in: ''};
+  if(cur[kind] !== name) midiPinSave(Object.assign({}, cur, {[kind]: name}));
+});
 let RX = {active:false, msgs:[], bytes:0, t0:0, sawTrailer:false};
 
 async function ensureMidi(){
@@ -14655,6 +14731,7 @@ async function ensureMidi(){
   MIDI_ACCESS.onstatechange=ev=>{
     const p=ev.port;
     if(p.type==='input') refreshMidiPorts();
+    midiPill();
     if(p.type==='input' && RX && RX.active && MIDI_INPUT && p.name===MIDI_INPUT.name){
       if(p.state==='disconnected'){
         rxLog(`⚠ "${p.name}" disconnected mid-listen — reconnect it and the listener re-attaches.`);
@@ -14704,7 +14781,7 @@ async function openMidiPanel(){
   }
 
   const opts=inputs.map((p,i)=>
-    `<option value="${i}"${MIDI_INPUT&&MIDI_INPUT.id===p.id?' selected':''}>${esc(p.name)}</option>`).join('');
+    `<option value="${i}"${(MIDI_INPUT ? MIDI_INPUT.id===p.id : i===portIndex(inputs,'in'))?' selected':''}>${esc(p.name)}</option>`).join('');
 
   showModal('Receive SysEx dump from Digitone II',
     'Pick the input port, press <b>Start receiving</b>, then on the device choose '+
@@ -15829,6 +15906,9 @@ function showHelp(){
         <tr><td>${K('Backup')}</td><td><b>Back up all projects</b> reads every project on the +Drive into one
           <b>.zip</b> with a manifest; read-only, it takes the projects as last saved. <b>Restore</b> puts a backup's
           projects back into their slots; occupied slots are skipped unless you choose to replace them.</td></tr>
+        <tr><td>${K('MIDI')}</td><td>the toolbar's MIDI port: the one every read, write, +Drive operation and Live Control uses.
+          <b>Auto</b> takes the first port named Digitone; click it to pick another (two Digitones, or a port named differently); hover it to see
+          which. The dialogs with their own port lists start from it, and picking a port there changes it. Green: connected; red: not connected.</td></tr>
         <tr><td>progress</td><td>every read, index and write shows a bar above its log; it slides while a read's size
           is not known yet, and turns red if something fails.</td></tr>
         <tr><td>the +Drive and Live Control</td><td><b>Not while Live Control is on</b>: +Drive work needs Live Control off, since its traffic shares the USB
@@ -16534,12 +16614,9 @@ function buildSoundMsg(rec, slot){
 async function drivePorts(){
   if(LIVE.on) throw new Error('Live Control is on — +Drive operations do not work while it is. Switch Live Control off first.');
   if(!MIDI_ACCESS) await ensureMidi();
-  const o = [...MIDI_ACCESS.outputs.values()], i = [...MIDI_ACCESS.inputs.values()];
-  const oi = o.findIndex(x => /digitone/i.test(x.name || '')), ii = i.findIndex(x => /digitone/i.test(x.name || ''));
-  if(oi < 0 || ii < 0) throw new Error('no MIDI port named Digitone — connect the Digitone II over USB, '+
-    'and close Transfer and Overbridge: another program on the port cuts listings short');
-  await o[oi].open(); await i[ii].open();
-  return {out: o[oi], inp: i[ii]};
+  const {out, inp} = pickPorts();
+  await out.open(); await inp.open();
+  return {out, inp};
 }
 let DRIVE_LIB = {bank: 7, lists: {}, busy: false, msg: '', err: ''};
 
@@ -16889,11 +16966,8 @@ async function savePresetFile(kind){
 // before the app sends -- the app does not address a slot. One 0x53, the same
 // message a .syx save holds (G18's four rebuilt byte for byte).
 function presetSendPort(){
-  const o = [...MIDI_ACCESS.outputs.values()];
-  if(!o.length) throw new Error('no MIDI output ports: connect the Digitone II over USB');
-  const i = o.findIndex(x => /digitone/i.test(x.name || ''));
-  if(i < 0) throw new Error('no MIDI output named Digitone — connect the Digitone II over USB');
-  return o[i];
+  if(![...MIDI_ACCESS.outputs.values()].length) throw new Error('no MIDI output ports: connect the Digitone II over USB');
+  return pickPort('out');
 }
 // v23.75 (H69b): which OS the receiving device runs decides the sound's version
 // word -- 1.11 and 1.12 store sounds as version 3, 1.10E as 2, and a 1.11 re-save
@@ -18833,8 +18907,7 @@ function sendBackupStatusHtml(){
 }
 // Choose the Digitone II's own ports by name, so the usual case is one click.
 function dn2PortIndex(ports){
-  const i=ports.findIndex(p=>/digitone/i.test(p.name||''));
-  return i>=0 ? i : (ports.length ? 0 : -1);
+  return portIndex(ports, ports.length && ports[0].type === 'input' ? 'in' : 'out');
 }
 function showSendBackupGate(){
   let outOpts='<option value="">(loading...)</option>', inOpts=outOpts;
@@ -21309,8 +21382,8 @@ function showDriveWriteMenu(){
     try{
       if(!MIDI_ACCESS) await ensureMidi();
       const o=[...MIDI_ACCESS.outputs.values()], i=[...MIDI_ACCESS.inputs.values()];
-      outOpts=o.length?o.map((p,n)=>`<option value="${n}">${esc(p.name)}</option>`).join(''):'<option value="">(none)</option>';
-      inOpts =i.length?i.map((p,n)=>`<option value="${n}">${esc(p.name)}</option>`).join(''):'<option value="">(none)</option>';
+      outOpts=o.length?portOptions(o,'out'):'<option value="">(none)</option>';
+      inOpts =i.length?portOptions(i,'in'):'<option value="">(none)</option>';
     }catch(e){ outOpts=inOpts='<option value="">(MIDI unavailable)</option>'; }
     const a=document.getElementById('dwOut'), b=document.getElementById('dwIn');
     if(a) a.innerHTML=outOpts; if(b) b.innerHTML=inOpts;
@@ -21789,9 +21862,9 @@ function showDumpRequestMenu(){
     try{
       if(!MIDI_ACCESS) await ensureMidi();
       const o=[...MIDI_ACCESS.outputs.values()], i=[...MIDI_ACCESS.inputs.values()];
-      outOpts=o.length?o.map((p,n)=>`<option value="${n}">${esc(p.name)}</option>`).join('')
+      outOpts=o.length?portOptions(o,'out')
                       :'<option value="">(no output ports)</option>';
-      inOpts=i.length?i.map((p,n)=>`<option value="${n}">${esc(p.name)}</option>`).join('')
+      inOpts=i.length?portOptions(i,'in')
                      :'<option value="">(no input ports)</option>';
     }catch(e){ outOpts=inOpts='<option value="">(MIDI unavailable)</option>'; }
     const a=document.getElementById('dreqOut'), b=document.getElementById('dreqIn');
@@ -22078,8 +22151,8 @@ function showDriveRead(){
     try{
       if(!MIDI_ACCESS) await ensureMidi();
       const o = [...MIDI_ACCESS.outputs.values()], i = [...MIDI_ACCESS.inputs.values()];
-      outOpts = o.length ? o.map((p, n) => `<option value="${n}">${esc(p.name)}</option>`).join('') : '<option value="">(no output ports)</option>';
-      inOpts = i.length ? i.map((p, n) => `<option value="${n}">${esc(p.name)}</option>`).join('') : '<option value="">(no input ports)</option>';
+      outOpts = o.length ? portOptions(o, 'out') : '<option value="">(no output ports)</option>';
+      inOpts = i.length ? portOptions(i, 'in') : '<option value="">(no input ports)</option>';
     }catch(e){ outOpts = inOpts = '<option value="">(MIDI unavailable)</option>'; }
     const a = document.getElementById('rpcOut'), b = document.getElementById('rpcIn');
     if(a) a.innerHTML = outOpts; if(b) b.innerHTML = inOpts;
@@ -22155,7 +22228,7 @@ function fillRpcPorts(){
     try{
       if(!MIDI_ACCESS) await ensureMidi();
       const o=[...MIDI_ACCESS.outputs.values()], i=[...MIDI_ACCESS.inputs.values()];
-      const opts=(ps,none)=>ps.length?ps.map((p,n)=>`<option value="${n}"${/digitone/i.test(p.name||'')?' selected':''}>${esc(p.name)}</option>`).join('')
+      const opts=(ps,none)=>ps.length?portOptions(ps, ps===o?'out':'in')
                                      :`<option value="">${none}</option>`;
       outOpts=opts(o,'(no output ports)'); inOpts=opts(i,'(no input ports)');
     }catch(e){ outOpts=inOpts='<option value="">(MIDI unavailable)</option>'; }
@@ -22578,9 +22651,9 @@ function showRpcMenu(){
     try{
       if(!MIDI_ACCESS) await ensureMidi();
       const o=[...MIDI_ACCESS.outputs.values()], i=[...MIDI_ACCESS.inputs.values()];
-      outOpts=o.length?o.map((p,n)=>`<option value="${n}">${esc(p.name)}</option>`).join('')
+      outOpts=o.length?portOptions(o,'out')
                       :'<option value="">(no output ports)</option>';
-      inOpts=i.length?i.map((p,n)=>`<option value="${n}">${esc(p.name)}</option>`).join('')
+      inOpts=i.length?portOptions(i,'in')
                      :'<option value="">(no input ports)</option>';
     }catch(e){ outOpts=inOpts='<option value="">(MIDI unavailable)</option>'; }
     const a=document.getElementById('rpcOut'), b=document.getElementById('rpcIn');
@@ -23416,6 +23489,7 @@ function verifyRoundTrip(){
   el.style.display='block';
 })();
 document.getElementById('verBadge').textContent=versionLabel();
+try{ midiPill(); }catch(e){}
 document.getElementById('verBadge').title=`${VIZ_VERSION} (${VIZ_DATE}) — ${VIZ_NOTE}`;
 document.title=`SYXGRID ${versionLabel()} — Digitone II pattern editor`;
 console.log(`SYXGRID ${versionLabel()} (${VIZ_DATE}) — ${VIZ_NOTE}`);

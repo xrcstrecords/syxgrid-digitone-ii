@@ -10,6 +10,17 @@ it was built from.
 
 ---
 
+## v2.1 — one MIDI port for everything
+
+- A **MIDI** button in the toolbar sets the port every read, write, +Drive
+  operation and Live Control uses. **Auto** (the default) takes the port named
+  Digitone, as before; pick another if you have two Digitones or yours is
+  named differently. Green means connected, red means the chosen port is not.
+- The dialogs that list ports start from it, and picking a port there changes
+  it — so a choice made once is used everywhere. Remembered in this browser.
+
+---
+
 ## v2.0 — whole projects: the sequence, the sounds and the +Drive
 
 v1 edited the sequencer of one pattern from a SysEx dump. v2 works on the whole

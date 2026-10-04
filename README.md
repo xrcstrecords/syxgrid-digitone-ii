@@ -50,7 +50,7 @@ change is carried through untouched.
 |---|---|
 | Browser | Talking to the device needs **Web MIDI**: **Chrome, Edge, Brave or Opera**. Firefox asks for a site permission first; Safari has no Web MIDI. Opening and editing files works in any modern browser. |
 | Context | **HTTPS or `localhost`** for MIDI — the hosted app at https://syxgrid.xrcst.com is both. |
-| Hardware | A Digitone II over USB, on stock OS 1.10E, 1.11 or 1.12. Close Transfer and Overbridge while the app talks to the device. |
+| Hardware | A Digitone II over USB, on stock OS 1.10E, 1.11 or 1.12. Close Transfer and Overbridge while the app talks to the device. The app finds the port named Digitone by itself; with two Digitones, or a port named differently, pick it with the **MIDI** button in the toolbar. |
 
 Opened straight from disk (`file://`), the browser disables MIDI; opening and
 editing files still works. To run your own copy with MIDI, serve the file locally:
@@ -101,6 +101,7 @@ Digitone.
 | **Device Write** | **A whole project** goes to a +Drive slot, read back to verify. **Send over SysEx** sends a pattern or a queue **into the slot you choose**, into the pattern **playing now** (not stored), or through SYSEX RECEIVE, where it lands in the slot selected on the device. Raise the dialog's **GAP** (ms) if a large send loses trigs. Kits and presets go from the Kit tab and the preset editor. The first send of a session offers a backup of the live project first. |
 | **+Drive** | the +Drive Manager: rename, delete, copy, move and swap projects, kits and presets on the device. Anything that would be lost is saved to this computer first, and every action is checked by reading the +Drive again. Leave the project open on the device alone: it cannot say which one that is. |
 | **Backup** | **Back up all projects** reads every project on the +Drive into one **.zip** with a manifest; read-only, it takes the projects as last saved. **Restore** puts a backup's projects back into their slots; occupied slots are skipped unless you choose to replace them. |
+| **MIDI** | the toolbar's MIDI port: the one every read, write, +Drive operation and Live Control uses. **Auto** takes the first port named Digitone; click it to pick another (two Digitones, or a port named differently); hover it to see which. The dialogs with their own port lists start from it, and picking a port there changes it. Green: connected; red: not connected. |
 | progress | every read, index and write shows a bar above its log; it slides while a read's size is not known yet, and turns red if something fails. |
 | the +Drive and Live Control | **Not while Live Control is on**: +Drive work needs Live Control off, since its traffic shares the USB port and the +Drive's replies get lost. The app asks to switch it off first. Close Transfer and Overbridge too. |
 
@@ -389,7 +390,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v24.20)`, so any copy of the file can be traced back to the
+`v0.1 (dev v24.21)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md). The last v1 release stays online at
