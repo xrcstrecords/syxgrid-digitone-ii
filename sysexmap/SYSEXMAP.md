@@ -1,6 +1,6 @@
 # DN2 SysEx Mapping Reference
 
-**Map version 1.13.0** · generated from `mappings.json` for app **v24.21** (2026-09-01)
+**Map version 1.13.0** · generated from `mappings.json` for app **v24.24** (2026-09-01)
 
 > Generated file — do not edit by hand. Edit `mappings.json` and run `node sysexmap/build_map.js`.
 

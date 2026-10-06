@@ -10,6 +10,22 @@ it was built from.
 
 ---
 
+## v2.2 — MIDI import: fold, fit and preview
+
+- **Import MIDI** draws the file as a piano roll over the destination track, on
+  one time axis, and the track part reads like the track editor: red trig
+  dots, note dots with a ring for a chord, `<` `>` `<>` for microtiming.
+  Every control redraws it; zoom to track-editor size or fit the whole file.
+- **Fold 2:1, 4:1, 8:1** sets the track to 1/2x, 1/4x or 1/8x speed, so 16
+  bars of 16ths fit the 128 steps: an off-beat note sits half a step from its
+  step as microtiming, on the same step as the on-beat one.
+- **Autofit** picks the speed and length that keep every note at its own
+  time, or shows what the best fit would lose (red: left out, amber: moved).
+- The import sets the track's speed and length, and the master length when
+  the pattern would reset too early. One Undo takes it all back.
+
+---
+
 ## v2.1 — one MIDI port for everything
 
 - A **MIDI** button in the toolbar sets the port every read, write, +Drive

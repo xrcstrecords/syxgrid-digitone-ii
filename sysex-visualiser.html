@@ -881,6 +881,52 @@ table.kittab .arrow{color:var(--muted);padding:0 2px}
 /* v23.68: every dialog wraps. The global button rule is nowrap (toolbar), so a
    dialog's option buttons, and any long text in its body, overflowed the box. */
 .modal{max-height:92vh;overflow:auto;max-width:min(720px,94vw);overflow-wrap:anywhere}
+/* v24.22: the MIDI import dialog -- piano roll over the destination track, controls on the right */
+.modal.impwide{max-width:min(1120px,96vw);width:min(1120px,96vw)}
+.impwrap{display:flex;gap:14px;align-items:flex-start}
+.impmain{flex:1;min-width:0}
+.impside{width:190px;flex:none;display:flex;flex-direction:column;gap:4px;font-size:11px}
+.impside label{color:var(--muted);font-size:10px;margin-top:4px}
+.impside .impchk{color:var(--fg);font-size:11px;display:flex;gap:6px;align-items:flex-start}
+.impside hr{border:0;border-top:1px solid var(--border);margin:8px 0 2px}
+.impfold{display:flex;gap:4px}
+.impfold button{flex:1}
+.impfold button.on{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+#impAutofit{margin-top:8px}
+.impsrc{font-size:11px;margin-bottom:6px;color:var(--muted)}
+.impsrc b{color:var(--note);margin-right:6px}
+.impwarn{font-size:11px;color:var(--danger);margin-bottom:6px}
+.impzoom{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:4px;font-size:10px;color:var(--muted)}
+.implegend{margin-left:auto;display:flex;gap:6px;align-items:center}
+.ir-k{display:inline-block;width:10px;height:6px;border-radius:1px}
+i.ir-note{background:var(--note)} i.ir-nudge{background:var(--warn)} i.ir-lost{background:var(--danger)}
+.implegend .mm-e{color:var(--early)} .implegend .mm-l{color:var(--late)} .implegend .mm-b{color:var(--accent2)}
+.impview{overflow-x:auto;border:1px solid var(--border);border-radius:6px;background:var(--panel2);padding:4px 0}
+.impsvg{display:block}
+.impsvg .ir-bar{stroke:var(--border);stroke-width:1}
+.impsvg .ir-end{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 3}
+.impsvg .ir-lbl{fill:var(--muted);font:9px ui-monospace,Menlo,monospace}
+.impsvg .ir-note{fill:var(--note)} .impsvg .ir-nudge{fill:var(--warn)} .impsvg .ir-lost{fill:var(--danger)}
+.impsvg .ir-row{fill:var(--muted);font:600 9px ui-monospace,Menlo,monospace;text-anchor:end;letter-spacing:.04em}
+.impsvg .ir-c{fill:var(--cell);stroke:var(--grid);stroke-width:1}
+.impsvg .ir-c.ir-c-beat{stroke:var(--grid-beat)}
+.impsvg .ir-c.ir-c-bar{stroke:var(--grid-bar);stroke-width:1.5}
+.impsvg .ir-dot{fill:var(--trig);filter:drop-shadow(0 0 3px var(--trig-glow))}
+.impsvg .ir-dot.ir-full{stroke:var(--warn);stroke-width:1.5}
+.impsvg .ir-nd{fill:var(--note);filter:drop-shadow(0 0 3px var(--note-glow))}
+.impsvg .ir-span{stroke:var(--note);stroke-linecap:round;opacity:.45}
+.impsvg .ir-ring{fill:none;stroke:var(--note);stroke-width:1.5;opacity:.75}
+.impsvg .ir-mm{font:700 11px ui-monospace,Menlo,monospace;text-anchor:middle;letter-spacing:-1px}
+.impsvg .ir-mm.early{fill:var(--early)} .impsvg .ir-mm.late{fill:var(--late)} .impsvg .ir-mm.both{fill:var(--accent2)}
+.impstat{font-size:11px;margin-top:6px;line-height:1.5}
+.impstat .ok{color:var(--vel)} .impstat .warn,.implayout .warn{color:var(--warn)}
+.impfit{color:var(--muted);margin-top:2px}
+.implayout{font-size:10px;color:var(--muted);line-height:1.5;margin-top:6px}
+.implayout b{color:var(--fg)}
+.impraw{margin-top:8px;font-size:10px}
+.imprawt{width:100%;border-collapse:collapse;font:10px ui-monospace,Menlo,monospace}
+.imprawt td,.imprawt th{padding:1px 6px;text-align:left;color:var(--muted)}
+@media (max-width:760px){.impwrap{flex-direction:column;align-items:stretch}.impmain,.impside{width:100%}}
 .modal .sub,.modal label,.modal p,.modal li,.modal div{overflow-wrap:anywhere}
 .modal button:not(.mini):not(.mbtn){white-space:normal}
 .modal pre,.modal .rxlog{white-space:pre-wrap;overflow-wrap:anywhere}
@@ -1131,12 +1177,12 @@ function setTheme(t){
 function toggleTheme(){ setTheme(currentTheme() === 'light' ? 'dark' : 'light'); }
 document.addEventListener('DOMContentLoaded', themeLabel);
 
-const VIZ_VERSION = 'v24.21';
-const VIZ_DATE    = '2026-10-04';
+const VIZ_VERSION = 'v24.24';
+const VIZ_DATE    = '2026-10-06';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v2.1';
+const VIZ_PUBLIC  = 'v2.2';
 // v24.20 (the operator): bugs go to GitHub's issue tracker. reportBug() copies
 // the facts a report needs -- version, browser, what is loaded -- and opens the
 // bug-report form (.github/ISSUE_TEMPLATE/bug_report.md) to paste them into.
@@ -1162,7 +1208,7 @@ async function reportBug(){
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'one MIDI port for everything';
+const VIZ_NOTE    = 'Send pattern / Send project use the chosen port';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -2263,7 +2309,10 @@ async function sendSysex(bytes){
   if(!MIDI_ACCESS) await ensureMidi();
   const outputs=[...MIDI_ACCESS.outputs.values()];
   if(!outputs.length) throw new Error('No MIDI output ports. Connect the Digitone II over USB.');
-  const out=outputs[0];
+  // v24.24: the one MIDI port choice (v24.21), not outputs[0], which is an
+  // IAC bus or an iPad's Network Session as often as a Digitone. Latent: the
+  // two callers have no button today. Found by the ios branch.
+  const out=pickPort('out');
   out.send(bytes);
   return out.name;
 }
@@ -14389,6 +14438,202 @@ function applyImportedProbability(p,track,notes,wasTrig){
   return out;
 }
 
+// ── v24.22 MIDI IMPORT: FOLD, FIT AND PREVIEW (the operator, 2026-10-06) ──
+//
+// "Import a MIDI file that has 16 bars of 16th notes and fit it into the
+// DN2's 128 steps using microtiming and the track speed multiplier."
+//
+// THE MODEL. A source note sits at a position measured in 16ths (step plus
+// micro, as parsed). The destination track plays at speed S, so one of its
+// steps lasts SPEED_FACTOR[S] 16ths, and the note belongs at position
+// pos16 / SPEED_FACTOR[S] in steps. At 1/2x ("fold 2:1") 256 16ths become 128
+// steps, and an off-beat 16th lands half a step from a step: micro +-12 on that
+// step. Micro is stored PER NOTE RECORD, so one step can hold an on-beat note
+// at micro 0 and an off-beat one at +12 -- the strum the device already plays.
+// Timing is kept; the import also SETS the track's speed and length (and the
+// pattern's master length when it is too short), so the track plays as long as
+// the source did.
+//
+// ASSUMPTION, NAMED: micro counts in 1/24 of the track's OWN step at every
+// speed (H134 checks it on the device).
+//
+// PLACEMENT. Every note may go to either neighbouring step as long as its
+// micro stays in -23..+23. The nearest step is preferred; the other is used
+// when the nearest one already holds the same pitch, or lies past the track's
+// end. Notes are placed in order of how certain their step is, on-grid first.
+// The SAME pitch twice on one step is held back unless the dialog allows it:
+// the device has never been shown to keep two records of one note on a step.
+const IMPORT_SPEED_TRY = [2, 0, 1, 3, 4, 5, 6];   // Autofit: 1x, then finer, then coarser
+const IMPORT_FOLDS = [[2, '1:1'], [4, '2:1'], [5, '4:1'], [6, '8:1']];
+const IMPORT_EXACT = 1 / 48;                       // timing error that still counts as exact, in 16ths
+const IMPORT_MAX_CHORD = 8;                        // more notes than this on a step is flagged
+function importPos16(n){ return (n.step - 1) + (n.micro || 0) / MICRO_PER_STEP; }
+function importTrackSpeed(p, t){
+  const d = p && p.patternSpeed != null ? p.patternSpeed : 2;
+  return p && p.perTrackMode && p.trackSpeeds && p.trackSpeeds[t] != null ? p.trackSpeeds[t] : d;
+}
+// o: {speed, micro, len (null = auto), dupes, cur: the track's own {speed, len}}
+function importPlan(src, o){
+  const sf = SPEED_FACTOR[o.speed];
+  const cand = src.map((n, i) => {
+    const p16 = importPos16(n), pos = p16 / sf;
+    const near = Math.round(pos), far = pos >= near ? near + 1 : near - 1;
+    return {n, i, p16, pos, near, far, dist: Math.abs(pos - near)};
+  }).sort((a, b) => a.dist - b.dist || a.p16 - b.p16 || a.n.note - b.n.note);
+  // The track length is decided before placement, so a note past it can try
+  // its other neighbour. Auto: the shortest multiple of 16 that holds the
+  // nearest steps (at most 128).
+  const reach = cand.reduce((m, c) => Math.max(m, c.near + 1), 1);
+  // A track that already plays at this speed and is long enough keeps its length.
+  const auto = Math.min(MAX_STEPS, Math.max(16, Math.ceil(reach / 16) * 16));
+  const len = o.len ? o.len : (o.cur && o.cur.speed === o.speed && reach <= o.cur.len ? o.cur.len : auto);
+  const taken = new Set(), count = {}, ev = [], lost = {beyond: [], nudged: [], dupes: []};
+  for(const c of cand){
+    const opts = o.micro ? [c.near, c.far] : [c.near];
+    let pick = null, why = 'beyond';
+    for(const s0 of opts){
+      if(s0 < 0) continue;
+      const micro = o.micro ? Math.round((c.pos - s0) * MICRO_PER_STEP) : 0;
+      if(micro < MICRO_MIN || micro > MICRO_MAX) continue;
+      if(s0 + 1 > len){ why = 'beyond'; continue; }
+      if(!o.dupes && taken.has(s0 + ':' + c.n.note)){ why = 'dupes'; continue; }
+      pick = {s0, micro}; break;
+    }
+    if(!pick){ lost[why].push(c.i); continue; }
+    const step = pick.s0 + 1, played = (pick.s0 + pick.micro / MICRO_PER_STEP) * sf;
+    const nudged = Math.abs(played - c.p16) > IMPORT_EXACT;
+    if(nudged) lost.nudged.push(c.i);
+    taken.add(pick.s0 + ':' + c.n.note);
+    count[step] = (count[step] || 0) + 1;
+    ev.push({step, micro: pick.micro, note: c.n.note, vel: c.n.vel, prob: c.n.prob, channel: c.n.channel,
+             lenSteps: Math.max(0.125, (c.n.lenSteps || 1) / sf), _t: c.n._t, src: c.i, nudged});
+  }
+  ev.sort((a, b) => a.step - b.step || a.micro - b.micro || a.note - b.note);
+  const crowded = Object.keys(count).filter(s => count[s] > IMPORT_MAX_CHORD).map(Number);
+  const maxPerStep = Object.values(count).reduce((m, v) => Math.max(m, v), 0);
+  const dropped = lost.beyond.length + lost.dupes.length;
+  return {speed: o.speed, sf, micro: !!o.micro, dupes: !!o.dupes, len, events: ev, lost, dropped,
+          nudged: lost.nudged.length, maxPerStep, crowded, exact: !dropped && !lost.nudged.length,
+          span16: len * sf};
+}
+// Autofit, exact first: the track's own speed, then IMPORT_SPEED_TRY -- the first that places every
+// note at its own time, micro on, the same pitch never twice on a step. Failing
+// that, the plan that loses least -- and whether allowing repeats would make it
+// exact, so the dialog can say so before anything is imported.
+function importAutofit(src, cur){
+  const order = cur ? [cur.speed, ...IMPORT_SPEED_TRY.filter(s => s !== cur.speed)] : IMPORT_SPEED_TRY;
+  for(const speed of order){
+    const pl = importPlan(src, {speed, micro: true, dupes: false, len: null, cur});
+    if(pl.exact) return {plan: pl, exact: true};
+  }
+  const score = pl => pl.dropped * 10 + pl.nudged;
+  let best = null;
+  for(const speed of order){
+    const pl = importPlan(src, {speed, micro: true, dupes: false, len: null, cur});
+    if(!best || score(pl) < score(best)) best = pl;
+  }
+  let withDupes = null;
+  for(const speed of order){
+    const pl = importPlan(src, {speed, micro: true, dupes: true, len: null, cur});
+    if(pl.exact){ withDupes = pl; break; }
+  }
+  return {plan: best, exact: false, withDupes};
+}
+// The pattern settings an import needs so the track plays the whole fold.
+function importLayout(p, t, plan){
+  const curSpd = importTrackSpeed(p, t), curLen = effectiveTrackLength(p, t);
+  const masterSf = SPEED_FACTOR[p.patternSpeed != null ? p.patternSpeed : 2] || 1;
+  const needMaster = Math.min(1024, Math.ceil(plan.span16 / masterSf));
+  const change = plan.speed !== curSpd || plan.len !== curLen;
+  const toPerTrack = change && !p.perTrackMode;
+  const master = change && (p.patternLength || 16) < needMaster ? needMaster : null;
+  return {curSpd, curLen, change, toPerTrack, master, needMaster};
+}
+function importApplyLayout(p, t, plan){
+  const L = importLayout(p, t, plan);
+  if(!L.change) return L;
+  if(L.toPerTrack){
+    // Every other track keeps playing as it did: the pattern's length and
+    // speed become its own before the mode switches.
+    const pl = p.patternLength || 16, ps = p.patternSpeed != null ? p.patternSpeed : 2;
+    p.trackLengths = p.trackLengths || {}; p.trackSpeeds = p.trackSpeeds || {};
+    for(let u = 1; u <= 16; u++){ p.trackLengths[u] = Math.min(MAX_STEPS, pl); p.trackSpeeds[u] = ps; }
+    p.perTrackMode = true;
+  }
+  p.trackLengths[t] = plan.len;
+  p.trackSpeeds[t] = plan.speed;
+  if(L.master) p.patternLength = L.master;
+  return L;
+}
+
+// ── the preview: piano roll over the destination track, one time axis ──
+function importPreviewSvg(src, plan, zoom, track){
+  const lost = new Set([...plan.lost.beyond, ...plan.lost.dupes]), nudged = new Set(plan.lost.nudged);
+  const end16 = src.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 16);
+  // A step's cell is CENTRED on the time it starts, so the dot of an on-beat
+  // note sits under the source note, and a micro offset moves a dot exactly as
+  // far as the note is off the step.
+  const span = Math.max(end16, plan.span16), z = zoom, cw = plan.sf * z, LM = 46 + cw / 2;
+  const W = Math.ceil(span * z + LM + cw / 2) + 4, X = x => LM + x * z;
+  const lo = src.reduce((m, n) => Math.min(m, n.note), 127), hi = src.reduce((m, n) => Math.max(m, n.note), 0);
+  const rows = hi - lo + 1, rh = Math.max(3, Math.min(9, Math.floor(150 / rows))), RH = rows * rh;
+  // v24.23 (operator): the destination reads like the track editor -- TRIG,
+  // NOTE and MICRO rows of 21 px, red trig dots, note dots with a ring for a
+  // chord, < > <> for microtiming. A step's notes sit where they really play:
+  // each onset's dot is offset by its micro, and the dots of one step are
+  // joined, so an on-beat and an off-beat note read as one stretched dot.
+  const RW = 21, top = 14, dTop = top + RH + 26, H = dTop + 3 * RW + 16;
+  const yT = dTop, yN = dTop + RW, yM = dTop + 2 * RW;
+  const out = [`<svg class="impsvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`];
+  for(let b = 0; b * 16 <= span; b++){                         // bar lines over the piano roll
+    const x = X(b * 16);
+    out.push(`<line class="ir-bar" x1="${x}" y1="${top - 2}" x2="${x}" y2="${top + RH + 4}"/>`);
+    if(b * 16 < span) out.push(`<text class="ir-lbl" x="${x + 2}" y="${top - 4}">${b + 1}</text>`);
+  }
+  for(let k = lo; k <= hi; k++) if(k % 12 === 0)
+    out.push(`<text class="ir-lbl" x="2" y="${top + (hi - k) * rh + rh}">${noteName(k)}</text>`);
+  src.forEach((n, i) => {
+    const cls = lost.has(i) ? 'ir-lost' : nudged.has(i) ? 'ir-nudge' : 'ir-note';
+    const w = Math.max(1, Math.max(0.25, n.lenSteps || 1) * z - 1);
+    out.push(`<rect class="${cls}" x="${X(importPos16(n)).toFixed(1)}" y="${top + (hi - n.note) * rh}" width="${w.toFixed(1)}" height="${Math.max(2, rh - 1)}"><title>${noteName(n.note)} at 16th ${(importPos16(n) + 1).toFixed(2)}${lost.has(i) ? ' — left out' : nudged.has(i) ? ' — moved' : ''}</title></rect>`);
+  });
+  out.push(`<text class="ir-lbl" x="${X(0)}" y="${dTop - 6}">T${track || ''} · ${SPEED_LABEL[plan.speed]} · ${plan.len} steps</text>`);
+  for(const [y, l] of [[yT, 'TRIG'], [yN, 'NOTE'], [yM, 'MICRO']])
+    out.push(`<text class="ir-row" x="${LM - cw / 2 - 4}" y="${y + RW / 2 + 3}">${l}</text>`);
+  const by = {};
+  for(const e of plan.events) (by[e.step] = by[e.step] || []).push(e);
+  const r = Math.max(1.5, Math.min(5.5, cw * 0.26)), cy = RW / 2;
+  for(let s = 1; s <= plan.len; s++){
+    const mid = X((s - 1) * plan.sf), x = mid - cw / 2, es = by[s] || [];
+    const edge = (s - 1) % 16 === 0 ? ' ir-c-bar' : (s - 1) % 4 === 0 ? ' ir-c-beat' : '';
+    const tip = `step ${s}${es.length ? ': ' + es.map(e => noteName(e.note) + (e.micro ? (e.micro > 0 ? ' +' : ' ') + e.micro : '')).join(', ') : ''}`;
+    for(const y of [yT, yN, yM])
+      out.push(`<rect class="ir-c${edge}" x="${x.toFixed(1)}" y="${y}" width="${Math.max(1, cw).toFixed(1)}" height="${RW}"><title>${tip}</title></rect>`);
+    if(!es.length) continue;
+    out.push(`<circle class="${es.length > IMPORT_MAX_CHORD ? 'ir-dot ir-full' : 'ir-dot'}" cx="${mid.toFixed(1)}" cy="${yT + cy}" r="${r.toFixed(1)}"/>`);
+    // NOTE row: one dot per onset, offset by its micro; a ring when it is a chord
+    const on = {};
+    for(const e of es) on[e.micro] = (on[e.micro] || 0) + 1;
+    const ms = Object.keys(on).map(Number).sort((a, b) => a - b);
+    const ox = m => mid + Math.max(-cw / 2 + r, Math.min(cw / 2 - r, m / MICRO_PER_STEP * cw));
+    if(ms.length > 1)
+      out.push(`<line class="ir-span" x1="${ox(ms[0]).toFixed(1)}" y1="${yN + cy}" x2="${ox(ms[ms.length - 1]).toFixed(1)}" y2="${yN + cy}" stroke-width="${(2 * r).toFixed(1)}"/>`);
+    for(const m of ms){
+      out.push(`<circle class="ir-nd" cx="${ox(m).toFixed(1)}" cy="${yN + cy}" r="${r.toFixed(1)}"/>`);
+      if(on[m] > 1) out.push(`<circle class="ir-ring" cx="${ox(m).toFixed(1)}" cy="${yN + cy}" r="${(r + Math.min(4, r * 0.7)).toFixed(1)}"/>`);
+    }
+    // MICRO row: < early, > late, <> both (a strum), as the track editor marks it
+    const early = ms[0] < 0, late = ms[ms.length - 1] > 0;
+    if(early || late) out.push(`<text class="ir-mm ${early && late ? 'both' : early ? 'early' : 'late'}" x="${mid.toFixed(1)}" y="${yM + cy + 4}">${early && late ? '&lt;&gt;' : early ? '&lt;' : '&gt;'}</text>`);
+  }
+  for(let s = 1; s <= plan.len; s += 16)
+    out.push(`<text class="ir-lbl" x="${X((s - 1) * plan.sf) - cw / 2 + 2}" y="${yM + RW + 11}">${s}</text>`);
+  const endX = X(plan.span16) - cw / 2;
+  out.push(`<line class="ir-end" x1="${endX}" y1="${top - 2}" x2="${endX}" y2="${yM + RW}"/>`);
+  out.push('</svg>');
+  return out.join('');
+}
+
 function showImportDialog(){
   const inp=document.createElement('input'); inp.type='file'; inp.accept='.mid,.alc';
   inp.onchange=async (e)=>{
@@ -14399,226 +14644,188 @@ function showImportDialog(){
     try{parsed=isAlc?await parseALC(buf):parseMIDI(buf); const srcTempo=readMidiTempo(buf); window._impSrcBpm=srcTempo.bpm; if(!isAlc) window._midiEvents=decodeMidiTimeline(buf);}
     catch(err){alert('Import failed: '+err.message);return}
     if(!parsed.length){alert('No notes found.');return}
-
-    // Detect multi-channel MIDI
-    const channels = new Set(parsed.map(n => n.channel || 0));
-    if(channels.size > 1){
-      console.warn('Multi-channel MIDI detected:', channels);
-      window._impMultiChannel = true;
-    } else {
-      window._impMultiChannel = false;
-    }
-
-    // Calculate source metrics
-    const maxStep=parsed.reduce((m,n)=>Math.max(m,n.step),0);
-    const maxLen=parsed.reduce((m,n)=>Math.max(m,n.step+Math.ceil(n.lenSteps)-1),0);
-    const srcSteps=Math.max(maxStep, maxLen);
-    const srcNotes=parsed.length;
-    const uniquePitches=new Set(parsed.map(n=>n.note)).size;
-    const noteRange=parsed.reduce((r,n)=>({lo:Math.min(r.lo,n.note),hi:Math.max(r.hi,n.note)}),{lo:127,hi:0});
-
-    // Get current pattern and track info
-    const cp=curPattern();
-    const activeTrk=document.getElementById('trkSel').value;
-    const defTrack=activeTrk==='all'?Object.keys(cp.tracks||{}).map(Number)[0]||1:+activeTrk;
-    const tLen=effectiveTrackLength(cp,defTrack);
-    const curTrigs=(cp.tracks&&cp.tracks[defTrack]?cp.tracks[defTrack].length:0);
-
-    // Pattern selector: the value is an index into PATTERNS (the unfiltered
-    // array), matching every other pattern selector in the app. v22.35 made
-    // refreshImportInfo() agree — it was indexing the FILTERED list with this
-    // unfiltered value, so with a non-pattern earlier in the list the import
-    // preview described the wrong pattern.
-    let patOpts=PATTERNS.map((p,i)=>{
-    if (p.notPattern) return '';
-    const n = p.records ? p.records.length : 0;
-    const emb = p.ok && p.patternName ? p.patternName : '';
-    let nm = p.slot ? p.slot : (p.label || ('P'+(i+1)));
-    if (emb) nm += ` · ${emb}`;
-    return '<option value="'+i+'"'+(i===getCurPatternIdx()?' selected':'')+'>'+esc(nm)+' ('+n+' trigs)</option>';
-  }).join('');
-
-    // Build track selector
-    let trkOpts='';
-    for(let t=1;t<=16;t++){
-      const n=cp.tracks&&cp.tracks[t]?cp.tracks[t].length:0;
-      trkOpts+='<option value="'+t+'"'+(t===defTrack?' selected':'')+'>T'+t+(n?' ('+n+' trigs)':' (empty)')+'</option>';
-    }
-
-    // Warn if source doesn't fit
-    const fits=srcSteps<=tLen;
-    const sugSpd=2; // default 1x speed
-
-    // Build dual-pane dialog
-    function buildInfo(spd, len, mode){
-      const sf=SPEED_FACTOR[spd];
-      const adjSteps=Math.round(srcSteps*sf*(tLen/len));
-      const srcBpm = window._impSrcBpm || 120;
-    const willFit=adjSteps<=tLen;
-      const usedSteps=Math.min(adjSteps,128);
-      const willTrunc=adjSteps>128;
-      const remaining=tLen-usedSteps;
-      const newTotal=mode==='replace'?usedSteps:(curTrigs+usedSteps);
-      const over=mode==='replace'?remaining:(tLen-newTotal);
-
-      return '<table style="width:100%;font-size:11px;border-collapse:collapse;font-family:ui-monospace,Menlo,monospace">'+
-        '<tr style="border-bottom:1px solid var(--border)"><td colspan="2" style="padding:6px 0;color:var(--note);font-weight:600;font-size:12px">SOURCE — '+esc(file.name)+'</td>'+
-        '<td style="width:20px"></td>'+
-        '<td colspan="2" style="padding:6px 0;color:var(--accent);font-weight:600;font-size:12px">DESTINATION</td></tr>'+
-        '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">Notes</td><td>'+srcNotes+' ('+uniquePitches+' pitches, '+noteName(noteRange.lo)+'–'+noteName(noteRange.hi)+')'+
-          (parsed.some(n=>n.prob)?'<br>'+parsed.filter(n=>n.prob).length+' with a chance &lt; 100% &rarr; PROB':'')+'</td>'+
-        '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Pattern</td><td><select id="impPatSel" onchange="refreshImportInfo()">'+patOpts+'</select></td></tr>'+
-        '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">BPM</td><td>'+(srcBpm||'—')+'</td>'+
-        '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Track</td><td><select id=\"impTrkSel\" onchange=\"refreshImportInfo()\">'+trkOpts+'</select></td></tr>'+
-        '<tr><td style=\"color:var(--muted);padding:3px 8px 3px 0\">BPM</td><td>'+(srcBpm||'—')+'</td>'+
-        '<td></td><td style=\"color:var(--muted);padding:3px 8px 3px 0\">Dest BPM</td><td>'+(cp.bpm||120).toFixed(1)+'</td></tr>'+
-        '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">Steps</td><td>'+srcSteps+' ('+(srcSteps/16).toFixed(1)+' bars)</td>'+
-    '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Division</td><td>'+(window._midiHeader?window._midiHeader.ppq:96)+' ppq</td></tr>'+
-    '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Channels</td><td>'+(window._impMultiChannel?'<span style=\"color:var(--warn)\">Multi-channel</span>':'Single channel')+'</td></tr>'+
-    '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">Division</td><td>'+(window._midiHeader?window._midiHeader.ppq:96)+' ticks/quarter</td>'+
-        '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Channels</td><td>'+(window._impMultiChannel?'<span style=\"color:var(--warn)\">Multi-channel</span>':'Single channel')+'</td></tr>'+
-        '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">Duration</td><td>'+srcSteps+' steps @1x</td>'+
-        '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Length</td><td>'+tLen+' steps ('+curTrigs+' trigs)</td></tr>'+
-        '<tr style="border-top:1px solid var(--border)"><td style="color:var(--muted);padding:6px 8px 6px 0">▼ After '+SPEED_LABEL[spd]+' speed</td><td style="color:'+(willFit?'var(--vel)':'var(--danger)')+'">'+adjSteps+' steps'+(willTrunc?' (truncated to '+usedSteps+')':'')+'</td>'+
-        '<td></td><td style="color:var(--muted);padding:6px 8px 6px 0">▼ '+SPEED_LABEL[spd]+' × '+len+' steps</td><td style="color:'+(over>=0?'var(--vel)':'var(--danger)')+'">'+usedSteps+' steps used'+(!willFit?', '+(-over)+' overflow':over>0?', '+over+' free':'')+'</td></tr>'+
-        '<tr style="border-top:1px solid var(--border)"><td style="color:var(--muted);padding:6px 8px 6px 0">Mode</td><td><select id="impModeSel" onchange="refreshImportInfo()"><option value="replace">Replace</option><option value="merge"'+(mode==='merge'?' selected':'')+'>Merge</option></select></td>'+
-        '<td></td><td style="padding:6px 8px 6px 0">'+
-        (willFit?'<span style="color:var(--vel)">✓ Fits</span>':
-         '<span style="color:var(--warn)">⚠ ' + (willTrunc ? 'Truncates ' + (-over) + ' steps' : 'Overflows ' + (-over) + ' steps') + '</span>') + '</td></tr>'+
-        '</table>'+
-    '<div style="margin-top:12px;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px">'+
-    '<table style="width:100%;font-size:10px;border-collapse:collapse;font-family:ui-monospace,Menlo,monospace">'+
-    '<tr style="background:var(--panel2);position:sticky;top:0"><th style="text-align:right;padding:3px 8px;color:var(--muted);font-weight:400">Tick</th><th style="text-align:right;padding:3px 8px;color:var(--muted);font-weight:400">Δ</th><th style="padding:3px 8px;color:var(--muted);font-weight:400">Trk</th><th style="padding:3px 8px;color:var(--muted);font-weight:400">Ch</th><th style="text-align:left;padding:3px 8px;color:var(--muted);font-weight:400">Event</th><th style="text-align:left;padding:3px 8px;color:var(--muted);font-weight:400">Detail</th></tr>'+
-    (window._midiEvents||[]).slice(0,60).map(l=>'<tr><td style="text-align:right;padding:2px 8px;color:var(--accent2)">'+l.tick+'</td><td style="text-align:right;padding:2px 8px;color:'+(l.delta>0?'var(--fg)':'var(--muted)')+'">'+l.delta+'</td><td style="padding:2px 8px;color:var(--accent)">'+l.trk+'</td><td style="padding:2px 8px;color:var(--note)">'+l.ch+'</td><td style="padding:2px 8px;color:var(--fg)">'+l.type+'</td><td style="padding:2px 8px;color:var(--muted)">'+esc(l.detail)+'</td></tr>').join('')+
-    (window._midiEvents&&window._midiEvents.length>60?'<tr><td colspan="6" style="padding:4px 8px;color:var(--muted);font-style:italic">... and ' + (window._midiEvents.length-60) + ' more events</td></tr>':'')+
-    '</table></div>'+
-        '</table>';
-    }
-
-    // Store parsed data globally so refreshImportInfo can access it
-    window._impParsed=parsed;
-    window._impSrcSteps=srcSteps;
-
-    showModal('Import '+file.name,
-      '<div style="margin-bottom:12px">'+
-      '<div class="ctl" style="margin-bottom:8px"><label style="font-size:11px;color:var(--muted)">SPEED</label>'+
-      '<select id="impSpeedSel" onchange="refreshImportInfo()">'+SPEED_LABEL.map((l,i)=>'<option value="'+i+'"'+(i===sugSpd?' selected':'')+'>'+l+'</option>').join('')+'</select></div>'+
-      '<div class="ctl" style="margin-bottom:8px"><label style="font-size:11px;color:var(--muted)">LENGTH</label>'+
-      '<select id="impLenSel" onchange="refreshImportInfo()">'+[16,32,48,64,96,128].map(v=>'<option value="'+v+'"'+(v===tLen?' selected':'')+'>'+v+' steps</option>').join('')+'</select></div>'+
-      '</div>'+
-      '<div style="margin:6px 0 10px 0;font-size:10px;color:'+(window._impMultiChannel?'var(--danger)':'var(--muted)')+';background:var(--panel2);padding:5px 8px;border-radius:4px">'+(window._impMultiChannel?'⚠ Multi-channel MIDI detected — only first channel will be imported':'only single channel midi files are supported')+'</div>'+
-      '<div id="impDualPane">'+buildInfo(sugSpd, tLen, 'replace')+'</div>',
-      [
-        {label:'Import', desc:'Apply import to the selected pattern/track.',
-         fn:()=>{
-           const pi=+document.getElementById('impPatSel').value;
-           const t=+document.getElementById('impTrkSel').value;
-           const sp=+document.getElementById('impSpeedSel').value;
-           const ln=+document.getElementById('impLenSel').value;
-           const md=document.getElementById('impModeSel').value;
-           const sf=SPEED_FACTOR[sp]; const sc=ln/tLen;
-           // Scaling must move the MICRO offset with the step, or the import
-           // conversion is undone here: rebuilding {step} alone drops `micro`
-           // and re-rounds to the grid. Work in fractional steps and convert
-           // back once, at the end.
-           const adj=parsed.map(n=>{
-               const pos=((n.step-1)+(n.micro||0)/MICRO_PER_STEP)*sf*sc;
-               const sm=posToStepMicro(pos);
-               return {step:sm.step,micro:sm.micro,note:n.note,vel:n.vel,prob:n.prob,
-                       channel:n.channel,lenSteps:n.lenSteps*sf*sc,_t:n._t};
-             })
-             .filter(n=>n.step>=1&&n.step<=128)
-             .filter(n=>!window._impMultiChannel || (n.channel||0)===0);
-           // Switch to target pattern if needed
-           if(pi!==getCurPatternIdx()){ document.getElementById('patSel').value=pi; onPatternChange(); }
-           closeModal();
-           importNotes(t,adj,md);
-           // v23.69: a .alc's CC lanes become p-locks on the imported trigs.
-           IMPORT_CC=importCCAsLocks(curPattern(),t,adj,parsed.ccEnvelopes);
-           if(IMPORT_CC.locks||IMPORT_CC.unmapped.length){ render();
-             const st=document.getElementById('status');
-             if(st) st.textContent=`${IMPORT_CC.locks} p-lock(s) on ${IMPORT_CC.lanes} parameter(s) from the clip's CC lanes`
-               +(IMPORT_CC.unmapped.length?` — CC ${IMPORT_CC.unmapped.join(', ')} drive(s) no parameter on this track, left out`:''); }
-           if(IMPORT_PROB.set){
-             const st=document.getElementById('status');
-             if(st) st.textContent=`${IMPORT_PROB.set} step(s) took Live's chance as PROB`
-               +(IMPORT_PROB.merged?` — ${IMPORT_PROB.merged} chord(s) with differing chances took the highest`:'');
-           }
-           if(MIDI_IMPORT_SNAPPED){
-             const st=document.getElementById('status');
-             if(st) st.textContent=MIDI_IMPORT_SNAPPED+' note(s) sat further off the grid than microtiming can express and were snapped to the nearest step';
-           }
-         }},
-        {label:'Cancel', desc:'', fn:()=>closeModal()},
-      ]);
-    // Force initial timeline render
-    setTimeout(()=>{if(document.getElementById('impSpeedSel')) refreshImportInfo();}, 80);
+    openImportDialog(file.name, parsed, isAlc);
   };
   inp.click();
 }
+// The dialog itself, apart from the file picker, so a test can open it.
+function openImportDialog(name, parsed, isAlc){
+  const channels = new Set(parsed.map(n => n.channel || 0));
+  window._impMultiChannel = channels.size > 1;
+  const src = window._impMultiChannel ? parsed.filter(n => (n.channel || 0) === 0) : parsed;
+  const cp=curPattern();
+  const activeTrk=document.getElementById('trkSel').value;
+  const defTrack=activeTrk==='all'?Object.keys(cp.tracks||{}).map(Number)[0]||1:+activeTrk;
+  const end16 = src.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 0);
+  const lo = src.reduce((m, n) => Math.min(m, n.note), 127), hi = src.reduce((m, n) => Math.max(m, n.note), 0);
+  const cur = {speed: importTrackSpeed(cp, defTrack), len: effectiveTrackLength(cp, defTrack)};
+  const fit = importAutofit(src, cur);
+  IMP = {name, parsed, src, isAlc, zoom: null,
+         o: {speed: fit.plan.speed, micro: true, dupes: false, len: null, cur}, fit, autofitNote: ''};
 
-// Dynamic refresh of import info when controls change
+  const patOpts=PATTERNS.map((p,i)=>{
+    if (p.notPattern) return '';
+    const n = p.records ? p.records.length : 0;
+    let nm = p.slot ? p.slot : (p.label || ('P'+(i+1)));
+    if (p.ok && p.patternName) nm += ` · ${p.patternName}`;
+    return '<option value="'+i+'"'+(i===getCurPatternIdx()?' selected':'')+'>'+esc(nm)+' ('+n+' trigs)</option>';
+  }).join('');
+  let trkOpts='';
+  for(let t=1;t<=16;t++){
+    const n=cp.tracks&&cp.tracks[t]?cp.tracks[t].length:0;
+    trkOpts+='<option value="'+t+'"'+(t===defTrack?' selected':'')+'>T'+t+(n?' ('+n+' trigs)':' (empty)')+'</option>';
+  }
+  const srcLine = `${src.length} notes · ${(end16 / 16).toFixed(1)} bars · ${noteName(lo)}–${noteName(hi)}`
+    + ` · ${window._impSrcBpm ? (+window._impSrcBpm).toFixed(1) + ' BPM' : ''}`
+    + (isAlc ? '' : ` · ${(window._midiHeader ? window._midiHeader.ppq : 96)} ppq`)
+    + (parsed.some(n => n.prob) ? ` · ${parsed.filter(n => n.prob).length} with a chance &lt; 100% → PROB` : '');
+  const body =
+    `<div class="impwrap">
+      <div class="impmain">
+        <div class="impsrc"><b>SOURCE</b> ${srcLine}</div>
+        ${window._impMultiChannel ? '<div class="impwarn">⚠ Several MIDI channels: only channel 1 is imported.</div>' : ''}
+        <div class="impzoom"><button class="mini" onclick="importZoom(-1)" title="zoom out">−</button><button class="mini" onclick="importZoom(1)" title="zoom in">+</button><button class="mini" onclick="importZoom(0)" title="the whole file in view, or back to track-editor size">fit</button>
+          <span class="implegend"><i class="ir-k ir-note"></i>note <i class="ir-k ir-nudge"></i>moved <i class="ir-k ir-lost"></i>left out · dots sit where they play: <b class="mm-e">&lt;</b> early <b class="mm-l">&gt;</b> late <b class="mm-b">&lt;&gt;</b> both</span></div>
+        <div id="impView" class="impview"></div>
+        <div id="impStat" class="impstat"></div>
+        <details class="impraw"><summary>Raw MIDI events</summary><div id="impEvents"></div></details>
+      </div>
+      <div class="impside">
+        <label>Fold</label>
+        <div class="impfold">${IMPORT_FOLDS.map(([s, l]) => `<button class="mini" data-speed="${s}" onclick="importSet('speed',${s})">${l}</button>`).join('')}</div>
+        <label>Track speed</label>
+        <select id="impSpeedSel" onchange="importSet('speed',+this.value)">${SPEED_LABEL.map((l, i) => `<option value="${i}">${l}</option>`).join('')}</select>
+        <label>Track length</label>
+        <select id="impLenSel" onchange="importSet('len',+this.value||null)"><option value="0">auto</option>${[16,32,48,64,80,96,112,128].map(v => `<option value="${v}">${v} steps</option>`).join('')}</select>
+        <label class="impchk"><input type="checkbox" id="impMicro" checked onchange="importSet('micro',this.checked)"> Off-grid notes as micro</label>
+        <label class="impchk" title="Two records of the same note on one step have not been tried on the device"><input type="checkbox" id="impDupes" onchange="importSet('dupes',this.checked)"> Same note twice on a step (untested)</label>
+        <button class="mini accent" id="impAutofit" onclick="importAutofitNow()">Autofit</button>
+        <hr>
+        <label>Pattern</label><select id="impPatSel" onchange="refreshImportInfo()">${patOpts}</select>
+        <label>Track</label><select id="impTrkSel" onchange="refreshImportInfo()">${trkOpts}</select>
+        <label>Mode</label><select id="impModeSel" onchange="refreshImportInfo()"><option value="replace">Replace</option><option value="merge">Merge</option></select>
+        <div id="impLayout" class="implayout"></div>
+      </div>
+    </div>`;
+  showModal('Import ' + name, 'Fold the file onto a track: the speed, track length and micro below decide where each note lands. The lanes share one time axis — each step is as wide as the time it plays.',
+    [{label: 'Import', desc: 'Write the notes and the track settings shown.', fn: () => importCommit()},
+     {label: 'Cancel', desc: '', fn: () => closeModal()}], body);
+  const m = document.querySelector('#ov .modal'); if(m) m.classList.add('impwide');
+  const ev = document.getElementById('impEvents');
+  const raw = isAlc ? [] : (window._midiEvents || []);
+  if(ev) ev.innerHTML = !raw.length ? '<div class="impstat">No raw events for a .alc clip.</div>'
+    : '<table class="imprawt"><tr><th>Tick</th><th>Δ</th><th>Event</th><th></th></tr>'
+      + raw.slice(0, 60).map(l => `<tr><td>${l.tick}</td><td>${l.delta}</td><td>${esc(l.type || '')}</td><td>${esc(l.detail || '')}</td></tr>`).join('')
+      + (raw.length > 60 ? `<tr><td colspan="4">… and ${raw.length - 60} more events</td></tr>` : '') + '</table>';
+  IMP.autofitNote = importAutofitText(fit);
+  refreshImportInfo();
+}
+let IMP = null;
+function importAutofitText(fit){
+  const pl = fit.plan;
+  if(fit.exact) return `Autofit: ${SPEED_LABEL[pl.speed]}, ${pl.len} steps — every note at its own time.`;
+  return `Autofit found no exact fit. Best: ${SPEED_LABEL[pl.speed]}, ${pl.len} steps — `
+    + [pl.lost.beyond.length && `${pl.lost.beyond.length} past the track's end`,
+       pl.lost.dupes.length && `${pl.lost.dupes.length} repeat a note already on their step`,
+       pl.nudged && `${pl.nudged} moved`].filter(Boolean).join(', ') + ' (red and amber above).'
+    + (fit.withDupes ? ` Ticking “Same note twice on a step” keeps every note at ${SPEED_LABEL[fit.withDupes.speed]} — untested on the device.` : '');
+}
+function importSet(k, v){
+  if(!IMP) return;
+  IMP.o[k] = v; IMP.autofitNote = '';
+  refreshImportInfo();
+}
+function importZoom(d){
+  if(!IMP) return;
+  if(d === 0) IMP.zoom = IMP.zoom === 'fit' ? null : 'fit';
+  else IMP.zoom = Math.max(4, Math.min(42, (IMP.zoom === 'fit' || !IMP.zoom ? 21 : IMP.zoom) * (d > 0 ? 1.5 : 1 / 1.5)));
+  refreshImportInfo();
+}
+function importAutofitNow(){
+  if(!IMP) return;
+  const fit = importAutofit(IMP.src, IMP.o.cur);
+  IMP.fit = fit;
+  IMP.o = {speed: fit.plan.speed, micro: true, dupes: false, len: null, cur: IMP.o.cur};
+  IMP.autofitNote = importAutofitText(fit);
+  refreshImportInfo();
+}
+
+// Dynamic refresh: the plan, the preview and the numbers follow the controls.
 function refreshImportInfo(){
-  const spEl=document.getElementById('impSpeedSel');
-  if(!spEl) return;
-  const sp=+spEl.value||2;
-  const ln=+document.getElementById('impLenSel').value||16;
-  const md=document.getElementById('impModeSel')?.value||'replace';
-  const pane=document.getElementById('impDualPane');
-  if(!pane||!window._impParsed) return;
+  if(!IMP || !document.getElementById('impView')) return;
+  const pi=+document.getElementById('impPatSel').value;
+  const ti=+document.getElementById('impTrkSel').value||1;
+  const md=document.getElementById('impModeSel').value;
+  const p=PATTERNS[pi];   // v22.35: impPatSel carries a PATTERNS index
+  if(p && p.ok) IMP.o.cur = {speed: importTrackSpeed(p, ti), len: effectiveTrackLength(p, ti)};
+  const plan = importPlan(IMP.src, IMP.o);
+  IMP.plan = plan;
+  // controls show the plan
+  document.getElementById('impSpeedSel').value = String(plan.speed);
+  document.getElementById('impLenSel').value = String(IMP.o.len || 0);
+  document.getElementById('impMicro').checked = plan.micro;
+  document.getElementById('impDupes').checked = plan.dupes;
+  for(const b of document.querySelectorAll('.impfold button')) b.classList.toggle('on', +b.dataset.speed === plan.speed);
+  // zoom is a step width: the track editor's 21 px by default (scroll for the
+  // rest), or 'fit' -- the whole file in the view.
+  const view = document.getElementById('impView');
+  const end16 = IMP.src.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 16);
+  const z = IMP.zoom === 'fit' ? Math.max(0.5, ((view.clientWidth || 640) - 52) / Math.max(end16, plan.span16))
+                               : (IMP.zoom || 21) / plan.sf;
+  view.innerHTML = importPreviewSvg(IMP.src, plan, z, ti);
+  const total = IMP.src.length, kept = plan.events.length;
+  const st = [];
+  st.push(plan.exact ? `<span class="ok">✓ ${kept} of ${total} notes on ${plan.len} steps at ${SPEED_LABEL[plan.speed]}, every one at its own time</span>`
+                     : `<span class="warn">⚠ ${kept} of ${total} notes placed</span>`);
+  if(plan.lost.beyond.length) st.push(`${plan.lost.beyond.length} past the track's end`);
+  if(plan.lost.dupes.length) st.push(`${plan.lost.dupes.length} repeat a note already on their step`);
+  if(plan.nudged) st.push(`${plan.nudged} moved off their time${plan.micro ? ' (further than micro reaches)' : ' (micro is off)'}`);
+  st.push(`up to ${plan.maxPerStep} note${plan.maxPerStep === 1 ? '' : 's'} on a step`);
+  if(plan.crowded.length) st.push(`<span class="warn">${plan.crowded.length} step(s) hold more than ${IMPORT_MAX_CHORD} notes</span>`);
+  document.getElementById('impStat').innerHTML = st.join(' · ') + (IMP.autofitNote ? `<div class="impfit">${esc(IMP.autofitNote)}</div>` : '');
+  // what the pattern will be told
+  const lay = document.getElementById('impLayout');
+  if(p && p.ok){
+    const L = importLayout(p, ti, plan), lines = [];
+    if(!L.change) lines.push(`T${ti} already plays ${SPEED_LABEL[plan.speed]} × ${plan.len} steps.`);
+    else {
+      lines.push(`T${ti}: ${SPEED_LABEL[L.curSpd]} × ${L.curLen} → <b>${SPEED_LABEL[plan.speed]} × ${plan.len}</b>`);
+      if(L.toPerTrack) lines.push('Pattern switches to per-track length; the other tracks keep their length and speed.');
+      if(L.master) lines.push(`Master length ${p.patternLength || 16} → <b>${L.master}</b>, so the pattern does not reset before the track ends.`);
+      if(md === 'merge' && p.tracks && p.tracks[ti] && p.tracks[ti].length && plan.speed !== L.curSpd)
+        lines.push(`<span class="warn">Merge: the ${p.tracks[ti].length} trigs already on T${ti} will play at the new speed.</span>`);
+    }
+    lay.innerHTML = lines.map(l => `<div>${l}</div>`).join('');
+  }
+}
 
-  const parsed=window._impParsed;
-  const srcSteps=window._impSrcSteps;
-  const sf=SPEED_FACTOR[sp];
-  const pi=+document.getElementById('impPatSel')?.value||0;
-  const ti=+document.getElementById('impTrkSel')?.value||1;
-
-  const p=PATTERNS[pi];   // v22.35: impPatSel now carries a PATTERNS index
-  const tLen=p?effectiveTrackLength(p,ti):16;
-  const curTrigs=(p&&p.tracks&&p.tracks[ti]?p.tracks[ti].length:0);
-
-  const adjSteps=Math.round(srcSteps*sf*(ln/tLen));
-  const willFit=adjSteps<=128;
-  const usedSteps=Math.min(adjSteps,128);
-  const willTrunc=adjSteps>128;
-  const over=128-usedSteps;
-  const remaining=tLen-usedSteps;
-  const newTotal=md==='replace'?usedSteps:(curTrigs+usedSteps);
-  const over2=md==='replace'?remaining:(tLen-newTotal);
-
-  const uniquePitches=new Set(parsed.map(n=>n.note)).size;
-  const noteRange=parsed.reduce((r,n)=>({lo:Math.min(r.lo,n.note),hi:Math.max(r.hi,n.note)}),{lo:127,hi:0});
-
-  pane.innerHTML=
-    '<table style="width:100%;font-size:11px;border-collapse:collapse;font-family:ui-monospace,Menlo,monospace">'+
-    '<tr style="border-bottom:1px solid var(--border)"><td colspan="2" style="padding:6px 0;color:var(--note);font-weight:600;font-size:12px">SOURCE — import data</td>'+
-    '<td style="width:20px"></td>'+
-    '<td colspan="2" style="padding:6px 0;color:var(--accent);font-weight:600;font-size:12px">DESTINATION — T'+ti+'</td></tr>'+
-    '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">Notes</td><td>'+parsed.length+' ('+uniquePitches+' pitches, '+noteName(noteRange.lo)+'–'+noteName(noteRange.hi)+')</td>'+
-    '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Pattern</td>'+
-    '<td><select id="impPatSelDyn" onchange="refreshImportInfo()">'+patOpts+'</select></td></tr>'+
-    '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">BPM</td><td>'+(window._impSrcBpm||'—')+'</td>'+
-    '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Length</td><td>'+tLen+' steps</td></tr>'+
-    '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">Steps</td><td>'+srcSteps+' ('+(srcSteps/16).toFixed(1)+' bars)</td>'+
-    '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Division</td><td>'+(window._midiHeader?window._midiHeader.ppq:96)+' ppq</td></tr>'+
-    '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Channels</td><td>'+(window._impMultiChannel?'<span style=\"color:var(--warn)\">Multi-channel</span>':'Single channel')+'</td></tr>'+
-    '<tr><td style="color:var(--muted);padding:3px 8px 3px 0">Division</td><td>'+(window._midiHeader?window._midiHeader.ppq:96)+' ticks/quarter</td>'+
-    '<td></td><td style="color:var(--muted);padding:3px 8px 3px 0">Current</td><td>'+curTrigs+' trigs</td></tr>'+
-    '<tr style="border-top:1px solid var(--border)"><td style="color:var(--muted);padding:6px 8px 6px 0">'+SPEED_LABEL[sp]+' speed</td><td style="color:'+(willFit?'var(--vel)':'var(--danger)')+'">'+adjSteps+' steps'+(willTrunc?' → '+usedSteps+' (truncated)':'')+'</td>'+
-    '<td></td><td style="color:var(--muted);padding:6px 8px 6px 0">'+SPEED_LABEL[sp]+' × '+ln+' steps</td><td style="color:'+(over2>=0?'var(--vel)':'var(--danger)')+'">'+usedSteps+' steps used'+(over2<0?', '+(-over2)+' overflow':over2>0?', '+over2+' free':'')+'</td></tr>'+
-    '<tr style="border-top:1px solid var(--border)"><td style="color:var(--muted);padding:6px 8px 6px 0">After import</td><td>'+(md==='replace'?'Replaces all':'Merges with existing')+'</td>'+
-    '<td></td><td style="padding:6px 8px 6px 0">'+
-    (over2>=0?'<span style="color:var(--vel)">✓ Fits</span>':
-     '<span style="color:var(--warn)">⚠ Overflow '+(-over2)+' steps</span>')+'</td></tr>'+
-    '</table>'+
-    '<div style="margin-top:12px">'+
-    '<button onclick="const ev=document.getElementById(\'impEvents\'); ev.style.display = ev.style.display==\'none\'?\'block\':\'none\'; this.textContent = ev.style.display==\'none\'?\'Show raw events\':\'Hide raw events\';" style="font-size:10px;padding:2px 8px;margin-bottom:4px">Show raw events</button>'+
-    '<div id="impEvents" style="display:block;max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px">'+
-    '<table style="width:100%;font-size:10px;border-collapse:collapse;font-family:ui-monospace,Menlo,monospace">'+
-    '<tr style="background:var(--panel2);position:sticky;top:0"><th style="text-align:right;padding:3px 8px;color:var(--muted);font-weight:400">Tick</th><th style="text-align:right;padding:3px 8px;color:var(--muted);font-weight:400">Δ</th><th style="padding:3px 8px;color:var(--muted);font-weight:400">Trk</th><th style="padding:3px 8px;color:var(--muted);font-weight:400">Ch</th><th style="text-align:left;padding:3px 8px;color:var(--muted);font-weight:400">Event</th><th style="text-align:left;padding:3px 8px;color:var(--muted);font-weight:400">Detail</th></tr>'+
-    (window._midiEvents||[]).slice(0,60).map(l=>'<tr><td style="text-align:right;padding:2px 8px;color:var(--accent2)">'+l.tick+'</td><td style="text-align:right;padding:2px 8px;color:'+(l.delta>0?'var(--fg)':'var(--muted)')+'">'+l.delta+'</td><td style="padding:2px 8px;color:var(--accent)">'+l.trk+'</td><td style="padding:2px 8px;color:var(--note)">'+l.ch+'</td><td style="padding:2px 8px;color:var(--fg)">'+l.type+'</td><td style="padding:2px 8px;color:var(--muted)">'+esc(l.detail)+'</td></tr>').join('')+
-    (window._midiEvents&&window._midiEvents.length>60?'<tr><td colspan="6" style="padding:4px 8px;color:var(--muted);font-style:italic">... and '+(window._midiEvents.length-60)+' more events</td></tr>':'')+
-    '</table></div></div>';
+function importCommit(){
+  if(!IMP || !IMP.plan) return;
+  const pi=+document.getElementById('impPatSel').value;
+  const t=+document.getElementById('impTrkSel').value;
+  const md=document.getElementById('impModeSel').value;
+  const plan = IMP.plan;
+  if(pi!==getCurPatternIdx()){ document.getElementById('patSel').value=pi; onPatternChange(); }
+  closeModal();
+  const p = curPattern(); if(!p || !p.ok) return;
+  markDirty('MIDI import');            // one undo step: layout and notes together
+  const L = importApplyLayout(p, t, plan);
+  importNotes(t, plan.events, md);
+  const msgs = [`${plan.events.length} of ${IMP.src.length} notes imported onto T${t}`
+    + (L.change ? ` at ${SPEED_LABEL[plan.speed]} × ${plan.len} steps` : '')
+    + (L.master ? `, master length ${L.master}` : '')];
+  if(plan.dropped) msgs.push(`${plan.dropped} left out`);
+  if(plan.nudged) msgs.push(`${plan.nudged} moved`);
+  // v23.69: a .alc's CC lanes become p-locks on the imported trigs.
+  IMPORT_CC=importCCAsLocks(curPattern(),t,plan.events,IMP.parsed.ccEnvelopes);
+  if(IMPORT_CC.locks||IMPORT_CC.unmapped.length){
+    msgs.push(`${IMPORT_CC.locks} p-lock(s) on ${IMPORT_CC.lanes} parameter(s) from the clip's CC lanes`
+      +(IMPORT_CC.unmapped.length?` — CC ${IMPORT_CC.unmapped.join(', ')} drive(s) no parameter on this track, left out`:''));
+  }
+  if(IMPORT_PROB.set) msgs.push(`${IMPORT_PROB.set} step(s) took Live's chance as PROB`
+    +(IMPORT_PROB.merged?` — ${IMPORT_PROB.merged} chord(s) with differing chances took the highest`:''));
+  render();
+  const st=document.getElementById('status'); if(st) st.textContent = msgs.join(' · ');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -16078,8 +16285,13 @@ function showHelp(){
         <tr><td>${K('Export MIDI')}</td><td>pick <b>.mid</b> or <b>.alc</b> and which tracks. Files are named slot&ndash;pattern&ndash;track.
           <b>All tracks in one file</b> writes a type-1 .mid with each track on its own channel and the shorter tracks repeated
           to the longest.</td></tr>
-        <tr><td>${K('Import MIDI')}</td><td>a .mid or .alc onto a chosen track; speed and length auto-detected. ${K('replace')}
-          clears the track first, ${K('merge')} keeps what is there.</td></tr>
+        <tr><td>${K('Import MIDI')}</td><td>a .mid or .alc onto a chosen track. The dialog draws the file as a piano roll over the
+          track's steps on one time axis, and every control redraws it. ${K('Fold')} 2:1, 4:1 or 8:1 sets the track to 1/2x, 1/4x or 1/8x,
+          so 16 bars of 16ths fit 128 steps: an off-beat note goes half a step from its step as microtiming, on the same step as
+          the on-beat one. ${K('Autofit')} picks the speed and length that keep every note at its own time, or says what the best
+          fit loses (red: left out, amber: moved). The import sets the track's speed and length, and the master length when the
+          pattern would reset too early. ${K('replace')} clears the track first, ${K('merge')} keeps what is there.
+          <i>Same note twice on a step</i> is off by default: it has not been tried on the device.</td></tr>
         <tr><td>microtiming</td><td>survives both ways: an off-grid note comes back as a trig plus its offset.</td></tr>
         <tr><td>speed multiplier</td><td>applied to both formats: a 2x track's steps last half as long.</td></tr>
         <tr><td>overlapping notes</td><td>a trig can outlast the gap to the next on the same pitch, which MIDI cannot hold; notes

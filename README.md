@@ -218,7 +218,7 @@ Digitone.
 | | |
 |---|---|
 | **Export MIDI** | pick **.mid** or **.alc** and which tracks. Files are named slot&ndash;pattern&ndash;track. **All tracks in one file** writes a type-1 .mid with each track on its own channel and the shorter tracks repeated to the longest. |
-| **Import MIDI** | a .mid or .alc onto a chosen track; speed and length auto-detected. **replace** clears the track first, **merge** keeps what is there. |
+| **Import MIDI** | a .mid or .alc onto a chosen track. The dialog draws the file as a piano roll over the track's steps on one time axis, and every control redraws it. **Fold** 2:1, 4:1 or 8:1 sets the track to 1/2x, 1/4x or 1/8x, so 16 bars of 16ths fit 128 steps: an off-beat note goes half a step from its step as microtiming, on the same step as the on-beat one. **Autofit** picks the speed and length that keep every note at its own time, or says what the best fit loses (red: left out, amber: moved). The import sets the track's speed and length, and the master length when the pattern would reset too early. **replace** clears the track first, **merge** keeps what is there. *Same note twice on a step* is off by default: it has not been tried on the device. |
 | microtiming | survives both ways: an off-grid note comes back as a trig plus its offset. |
 | speed multiplier | applied to both formats: a 2x track's steps last half as long. |
 | overlapping notes | a trig can outlast the gap to the next on the same pitch, which MIDI cannot hold; notes are trimmed to stop just before the next one. |
@@ -390,7 +390,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v24.21)`, so any copy of the file can be traced back to the
+`v0.1 (dev v24.24)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md). The last v1 release stays online at
