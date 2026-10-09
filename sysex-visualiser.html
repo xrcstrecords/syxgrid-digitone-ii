@@ -662,6 +662,10 @@ table.names tr.act td.tn{font-weight:700}
      font-size:12px;line-height:1.45;padding:9px 14px;text-align:center}
 .browserwarn a{color:#000;text-decoration:underline}
 .browserwarn code{background:rgba(0,0,0,.18);padding:1px 5px;border-radius:3px}
+/* v24.25: no Web MIDI here (Safari, Firefox, every iPhone / iPad browser). */
+.browserwarn.nomidi{background:var(--warn)}
+.browserwarn.nomidi button{margin-left:8px;padding:2px 10px;font-weight:700;cursor:pointer;
+     background:rgba(0,0,0,.2);color:#000;border:1px solid rgba(0,0,0,.35);border-radius:4px}
 .err{background:rgba(255,107,107,.12);border:1px solid var(--danger);color:var(--danger);
      padding:11px 14px;border-radius:7px;margin-bottom:14px}
 .lwarn{color:var(--warn)}
@@ -794,6 +798,8 @@ button.mini.dbok{background:var(--accent);border-color:var(--accent);color:#000;
 .patstats .chordempty{color:var(--muted);font-size:10px;margin-top:6px}
 .patstats .der{text-decoration:underline dotted;text-underline-offset:3px}
 .patstats .rtabs .ptab i{font-style:normal;opacity:.6;font-size:9px}
+.patstats .rtabs .ptab.plug{border-style:dashed}
+.patstats .rtabs .ptab sup{font-size:7.5px;letter-spacing:.04em;opacity:.65;text-transform:uppercase}
 /* v23.94 (G3.24): the right panel's tabs drawn as the preset editor's are --
    small folder tabs on a rule, the open one outlined in the accent. */
 .patstats .rtabs{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:10px}
@@ -904,6 +910,7 @@ i.ir-note{background:var(--note)} i.ir-nudge{background:var(--warn)} i.ir-lost{b
 .impview{overflow-x:auto;border:1px solid var(--border);border-radius:6px;background:var(--panel2);padding:4px 0}
 .impsvg{display:block}
 .impsvg .ir-bar{stroke:var(--border);stroke-width:1}
+.impsvg .ir-barx{stroke:var(--muted);stroke-width:2;opacity:.45;pointer-events:none}
 .impsvg .ir-end{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 3}
 .impsvg .ir-lbl{fill:var(--muted);font:9px ui-monospace,Menlo,monospace}
 .impsvg .ir-note{fill:var(--note)} .impsvg .ir-nudge{fill:var(--warn)} .impsvg .ir-lost{fill:var(--danger)}
@@ -916,9 +923,31 @@ i.ir-note{background:var(--note)} i.ir-nudge{background:var(--warn)} i.ir-lost{b
 .impsvg .ir-nd{fill:var(--note);filter:drop-shadow(0 0 3px var(--note-glow))}
 .impsvg .ir-span{stroke:var(--note);stroke-linecap:round;opacity:.45}
 .impsvg .ir-ring{fill:none;stroke:var(--note);stroke-width:1.5;opacity:.75}
+.impsvg .ir-rep{fill:var(--cell);stroke:var(--note);stroke-width:1.5}
+.impsvg .ir-cd{fill:var(--accent);font:700 7px ui-monospace,Menlo,monospace}
+.impsvg .ir-wr{fill:var(--accent);font:700 8px ui-monospace,Menlo,monospace}
+.impsvg .ir-rt{fill:var(--accent2);font:700 7px ui-monospace,Menlo,monospace;text-anchor:end}
+.impside .impchk.dim{opacity:.5}
+.impadv{margin-top:6px;border-top:1px solid var(--border);padding-top:4px}
+.impadv summary{cursor:pointer;color:var(--muted);font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.impadv[open]{display:flex;flex-direction:column;gap:4px}
+.impsources{margin:2px 0 6px}
+.impsrct{border-collapse:collapse;font-size:11px;width:100%}
+.impsrct th{color:var(--muted);font-weight:400;font-size:10px;text-align:left;padding:2px 6px}
+.impsrct td{padding:2px 6px;border-top:1px solid var(--border)}
+.impsrct tr.foc td{background:var(--panel2)}
+.impsrct select{font-size:11px}
+.impsrct .ok{color:var(--vel)} .impsrct .warn{color:var(--warn)}
+.impsrct .impsug{border-color:var(--vel);color:var(--vel)}
+.impsvg .ir-loop{fill:var(--accent);fill-opacity:.05;stroke:var(--accent);stroke-opacity:.35;stroke-dasharray:3 3}
+.impsvg .ir-loopl{fill:var(--accent)}
+.impsvg .ir-dim{opacity:.35}
+.impsvg .ir-mm.swing{fill:var(--len)}
+.implegend .mm-s{color:var(--len)}
 .impsvg .ir-mm{font:700 11px ui-monospace,Menlo,monospace;text-anchor:middle;letter-spacing:-1px}
 .impsvg .ir-mm.early{fill:var(--early)} .impsvg .ir-mm.late{fill:var(--late)} .impsvg .ir-mm.both{fill:var(--accent2)}
 .impstat{font-size:11px;margin-top:6px;line-height:1.5}
+.impstat .muted{color:var(--muted)}
 .impstat .ok{color:var(--vel)} .impstat .warn,.implayout .warn{color:var(--warn)}
 .impfit{color:var(--muted);margin-top:2px}
 .implayout{font-size:10px;color:var(--muted);line-height:1.5;margin-top:6px}
@@ -1061,6 +1090,12 @@ option:disabled{color:var(--opt-off)}
   This is a browser bug, not a fault in this app.
 </div>
 
+<div class="browserwarn nomidi" id="noMidiWarn">
+  <b>This browser cannot talk to the Digitone II</b> — it has no Web MIDI with SysEx. That is <span id="nmWhy">Safari, Firefox,
+  and every browser on an iPhone or iPad</span>. Opening, editing and saving files works here; reading from and writing to the
+  device needs <b>Chrome, Edge or Brave on a computer</b>.<button type="button" onclick="dismissNoMidi()">OK</button>
+</div>
+
 <div class="toolbar">
   <!-- XRCST logotype, inlined as SVG so the app stays a single self-contained
        file. fill=currentColor lets it inherit the theme instead of hardcoding
@@ -1177,12 +1212,12 @@ function setTheme(t){
 function toggleTheme(){ setTheme(currentTheme() === 'light' ? 'dark' : 'light'); }
 document.addEventListener('DOMContentLoaded', themeLabel);
 
-const VIZ_VERSION = 'v24.24';
-const VIZ_DATE    = '2026-10-06';
+const VIZ_VERSION = 'v24.36';
+const VIZ_DATE    = '2026-10-09';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v2.2';
+const VIZ_PUBLIC  = 'v2.3';
 // v24.20 (the operator): bugs go to GitHub's issue tracker. reportBug() copies
 // the facts a report needs -- version, browser, what is loaded -- and opens the
 // bug-report form (.github/ISSUE_TEMPLATE/bug_report.md) to paste them into.
@@ -1208,7 +1243,7 @@ async function reportBug(){
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'Send pattern / Send project use the chosen port';
+const VIZ_NOTE    = 'Generator: Claude composes patterns through the generator’s tools (private)';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -2402,6 +2437,20 @@ function isMidiTrack(p,t){
   if(t<1 || t>16) return false;
   return ((trackTypeMask(p) >> (t-1)) & 1) === 1;
 }
+// v24.34 (the operator): a track goes by the name the device shows for it --
+// a MIDI track by its MIDI name, an audio track by its preset's -- in the
+// track header and in every dialog that names a track. Plain text: callers
+// escape it.
+function trackName(p,t){
+  if(!p || t<1 || t>16) return '';
+  const n = isMidiTrack(p,t) ? (p.midiNames && p.midiNames[t-1]) : (p.presetNames && p.presetNames[t-1]);
+  return String(n || '').trim();
+}
+// "T3 · JX PLUCK"; a MIDI track with no name is "T3 · MIDI".
+function trackTag(p,t){
+  const n = trackName(p,t) || (p && isMidiTrack(p,t) ? 'MIDI' : '');
+  return `T${t}` + (n ? ' · ' + n : '');
+}
 
 // Set a track's type. Writes the cached mask only; the three on-disk
 // encodings are written together by buildSyxForPattern, because writing
@@ -2517,7 +2566,7 @@ function showTrackType(t){
 
   const midiName   = p.midiNames && p.midiNames[t-1] || '';
 
-  showModal('Track '+t+' — audio or MIDI',
+  showModal(trackTag(p,t)+' — audio or MIDI',
     'Currently '+machineName(p,t)+'.'+
     (isMidi?'':' Switching to MIDI keeps the trigs; the synth preset is not carried over.'),
     [
@@ -5830,8 +5879,44 @@ function poolHtml(p, inTab){
   return h + `</div>`;
 }
 
+// ── PLUGINS (v24.35, G10.19) ────────────────────────────────────────────
+// Features that are not for the public build live in files of their own
+// under private/, one per feature, and plug in here. The core never names
+// them: it offers hooks, and a public build simply has fewer tabs.
+//
+//   private/<file>.js   pushes {id, tier, tab?, beforeDrive?} onto
+//                       window.SYXGRID_PLUGINS before this script runs
+//   features.json       says where each one goes: "beta" (the beta URL and
+//                       Gitea) or "private" (Gitea and the local file only)
+//   scripts/plugins.py  inlines the beta ones into the beta page and drops
+//                       the whole PLUGINS block from every public build
+//
+// Hooks: tab.label, tab.html(p) for the right panel, tab.afterRender() after
+// each render, tab.leave() when another tab is picked, beforeDrive() before
+// other +Drive work takes the port. A public build (VIZ_PUBLIC set) refuses
+// every plugin, so a stray one cannot appear even if a strip were missed.
+const PLUGINS = [];
+function registerPlugin(def){
+  if(!def || !/^[a-z][a-z0-9-]*$/.test(def.id || '')) throw new Error('a plugin needs an id');
+  if(VIZ_PUBLIC || PLUGINS.some(x => x.id === def.id)) return false;
+  PLUGINS.push(def);
+  return true;
+}
+const pluginTab = k => PLUGINS.find(x => x.tab && x.id === k) || null;
+// One RPC exchange at a time may use the port: each plugin but the caller stops first.
+async function pluginsBeforeDrive(own){
+  for(const x of PLUGINS) if(x.id !== own && x.beforeDrive) await x.beforeDrive();
+}
+// globalThis, not window: some offline harnesses run the core without one.
+for(const d of (globalThis.SYXGRID_PLUGINS || [])) try{ registerPlugin(d); }catch(e){ console.error(e); }
+globalThis.SYXGRID_PLUGINS = {push: d => registerPlugin(d)};
+
 let RIGHT_TAB = 'stats';        // G1.7: pool | kit | chords | song | stats | settings (v23.76)
-function setRightTab(t){ RIGHT_TAB = t; render(); }
+function setRightTab(t){
+  const was = pluginTab(RIGHT_TAB);
+  if(was && t !== RIGHT_TAB && was.tab.leave) was.tab.leave();
+  RIGHT_TAB = t; render();
+}
 
 function rightPanelHtml(p, patLen, totalTrigs, totalNotes){
   const songs = projectSongs();
@@ -5872,7 +5957,8 @@ function rightPanelHtml(p, patLen, totalTrigs, totalNotes){
                  ['project','Project',''],
                  ['kit','Kit',''],
                  ['kitsetup','Kit setup',''],
-                 ['kitfx','FX & mixer','']]
+                 ['kitfx','FX & mixer',''],
+                 ...PLUGINS.filter(x => x.tab).map(x => [x.id, x.tab.label, '', x.tier])]
     .filter(([k]) => k === 'stats' || (k === 'pool' ? !!pool.source
                                      : k === 'project' ? hasSettings
                                      : k === 'kitsetup' || k === 'kitfx' || k === 'kit' ? hasKit
@@ -5885,9 +5971,10 @@ function rightPanelHtml(p, patLen, totalTrigs, totalNotes){
   let h = `<div class="patstats">`;
   if(avail.length > 1)
     h += `<div class="rtabs">`
-       + avail.map(([k, label, badge]) =>
-           `<button class="ptab${k === RIGHT_TAB ? ' on' : ''}" onclick="setRightTab('${k}')">`
-           + `${label}${badge ? ` <i>${badge}</i>` : ''}</button>`).join('')
+       + avail.map(([k, label, badge, tier]) =>
+           `<button class="ptab${k === RIGHT_TAB ? ' on' : ''}${tier ? ' plug' : ''}" onclick="setRightTab('${k}')"`
+           + `${tier ? ` title="${tier === 'private' ? 'Private plugin: local and Gitea only' : 'Beta plugin: not in the public build'}"` : ''}>`
+           + `${label}${badge ? ` <i>${badge}</i>` : ''}${tier ? ` <sup>${tier}</sup>` : ''}</button>`).join('')
        + `</div>`;
   h += RIGHT_TAB === 'pool'     ? poolHtml(p, true)
      : RIGHT_TAB === 'song'     ? songTabHtml(songs)
@@ -5897,6 +5984,7 @@ function rightPanelHtml(p, patLen, totalTrigs, totalNotes){
      : RIGHT_TAB === 'kitfx'    ? kitFxHtml(p, kbk)
      : RIGHT_TAB === 'keyboard' ? keyboardTabHtml(p)
      : RIGHT_TAB === 'chords'   ? chordTabHtml(p)
+     : pluginTab(RIGHT_TAB)     ? pluginTab(RIGHT_TAB).tab.html(p)
      : statsTabHtml(p, patLen, totalTrigs, totalNotes);
   return h + `</div>`;
 }
@@ -6617,7 +6705,7 @@ function kitTableEdit(key){
   const kb = patternKitBlock(p), base = KIT_REL[key], verb = key === 'layering' ? 'also plays' : 'chokes';
   // v24.04 (H98): rows named and coloured by the track's machine, so it is clear
   // which track is the source; a Clear all.
-  const nm = t => isMidiTrack(p, t) ? 'MIDI' : (p.presetNames[t - 1] || 'PRESET ' + t);
+  const nm = t => trackName(p, t) || (isMidiTrack(p, t) ? 'MIDI' : 'PRESET ' + t);
   let g = `<div style="font-size:11px;margin-bottom:4px">Each <b>row</b> is the source: tick the tracks it ${verb}. `
         + `<button class="mini" onclick="ktClear()">clear all</button></div>`
         + '<table class="kmtab"><tr><th>source ↓ · target →</th>' + Array.from({length: 16}, (_, i) => `<th class="m${trackMachine(p, i + 1)}" title="T${i + 1} ${esc(nm(i + 1))}">${i + 1}</th>`).join('') + '</tr>';
@@ -7288,7 +7376,7 @@ function showEuclid(t){
   const p = curPattern(); const ts = p && trackSetup(p, t); if(!ts) return;
   const e = ts.euc, n = trackLenOf(p, t);
   const num = (id, v, lo, hi) => `<input id="eu_${id}" type="number" min="${lo}" max="${hi}" value="${v}" style="width:60px" oninput="euclidPreview(${t})">`;
-  showModal(`Euclidean — T${t}`, 'The device’s SEQUENCER menu (manual 10.6). With EUC on, the device plays the generated trigs and hides the stored ones. Saved with the pattern; Undo takes it back.',
+  showModal(`Euclidean — ${trackTag(p, t)}`, 'The device’s SEQUENCER menu (manual 10.6). With EUC on, the device plays the generated trigs and hides the stored ones. Saved with the pattern; Undo takes it back.',
     [{label: 'Apply', desc: '', fn: () => {
         const g = id => document.getElementById('eu_' + id);
         try{
@@ -8078,10 +8166,10 @@ function presetPanelBody(p, tOverride){
   if(t === null || t === undefined) return '';
   const isMidi = isMidiTrack(p, t);
   const title = sound
-    ? `${esc(p.presetNames[0] || 'SOUND')}`
+    ? (p.presetNames[0] || 'SOUND')
     : isMidi
-    ? `T${t} · MIDI` + (midiChannel(p, t) ? ` CH ${midiChannel(p, t)}` : '')
-    : `T${t} · ${esc(p.presetNames[t - 1] || 'PRESET ' + t)}`;
+    ? trackTag(p, t) + (midiChannel(p, t) ? ` · CH ${midiChannel(p, t)}` : '')
+    : `T${t} · ${p.presetNames[t - 1] || 'PRESET ' + t}`;
 
   let h = `<div class="presetpanel${sound ? ' soundpanel' : ''}">`
         + `<div class="presethdr"><span class="presettitle m${trackMachine(p, t)}${sound ? '' : ' ttedit'}"`
@@ -8584,7 +8672,7 @@ function showAddPlock(track){
       `onclick="pickAddPlock(${track},${a.id})" title="${esc(a.name)}${a.lane?' — already has a lane':''}">`+
       `${esc(a.short||a.name)}${a.lane?' •':''}</button>`).join('')
   ).join('');
-  showModal(`Add a p-lock — track ${track}`,
+  showModal(`Add a p-lock — ${trackTag(p, track)}`,
     `<div style="margin-bottom:6px">Pick a parameter, then the step. `+
     `<span style="color:var(--accent2)">•</span> marks one that already has a lane.</div>`+
     `<div style="max-height:320px;overflow:auto">${body}</div>`+
@@ -8703,7 +8791,7 @@ function showLaneMenu(track,baseParam){
       markDirty('clear p-lock lane'); render();
       document.getElementById('status').textContent=`Cleared ${label} on T${track} — the lane is free again`; }});
   acts.push({label:'Cancel', desc:'', fn:()=>closeModal()});
-  showModal(`${label} — track ${track}`,
+  showModal(`${label} — ${trackTag(p, track)}`,
     `<div>${lane.locks.length} locked step(s), lane ${lane.lane}.</div>`+
     `<div style="margin-top:6px;font-size:11px;color:var(--muted)">`+
     `Pasting writes the copied lane’s values onto THIS parameter, whatever it was copied from. `+
@@ -8762,7 +8850,7 @@ function editPlock(track, baseParam, step, clear){
 
   // An enum: offer its own labels, one button each.
   if(choices){
-    showModal(`${existing?'Edit':'Add'} ${label} — T${track} step ${step}`,
+    showModal(`${existing?'Edit':'Add'} ${label} — ${trackTag(p, track)} step ${step}`,
       `<div>${existing?`Currently <b>${esc(curText||String(cur))}</b> (stored ${cur}).`:'Not locked yet.'}`+
       ` This parameter has ${choices.length} values.</div>`,
       choices.map(c=>({label:c.text, desc:'stored '+c.raw,
@@ -8775,7 +8863,7 @@ function editPlock(track, baseParam, step, clear){
   }
 
   // A number: type what the device shows, with the stored value beside it.
-  showModal(`${existing?'Edit':'Add'} ${label} — T${track} step ${step}`,
+  showModal(`${existing?'Edit':'Add'} ${label} — ${trackTag(p, track)} step ${step}`,
     `<div style="margin-bottom:8px">Value as the device shows it`+
     (curText?`, currently <b>${esc(curText)}</b>`:'')+`:</div>`+
     `<input id="plockDisp" type="text" value="${esc(curText||'')}" style="width:130px" `+
@@ -8832,7 +8920,7 @@ function editPresetParam(track, id){
 
   const choices = nm.sure ? plockValueChoices(p, track, id) : null;
   if(choices){
-    showModal(`${label} — T${track}`,
+    showModal(`${label} — ${trackTag(p, track)}`,
       `<div>Currently <b>${esc(curText || String(cur))}</b>, in ${where}. `+
       `This parameter has ${choices.length} values.</div>` + was,
       choices.map(c => ({label:c.text, desc:'stored ' + (c.raw / src.scale),
@@ -8841,7 +8929,7 @@ function editPresetParam(track, id){
         .concat([{label:'Cancel', desc:'', fn:()=>closeModal()}]));
     return;
   }
-  showModal(`${label} — T${track}`,
+  showModal(`${label} — ${trackTag(p, track)}`,
     `<div style="margin-bottom:8px">Value as the device shows it`+
     (curText ? `, currently <b>${esc(curText)}</b>` : '') + `:</div>`+
     `<input id="presetDisp" type="text" value="${esc(curText || '')}" style="width:130px" `+
@@ -10801,7 +10889,7 @@ function editTrigAttr(t, key, step){
     document.getElementById('status').textContent =
       `${a.name} T${t} ${all ? 'every trig' : 'step ' + step} = ${r ? r.text : 'not set (track default)'}`;
   };
-  showModal(`${a.name} — T${t} step ${step}`,
+  showModal(`${a.name} — ${trackTag(p, t)} step ${step}`,
     `Now <b>${esc(tx ? tx.text : 'not set')}</b>${tx ? '' : ' — the track default applies'}. `+
     `Saved with the pattern; Undo takes it back.`,
     [{label: 'Set', desc: '', fn: () => {
@@ -10822,7 +10910,7 @@ function showAddTrigAttr(t){
   const midi = isMidiTrack(p, t);
   const can = TRACK_STEP_ARRAYS.filter(a => !have.has(a.key) && !(midi && a.audioOnly));
   if(!can.length){ alert(`T${t} already shows every trig attribute it can have.`); return; }
-  showModal(`T${t} — add a trig attribute`, 'A lane per attribute; click a trig\u2019s cell in it to set a value.',
+  showModal(`${trackTag(p, t)} — add a trig attribute`, 'A lane per attribute; click a trig\u2019s cell in it to set a value.',
     can.map(a => ({label: a.name, desc: a.short, fn: () => {
       p._trigAttrShown = p._trigAttrShown || {};
       p._trigAttrShown[t] = (p._trigAttrShown[t] || []).concat(a.key);
@@ -10965,7 +11053,7 @@ function showTrackCopy(t){
   const p = curPattern(); if(!p || !p.ok) return;
   const midi = isMidiTrack(p, t), n = (p.tracks[t] || []).length;
   const locks = (p.locks || []).filter(l => l.track === t).reduce((k, l) => k + l.locks.length, 0);
-  showModal(`Copy from T${t}`, 'What goes on the clipboard. Paste it onto any track of any pattern.',
+  showModal(`Copy from ${trackTag(p, t)}`, 'What goes on the clipboard. Paste it onto any track of any pattern.',
     [{label: 'Copy the preset', desc: midi ? 'A MIDI track has no preset.' : `${(p.presetNames || [])[t - 1] || 'its preset'} — machine and every parameter.`,
       fn: () => { if(midi){ alert(`T${t} is a MIDI track: it has no preset to copy.`); return; }
                   try{ copyTrackPreset(p, t); }catch(e){ alert(e.message); return; }
@@ -10981,7 +11069,7 @@ function showTrackPaste(t){
   const c = TRACK_CLIP;
   if(c.kind === 'preset'){
     if(isMidiTrack(p, t)){ alert(`T${t} is a MIDI track: a preset cannot go on it. Make it an audio track first.`); return; }
-    showModal(`Paste ${c.name} onto T${t}?`,
+    showModal(`Paste ${c.name} onto ${trackTag(p, t)}?`,
       `The preset copied from <b>${esc(c.from)}</b> replaces <b>${esc((p.presetNames || [])[t - 1] || 'the preset')}</b> — machine and every parameter. Undo takes it back.`,
       [{label: 'Paste the preset', desc: '', fn: () => {
           try{ markDirty(`paste preset onto T${t}`); pasteTrackPreset(p, t); }catch(e){ alert(e.message); return; }
@@ -10990,7 +11078,7 @@ function showTrackPaste(t){
     return;
   }
   const match = clipLocksMatch(p, t), n = c.snap.steps.length, had = (p.tracks[t] || []).length;
-  showModal(`Paste trigs onto T${t}?`,
+  showModal(`Paste trigs onto ${trackTag(p, t)}?`,
     `${n} trig${n === 1 ? '' : 's'} from <b>${esc(c.from)}</b>` + (had ? ` <b>replace T${t}'s ${had}</b>` : '') + '. Undo takes it back.'
     + (c.lockCount ? `<br><br>They carry <b>${c.lockCount} p-lock${c.lockCount === 1 ? '' : 's'}</b>. `
       + (match ? 'The machines match, so they mean the same here.'
@@ -11013,8 +11101,8 @@ function showTrackSwap(t){
   if(why){ alert(`A track swap moves the preset too, and ${why}.`); return; }
   let opts = '';
   for(let k = 1; k <= 16; k++) if(k !== t)
-    opts += `<option value="${k}">T${k} · ${esc(isMidiTrack(p, k) ? 'MIDI' : ((p.presetNames || [])[k - 1] || 'PRESET ' + k))} · ${(p.tracks[k] || []).length} trigs</option>`;
-  showModal(`Swap T${t} with…`,
+    opts += `<option value="${k}">${esc(trackTag(p, k))}${isMidiTrack(p, k) && trackName(p, k) ? ' (MIDI)' : ''} · ${(p.tracks[k] || []).length} trigs</option>`;
+  showModal(`Swap ${trackTag(p, t)} with…`,
     'The <b>complete track</b> changes places: trigs with their notes, conditions, p-locks and preset locks, length and speed, and the preset. Undo takes it back.',
     [{label: 'Swap', desc: '', fn: () => {
         const k = parseInt((document.getElementById('swDst') || {}).value, 10);
@@ -11036,13 +11124,21 @@ function showTrackSwap(t){
 // locks and the preset have no MIDI-track counterpart. A copy, not a link.
 const COPY_TO_PARTS = ['trigs', 'notes', 'locks', 'prob', 'preset'];
 // What a copy from (p, s) to (q, t) may carry, and why the rest cannot go.
-function copyToRules(p, s, q, t){
-  const sm = isMidiTrack(p, s), dm = isMidiTrack(q, t), cross = sm !== dm;
+// v24.34 (the operator): with `kind` the destination first becomes the
+// source's kind -- a MIDI track on the source's channel with its name, or an
+// audio track with the source's preset -- so the copy is a same-kind one.
+function copyToRules(p, s, q, t, kind){
+  const sm = isMidiTrack(p, s), dm0 = isMidiTrack(q, t);
+  // Becoming audio loads the source's preset, so it needs a writable kit.
+  const kindWhy = sm ? '' : kitRefusal(q);
+  const asSrc = !!kind && !kindWhy;
+  const dm = asSrc ? sm : dm0, cross = sm !== dm;
   const presetWhy = sm || dm ? 'a MIDI track has no preset' : kitRefusal(q);
-  return {srcMidi: sm, dstMidi: dm, cross,
+  const dstMachine = asSrc && !sm ? trackMachine(p, s) : trackMachine(q, t);
+  return {srcMidi: sm, dstMidi: dm, dstMidiNow: dm0, cross, kindCross: sm !== dm0, kindWhy: kindWhy || '',
           locks: !cross, preset: !presetWhy, presetWhy: presetWhy || '',
-          srcMachine: trackMachine(p, s), dstMachine: trackMachine(q, t),
-          machineDiffers: !sm && !dm && trackMachine(p, s) !== trackMachine(q, t)};
+          srcMachine: trackMachine(p, s), dstMachine,
+          machineDiffers: !sm && !dm && trackMachine(p, s) !== dstMachine};
 }
 // Lay the chosen parts of (p, s) onto (q, t). Unticked parts keep what the
 // destination had. -> {steps, skippedArrays, skippedLocks, droppedLocks}.
@@ -11050,11 +11146,27 @@ function copyTrackTo(p, s, q, t, opts){
   s = +s; t = +t;
   if(!(s >= 1 && s <= MAX_TRACK && t >= 1 && t <= MAX_TRACK)) throw new Error('pick a track, 1 to 16');
   if(p === q && s === t) throw new Error('the source and the destination are the same track');
-  const o = Object.assign({trigs: false, notes: false, locks: false, prob: false, preset: false}, opts || {});
+  const o = Object.assign({trigs: false, notes: false, locks: false, prob: false, preset: false, kind: false}, opts || {});
+  if(o.kind){
+    const k = copyToRules(p, s, q, t, true);
+    if(k.kindWhy) throw new Error(`T${t} cannot become an audio track: ${k.kindWhy}`);
+    // An audio source's kind comes with its preset: the machine is the preset's.
+    if(!k.srcMidi) o.preset = true;
+  }
+  if(!COPY_TO_PARTS.some(k => o[k]) && !o.kind) throw new Error('tick at least one part to copy');
+  // The destination's type, channel and name first; the rules below then see
+  // a same-kind copy. The trigs are snapshot after, so they are read as the
+  // kind they now are.
+  if(o.kind){
+    setTrackType(q, t, isMidiTrack(p, s));
+    if(isMidiTrack(p, s)){
+      setMidiChannel(q, t, midiChannel(p, s));
+      setMidiName(q, t, (p.midiNames || [])[s - 1] || '');
+    }
+  }
   const rules = copyToRules(p, s, q, t);
   if(!rules.locks) o.locks = false;
   if(o.preset && !rules.preset) throw new Error(`the preset cannot go: ${rules.presetWhy}`);
-  if(!COPY_TO_PARTS.some(k => o[k])) throw new Error('tick at least one part to copy');
   const src = trackTrigsSnapshot(p, s), dst = trackTrigsSnapshot(q, t);
   // The preset first: the destination's machine is then the source's, and the
   // p-locks laid below name the parameters they were set on.
@@ -11108,17 +11220,22 @@ function showTrackCopyTo(s, keep){
   if(!pats.some(([, k]) => k === COPYTO.q)) COPYTO.q = PATTERNS.indexOf(p);
   const q = PATTERNS[COPYTO.q];
   if(q === p && COPYTO.t === s) COPYTO.t = s % MAX_TRACK + 1;
-  const t = COPYTO.t, rules = copyToRules(p, s, q, t);
+  const t = COPYTO.t;
+  const kindOn = !!(COPYTO.parts && COPYTO.parts.kind);
+  const rules = copyToRules(p, s, q, t, kindOn);
   const same = !rules.cross;
   // Defaults per pairing: everything for a same-kind copy except the preset;
   // across kinds what can go. Kept while the operator only moves the destination.
   if(!COPYTO.parts || COPYTO.parts._cross !== rules.cross)
     COPYTO.parts = {_cross: rules.cross, trigs: true, notes: true, prob: true,
-                    locks: same && !rules.machineDiffers, preset: false};
+                    locks: same && !rules.machineDiffers, preset: false, kind: kindOn};
   const P = COPYTO.parts;
   if(!rules.locks) P.locks = false;
   if(!rules.preset) P.preset = false;
-  const kind = (x, k) => isMidiTrack(x, k) ? 'MIDI' : `audio · ${esc((x.presetNames || [])[k - 1] || 'PRESET ' + k)}`;
+  // An audio source made audio there brings its preset: ticked, not optional.
+  const presetByKind = kindOn && !rules.srcMidi && rules.kindCross;
+  if(presetByKind) P.preset = true;
+  const kind = (x, k) => isMidiTrack(x, k) ? (trackName(x, k) ? `MIDI · ${esc(trackName(x, k))}` : 'MIDI') : `audio · ${esc((x.presetNames || [])[k - 1] || 'PRESET ' + k)}`;
   const nm = x => esc(x.slot || x.label);
   const popts = pats.map(([x, k]) => `<option value="${k}"${k === COPYTO.q ? ' selected' : ''}>${esc(x.slot || x.label)}`
     + `${x.patternName ? ' · ' + esc(x.patternName) : ''}</option>`).join('');
@@ -11128,8 +11245,9 @@ function showTrackCopyTo(s, keep){
     topts += `<option value="${k}"${k === t ? ' selected' : ''}>T${k} · ${kind(q, k)} · ${(q.tracks[k] || []).length} trigs</option>`;
   }
   const srcLocks = (p.locks || []).filter(l => l.track === s).reduce((n, l) => n + l.locks.length, 0);
-  const box = (key, label, ok, why) => `<label style="display:flex;align-items:center;gap:6px;font-size:12px;margin:3px 0${ok ? '' : ';opacity:.5'}">`
-    + `<input type="checkbox" ${P[key] && ok ? 'checked' : ''}${ok ? '' : ' disabled'} onchange="COPYTO.parts.${key}=this.checked;showTrackCopyTo(${s},true)"> ${label}`
+  // forced: ticked and locked, because another choice brings it.
+  const box = (key, label, ok, why, forced) => `<label style="display:flex;align-items:center;gap:6px;font-size:12px;margin:3px 0${ok || forced ? '' : ';opacity:.5'}">`
+    + `<input type="checkbox" ${forced || (P[key] && ok) ? 'checked' : ''}${ok && !forced ? '' : ' disabled'} onchange="COPYTO.parts.${key}=this.checked;showTrackCopyTo(${s},true)"> ${label}`
     + (why ? ` <span style="color:var(--muted)">— ${why}</span>` : '') + `</label>`;
   let warn = '';
   if(rules.cross)
@@ -11143,6 +11261,15 @@ function showTrackCopyTo(s, keep){
   else if(rules.machineDiffers && !P.preset)
     warn += `<div style="color:var(--muted);font-size:11px;margin:8px 0">The destination has a different machine; the trigs play its sound.</div>`;
   const had = (q.tracks[t] || []).length;
+  // v24.34: make the destination the source's kind. Offered across kinds, and
+  // between MIDI tracks for the channel and name; audio to audio has the
+  // preset box for that.
+  const sch = midiChannel(p, s), sname = trackName(p, s);
+  const midiWhat = `channel ${sch == null ? 'OFF' : sch}${sname ? ', name ' + esc(sname) : ''}`;
+  const kindBox = rules.kindCross
+    ? box('kind', rules.srcMidi ? `Make T${t} a MIDI track like the source` : `Make T${t} an audio track like the source`,
+          !rules.kindWhy, rules.srcMidi ? midiWhat : rules.kindWhy || 'with the source’s preset')
+    : rules.srcMidi ? box('kind', 'The MIDI channel and name', true, midiWhat) : '';
   const body = `<label class="spname">Pattern <select id="ctPat" class="nlen" onchange="COPYTO.q=+this.value;showTrackCopyTo(${s},true)">${popts}</select></label>
     <label class="spname">Track <select id="ctTrk" class="nlen" onchange="COPYTO.t=+this.value;showTrackCopyTo(${s},true)">${topts}</select></label>
     <div style="font-size:12px;margin:6px 0">From <b>${nm(p)} T${s}</b> (${kind(p, s)}) to <b>${nm(q)} T${t}</b> (${kind(q, t)})</div>
@@ -11151,9 +11278,10 @@ function showTrackCopyTo(s, keep){
     ${box('notes', 'Notes', true, 'note, velocity, length, chords')}
     ${box('locks', `P-locks${srcLocks ? ` (${srcLocks})` : ''}`, rules.locks, rules.cross ? 'not across audio and MIDI' : '')}
     ${box('prob', 'Probability', true, '')}
-    ${box('preset', 'The track’s preset', rules.preset, rules.preset ? 'machine and every parameter' : rules.presetWhy)}`;
+    ${box('preset', 'The track’s preset', rules.preset, presetByKind ? 'comes with the audio track' : rules.preset ? 'machine and every parameter' : rules.presetWhy, presetByKind)}
+    ${kindBox}`;
   closeModal();
-  showModal(`Copy T${s} to…`,
+  showModal(`Copy ${trackTag(p, s)} to…`,
     `A copy, not a link: later edits to T${s} do not follow. Unticked parts keep what the destination has`
     + (had ? `; its <b>${had} trig${had === 1 ? '' : 's'}</b> are replaced when Trigs is ticked` : '') + '. Undo takes it back.',
     [{label: 'Copy', desc: '', fn: () => copyToGo(s)},
@@ -11163,6 +11291,7 @@ function copyToGo(s){
   const p = curPattern(), q = PATTERNS[COPYTO.q], t = COPYTO.t;
   const opts = {};
   for(const k of COPY_TO_PARTS) opts[k] = !!COPYTO.parts[k];
+  opts.kind = !!COPYTO.parts.kind;
   let r;
   try{
     pushUndoFor(q, `copy T${s} to ${q === p ? '' : (q.slot || q.label) + ' '}T${t}`);
@@ -11171,6 +11300,7 @@ function copyToGo(s){
   COPYTO = null;
   closeModal(); refreshTrackSel(); render();
   const parts = COPY_TO_PARTS.filter(k => opts[k]).map(k => ({trigs: 'trigs', notes: 'notes', locks: 'p-locks', prob: 'probability', preset: 'preset'})[k]);
+  if(opts.kind) parts.push(isMidiTrack(p, s) ? 'MIDI channel and name' : 'track type');
   saveStatus(`Copied T${s}'s ${parts.join(', ')} to ${q === p ? '' : (q.slot || q.label) + ' '}T${t}`
     + (r.skippedArrays ? ` — ${r.skippedArrays} retrig/preset-lock value(s) left out: a MIDI track has none` : '')
     + (r.droppedLocks ? ` — ${r.droppedLocks} p-lock(s) left out: no trig on their step` : '')
@@ -11585,7 +11715,7 @@ function setTrackLength(t,v){
     // In-app dialog rather than window.prompt, which is unstyled, blocks the
     // page, and is suppressed outright by some browsers.
     const cur=effectiveTrackLength(p,t);
-    showModal(`Track ${t} — custom length`,
+    showModal(`${trackTag(p, t)} — custom length`,
       'Any value from 1 to 128 steps. Applying a per-track length switches the pattern into per-track mode.',
       [
         {label:'Apply', desc:'', fn:()=>{
@@ -11621,7 +11751,7 @@ function setTrackLength(t,v){
   };
 
   if(want>cur){
-    showModal(`Track ${t}: extend to ${want} steps`,
+    showModal(`${trackTag(p, t)}: extend to ${want} steps`,
       `Track ${t} is currently ${cur} steps. What should steps ${cur+1}\u2013${want} contain?`,
       [
         {label:'Leave new steps empty', desc:'Extends the track length; the added steps have no trigs.',
@@ -11635,7 +11765,7 @@ function setTrackLength(t,v){
 
   const beyond=(p.tracks[t]||[]).filter(s=>s>want);
   if(!beyond.length){ commit(); markDirty(); render(); return; }
-  showModal(`Track ${t}: reduce to ${want} steps`,
+  showModal(`${trackTag(p, t)}: reduce to ${want} steps`,
     `<b class="dirty">${beyond.length} trig(s) on track ${t} lie beyond step ${want}.</b><br>`+
     `steps ${esc(beyond.slice(0,16).join(', '))}${beyond.length>16?' \u2026':''}`,
     [
@@ -11884,6 +12014,7 @@ async function ingestBytes(bytes,name,opts){
 
 function loadFiles(files){
   if(!files||!files.length) return;
+  FILE_HANDLE=null;              // v24.25: set again by the launchQueue consumer, after this
   PATTERNS=[]; DIRTY=false; VIEW_STEPS=null;
   document.getElementById('dirtyBadge').style.display='none';
   let pending=files.length;
@@ -12441,7 +12572,7 @@ function clearTrack(t,quiet){
   if(quiet){ apply(); return true; }
   if(!steps){ showModal('Track '+t+' is already empty','Nothing to clear.',
     [{label:'OK',desc:'',fn:()=>closeModal()}]); return false; }
-  showModal('Clear track '+t+'?',
+  showModal('Clear '+trackTag(p,t)+'?',
     'Removes every trig from this track but keeps the track itself — its name '+
     'and settings stay. Use Delete to remove the track entirely.',
     [
@@ -12486,7 +12617,7 @@ function duplicateTrack(src,dst,quiet){
   const what = steps.length
     ? 'Copies '+steps.length+' trig'+(steps.length===1?'':'s')+' and '+notes+' note'+(notes===1?'':'s')+', microtiming included.'
     : 'Track '+src+' has no trigs, so track '+dst+' is created empty.';
-  showModal('Duplicate track '+src+' to track '+dst+'?',
+  showModal('Duplicate '+trackTag(p,src)+' to '+trackTag(p,dst)+'?',
     occupied
       ? 'Track '+dst+' already has '+occupied+' trig'+(occupied===1?'':'s')+'. They will be REPLACED.'
       : 'Track '+dst+' is empty and will receive a copy.',
@@ -12558,10 +12689,10 @@ function showDuplicateTrack(src){
     const n=(p.tracks[t]||[]).length;
     const state=!active ? 'inactive' : (n? n+' trig'+(n===1?'':'s')+' — will be REPLACED' : 'active, empty');
     if(dflt===null && (!active || !n)) dflt=t;
-    opts+=`<option value="${t}"${t===src+1?' data-next="1"':''}>Track ${t} · ${state}</option>`;
+    opts+=`<option value="${t}"${t===src+1?' data-next="1"':''}>${esc(trackTag(p,t))} · ${state}</option>`;
   }
   if(dflt===null) dflt=(src%16)+1;
-  showModal('Duplicate track '+src,
+  showModal('Duplicate '+trackTag(p,src),
     steps
       ? 'Copies all '+steps+' trig'+(steps===1?'':'s')+' — notes, velocity, length and microtiming — to another track.'
       : 'Track '+src+' has no trigs, so this creates an empty track with the same length, speed and type.',
@@ -12587,8 +12718,8 @@ function deleteTrack(t){
   // it states exactly what is lost and defaults to Cancel.
   const steps=(p.tracks[t]||[]).length;
   const notes=Object.values((p.notesAt&&p.notesAt[t])||{}).reduce((a,v)=>a+v.length,0);
-  const pn=p.presetNames[t-1]||'';
-  showModal(`Delete track ${t}?`,
+  const pn=trackName(p,t);
+  showModal(`Delete ${trackTag(p,t)}?`,
     'This removes the track from the pattern in memory. The file on disk is untouched until you save.',
     [
       {label:'Cancel', desc:'Keep the track.', fn:()=>closeModal()},
@@ -13023,7 +13154,7 @@ function showDefaultTrig(t){
   const p = curPattern(); if(!p || !p.ok) return;
   const cfg = Object.assign(defTrigInit(), DEFTRIG[t] || {});
   const first = (p.tracks[t] || []).length ? Math.max(...p.tracks[t]) + 1 : 1;
-  showModal(`Track ${t} · what a click places`,
+  showModal(`${trackTag(p, t)} · what a click places`,
     'Clicking an empty step places this instead of the device’s init trig (C5, the track’s velocity and length). '
     + 'Kept for this track while the app is open; SHIFT-click still restores a removed trig.',
     [{label: 'Use this', desc: '', fn: () => {
@@ -13124,7 +13255,7 @@ function openNoteEditor(track,step){
       `<b>This is a trigless trig.</b> It carries parameter locks and plays <b>no note</b> on the device. `+
       `Saving a note change here will turn it into an ordinary sounding trig; its locks are kept.</p>`
     : '';
-  showModal(`Track ${track} \u00b7 step ${step}`,
+  showModal(`${trackTag(p, track)} \u00b7 step ${step}`,
     triglessNote+
     `${notes.length} note(s), highest pitch first. Note name and number stay in sync. Blank velocity = inherit track default. `+
     `Drag any number field up/down to change it, or click to type. `+
@@ -13436,11 +13567,14 @@ function trackEvents(p,t){
       out.push({step:s, note:r.note===INHERIT?60:r.note,
                 vel:r.vel===INHERIT?100:r.vel,
                 micro:r.micro|0,
-                // Both the step position and the note length scale with speed.
-                // The micro offset scales too — it is a musical offset, not a
-                // wall-clock one, so a 2x track's strum tightens with it.
+                // The step position scales with speed, and so does the micro
+                // offset -- a musical offset, not a wall-clock one, so a 2x
+                // track's strum tightens with it. The note LENGTH does not
+                // (v24.32): LEN is a note value (1/16, 1/8, 1 bar...) in the
+                // pattern's own 16ths. Measured on the emulated device: LEN 32
+                // at 1/2x sounds 32 16ths, LEN 8 at 1/8x sounds 8 (H147).
                 pos:((s-1)+micro)*sf,
-                lenSteps:rawLen*sf});
+                lenSteps:rawLen});
     }
   }
   // A DN2 trig may be longer than the gap to the next trig on the SAME pitch.
@@ -14125,6 +14259,11 @@ function parseMIDI(bytes){
   const hdrLen=r32(), fmt=r16(), nTr=r16(), ppq=r16();
   const tps=ppq/4;
   const evs=[];
+  // v24.28: each note keeps its file track and channel (the import dialog maps
+  // every source to a track), track names, and controller changes per source
+  // (CC -> p-locks, as the .alc path already does).
+  const trkNames={}, ccs={};
+  let eot=0;                          // v24.32: the latest end-of-track, the file's own length
   for(let t=0;t<nTr;t++){
     if(r4()!=='MTrk') throw new Error('Missing track chunk');
     const trkLen=r32(), trkEnd=p+trkLen;
@@ -14133,11 +14272,14 @@ function parseMIDI(bytes){
       let dt=rVLQ(); abs+=dt;
       let st=v.getUint8(p);
       if(st<0x80){st=run}else{run=st;p++}
-      const cmd=st&0xF0;
+      const cmd=st&0xF0, ch=st&0x0F;
       if(cmd===0x80||cmd===0x90){
         const n=v.getUint8(p++), vl=v.getUint8(p++);
-        evs.push({absTick:abs,note:n,vel:cmd===0x90&&vl>0?vl:0,on:cmd===0x90&&vl>0});
-      }else if(cmd===0xB0||cmd===0xE0){p++;p++}
+        evs.push({absTick:abs,note:n,vel:cmd===0x90&&vl>0?vl:0,on:cmd===0x90&&vl>0,trk:t,ch});
+      }else if(cmd===0xB0){
+        const c=v.getUint8(p++), val=v.getUint8(p++), key=t+':'+ch;
+        ((ccs[key]=ccs[key]||{})[c]=ccs[key][c]||[]).push({t:abs/tps,v:val});
+      }else if(cmd===0xE0){p++;p++}
       // Program Change (0xC0) and Channel Aftertouch (0xD0) carry ONE data
       // byte, not two. They were unhandled, so any file containing a program
       // change failed to import at all ("Unknown MIDI status 0xc0") rather
@@ -14145,25 +14287,37 @@ function parseMIDI(bytes){
       // anything: the DN2 pattern format has no per-trig program change, and
       // the export path never emits one.
       else if(cmd===0xC0||cmd===0xD0){p++}
-      else if(st===0xFF){const mt=v.getUint8(p++); const ml=rVLQ(); p+=ml;}
+      else if(st===0xFF){const mt=v.getUint8(p++); const ml=rVLQ();
+        if(mt===0x2F) eot=Math.max(eot,abs);
+        if(mt===0x03&&ml>0){let nm='';for(let i=0;i<ml;i++)nm+=String.fromCharCode(v.getUint8(p+i));trkNames[t]=nm.replace(/\0+$/,'').trim();}
+        p+=ml;}
       else if(st===0xF0||st===0xF7){const sl=rVLQ(); p+=sl;}
       else{throw new Error('Unknown MIDI status 0x'+st.toString(16))}
     }
   }
   const notes=[], om={};
   evs.sort((a,b)=>a.absTick-b.absTick);
+  const mk=(pr,len)=>{const n=midiNote(pr.absTick/tps,pr.note,pr.vel,len/tps); n.channel=pr.ch; n.mtrk=pr.trk; n._t=pr.absTick/tps; return n;};
   for(const e of evs){
-    if(e.on){ 
-      const k=e.note;
-      if(om[k]){const pr=om[k]; notes.push(midiNote(pr.absTick/tps,k,pr.vel,(e.absTick-pr.absTick)/tps))}
+    const k=e.trk+':'+e.ch+':'+e.note;
+    if(e.on){
+      if(om[k]) notes.push(mk(om[k],e.absTick-om[k].absTick));
       om[k]=e;
     }else{
-      const pr=om[e.note]; if(pr){notes.push(midiNote(pr.absTick/tps,e.note,pr.vel,(e.absTick-pr.absTick)/tps));delete om[e.note]}
+      const pr=om[k]; if(pr){notes.push(mk(pr,e.absTick-pr.absTick));delete om[k]}
     }
   }
   const maxT=evs.length?evs[evs.length-1].absTick:0;
-  for(const [k,pr] of Object.entries(om))
-    notes.push(midiNote(pr.absTick/tps,Number(k),pr.vel,(maxT-pr.absTick)/tps));
+  for(const pr of Object.values(om)) notes.push(mk(pr,maxT-pr.absTick));
+  notes.trackNames=trkNames;
+  // v24.32: a file that ends on a bar line after its last note loops there
+  // (a DAW export ends the track at the clip's end), so the import keeps that
+  // length -- the silent bars at the end included.
+  {const e16=eot/tps, last=notes.reduce((m,n)=>Math.max(m,(n.step-1)+(n.micro||0)/MICRO_PER_STEP),0);
+   if(e16>last+1e-6 && Math.abs(e16/16-Math.round(e16/16))<1e-3) notes.loop16=Math.round(e16/16)*16;}
+  notes.ccBySource={};
+  for(const [key,byCC] of Object.entries(ccs))
+    notes.ccBySource[key]=Object.entries(byCC).map(([c,list])=>({cc:+c, evs:list.sort((a,b)=>a.t-b.t)}));
   // Also store raw events for the import dialog timeline
   window._midiEvents = evs;
   window._midiHeader = {fmt, nTr, ppq, ticksPerStep:ppq/4};
@@ -14184,7 +14338,7 @@ function readMidiTempo(bytes){
         let st=bytes[p]; if(st<0x80){st=run}else{run=st;p++}
         if(st===0xFF){
           const mt=bytes[p++]; let ml=0; do{const b=bytes[p++]; ml=(ml<<7)|(b&0x7F)}while(bytes[p-1]&0x80);
-          if(mt===0x51&&ml===3){ const mpq=(bytes[p]<<16)|(bytes[p+1]<<8)|bytes[p+2]; return {bpm:60000000/mpq, tick:abs}; }
+          if(mt===0x51&&ml===3){ const mpq=(bytes[p]<<16)|(bytes[p+1]<<8)|bytes[p+2]; return {bpm:60000000/mpq, tick:abs, found:true}; }
           p+=ml;
         }else if((st&0xF0)===0x80||(st&0xF0)===0x90){p+=2}
         else if((st&0xF0)===0xB0||(st&0xF0)===0xE0){p+=2}
@@ -14321,6 +14475,14 @@ async function parseALC(bytes){
     notes.push(n);
   }
   notes.ccEnvelopes=alcReadCCEnvelopes(scope);
+  // v24.32: the clip's loop (LoopStart..LoopEnd, in beats) is its length: a
+  // 16-bar clip whose last note starts in bar 13 still loops at 16 bars.
+  const lp=clip&&clip.querySelector('Loop');
+  if(lp){
+    const ls=parseFloat(lp.querySelector('LoopStart')?.getAttribute('Value')||'0');
+    const le=parseFloat(lp.querySelector('LoopEnd')?.getAttribute('Value')||'0');
+    if(Math.abs(ls)<1e-6 && le>0) notes.loop16=le*4;
+  }
   return notes;
 }
 // v23.69: A CLIP'S CC ENVELOPES, as [{cc, evs:[{t, v}]}], t in beats. The
@@ -14386,7 +14548,7 @@ function importCCAsLocks(p, t, notes, envs){
   return out;
 }
 
-function importNotes(track,notes,mode){
+function importNotes(track,notes,mode,opts){
   const p=curPattern(); if(!p||!p.ok) return;
   // Which steps were trigs before, so a NEW trig does not inherit a leftover PROB.
   const wasTrig=new Set(mode==='replace' ? [] : ((p.tracks&&p.tracks[track])||[]));
@@ -14409,7 +14571,11 @@ function importNotes(track,notes,mode){
   }
   if(p.tracks[track]) p.tracks[track].sort((a,b)=>a-b);
   IMPORT_PROB=applyImportedProbability(p,track,notes,wasTrig);
-  markDirty(); refreshTrackSel(); updateCurrentPatternInSel(); render();
+  markDirty();
+  // v24.28: an import onto several tracks renders once, at the end, so the
+  // whole import stays one undo step (render re-arms the undo snapshot).
+  if(opts && opts.render === false) return;
+  refreshTrackSel(); updateCurrentPatternInSel(); render();
 }
 // G5.16 -- A LIVE NOTE'S CHANCE BECOMES THE TRIG'S PROB. The DN2 has one
 // probability per trig, Live one per note, so a chord whose notes differ takes
@@ -14461,8 +14627,9 @@ function applyImportedProbability(p,track,notes,wasTrig){
 // micro stays in -23..+23. The nearest step is preferred; the other is used
 // when the nearest one already holds the same pitch, or lies past the track's
 // end. Notes are placed in order of how certain their step is, on-grid first.
-// The SAME pitch twice on one step is held back unless the dialog allows it:
-// the device has never been shown to keep two records of one note on a step.
+// The SAME pitch twice on one step does not work on the device (H135, the
+// operator, 2026-10-06), so it is never written. v24.26: such a repeat becomes a
+// RETRIG instead, where that is exact -- see importRetrigShape().
 const IMPORT_SPEED_TRY = [2, 0, 1, 3, 4, 5, 6];   // Autofit: 1x, then finer, then coarser
 const IMPORT_FOLDS = [[2, '1:1'], [4, '2:1'], [5, '4:1'], [6, '8:1']];
 const IMPORT_EXACT = 1 / 48;                       // timing error that still counts as exact, in 16ths
@@ -14472,7 +14639,48 @@ function importTrackSpeed(p, t){
   const d = p && p.patternSpeed != null ? p.patternSpeed : 2;
   return p && p.perTrackMode && p.trackSpeeds && p.trackSpeeds[t] != null ? p.trackSpeeds[t] : d;
 }
-// o: {speed, micro, len (null = auto), dupes, cur: the track's own {speed, len}}
+// ── v24.26 REPEATS AS RETRIGS (the operator: "same note on one step won't work,
+// hardware doesn't allow it -- let's use retrigs") ──
+// A retrig replays the WHOLE trig -- every note on the step -- at the retrig
+// RATE for the retrig LENGTH. So a step can take it exactly when its notes fall
+// into onset groups that are evenly spaced, all hold the same notes, and the
+// spacing is a rate the device has. Spacing in micro units (24 = one step): a
+// rate of 1/d repeats every 384/d units at any track speed (1/16 = one step,
+// the export's Keep retrigs model), so 1/32 = 12 = half a step. The LENGTH is
+// chosen strictly between n-1 and n spacings, so the device fires exactly n
+// times whether its length end is inclusive or not. Written as the per-step
+// RATE and LENGTH arrays (+768 / +640), the way the device's own Digitone I
+// conversion writes retrigs. H138 checks it on the device.
+const IMPORT_RETRIG_IV = {6: 15, 8: 14, 12: 12, 16: 11, 24: 9, 32: 8};   // spacing (micro units) -> rate index
+function importRetrigShape(notes){
+  const g = {};
+  for(const x of notes) (g[x.micro] = g[x.micro] || new Set()).add(x.note);
+  const ms = Object.keys(g).map(Number).sort((a, b) => a - b);
+  if(ms.length < 2) return null;
+  const iv = ms[1] - ms[0];
+  if(IMPORT_RETRIG_IV[iv] === undefined) return null;
+  const key = m => [...g[m]].sort((a, b) => a - b).join(',');
+  for(let i = 1; i < ms.length; i++)
+    if(ms[i] - ms[i - 1] !== iv || key(ms[i]) !== key(ms[0])) return null;
+  const n = ms.length, lo = (n - 1) * iv / MICRO_PER_STEP, hi = n * iv / MICRO_PER_STEP, mid = (lo + hi) / 2;
+  let rlen = null, bd = 1e9;
+  LEN_STEPS.forEach((v, i) => { if(v !== null && v > lo + 1e-6 && v < hi - 1e-6 && Math.abs(v - mid) < bd){ bd = Math.abs(v - mid); rlen = i; } });
+  if(rlen === null) return null;
+  return {m0: ms[0], iv, n, rate: IMPORT_RETRIG_IV[iv], rlen, pitches: key(ms[0])};
+}
+// ── v24.27 THE END WRAPS TO STEP 1 (the operator) ──
+// The pattern loops, so a note in the last half step of a file whose length IS
+// the track's length belongs just BEFORE step 1: it goes on step 1 at a
+// negative micro, exactly as every other bar's last 16th sits early on the
+// next bar's first step. Only when the file loops at the track's end (its
+// length, to the bar, equals the track's time span). On the first pass from
+// STOP nothing comes before step 1, so a step that holds ONLY wrapped notes
+// gets the trig condition !1ST (every pass but the first). A condition belongs
+// to the whole trig, so where step 1 also holds the pattern's first notes it
+// is left unconditioned -- !1ST would silence them on the first pass too -- and
+// the plan says so (what the device does with an early step-1 note on the very
+// first pass is H139).
+// o: {speed, micro, len (null = auto), retrig, wrap, cur: the track's own {speed, len}}
 function importPlan(src, o){
   const sf = SPEED_FACTOR[o.speed];
   const cand = src.map((n, i) => {
@@ -14483,61 +14691,360 @@ function importPlan(src, o){
   // The track length is decided before placement, so a note past it can try
   // its other neighbour. Auto: the shortest multiple of 16 that holds the
   // nearest steps (at most 128).
-  const reach = cand.reduce((m, c) => Math.max(m, c.near + 1), 1);
+  // v24.32: the file's own loop (o.loop16, in 16ths) sets the length where it
+  // is a whole number of steps; a speed too fast to hold it is not exact.
+  const want = o.loop16 ? o.loop16 / sf : 0, wantInt = want && Math.abs(want - Math.round(want)) < 1e-6;
+  const reach = Math.max(cand.reduce((m, c) => Math.max(m, c.near + 1), 1), Math.ceil(want - 1e-6));
+  const loopShort = want > MAX_STEPS + 1e-6;
   // A track that already plays at this speed and is long enough keeps its length.
-  const auto = Math.min(MAX_STEPS, Math.max(16, Math.ceil(reach / 16) * 16));
-  const len = o.len ? o.len : (o.cur && o.cur.speed === o.speed && reach <= o.cur.len ? o.cur.len : auto);
+  const auto = wantInt && !loopShort && Math.round(want) >= 1 ? Math.round(want) : Math.min(MAX_STEPS, Math.max(16, Math.ceil(reach / 16) * 16));
+  const len = o.len ? o.len : (!wantInt && o.cur && o.cur.speed === o.speed && reach <= o.cur.len ? o.cur.len : auto);
   const taken = new Set(), count = {}, ev = [], lost = {beyond: [], nudged: [], dupes: []};
+  const lastOn = src.reduce((m, n) => Math.max(m, importPos16(n)), 0);
+  const period = o.period || o.loop16 || Math.ceil((lastOn + 1e-6) / 16) * 16;     // a folded loop's own length
+  const loops = !!o.wrap && Math.abs(period - len * sf) < 1e-6;
+  // v24.31 HELPER BEFORE WRAP (H146): at the loop, a step-1 trig with a
+  // negative-micro note sounds step 1 twice (seen on the emulator, likely the
+  // stock sequencer). So with a helper track free, a note that only fits by
+  // wrapping -- or by a step its pitch already holds -- goes to the helper at
+  // its own end step instead; wrap is the fallback when no helper is free.
   for(const c of cand){
     const opts = o.micro ? [c.near, c.far] : [c.near];
     let pick = null, why = 'beyond';
-    for(const s0 of opts){
+    const wraps = [];
+    for(let s0 of opts){
       if(s0 < 0) continue;
       const micro = o.micro ? Math.round((c.pos - s0) * MICRO_PER_STEP) : 0;
       if(micro < MICRO_MIN || micro > MICRO_MAX) continue;
-      if(s0 + 1 > len){ why = 'beyond'; continue; }
-      if(!o.dupes && taken.has(s0 + ':' + c.n.note)){ why = 'dupes'; continue; }
-      pick = {s0, micro}; break;
+      let wrapped = false;
+      if(s0 + 1 > len){
+        if(!(loops && s0 - len >= 0 && s0 - len < len && micro < 0)){ why = 'beyond'; continue; }
+        if(o.spill){ wraps.push({s0: s0 - len, micro}); continue; }
+        s0 -= len; wrapped = true;
+      }
+      if(taken.has(s0 + ':' + c.n.note)){ why = 'dupes'; continue; }
+      pick = {s0, micro, wrapped}; break;
     }
+    if(!pick && why !== 'dupes')
+      for(const w of wraps) if(!taken.has(w.s0 + ':' + c.n.note)){ pick = {s0: w.s0, micro: w.micro, wrapped: true}; break; }
     if(!pick){ lost[why].push(c.i); continue; }
-    const step = pick.s0 + 1, played = (pick.s0 + pick.micro / MICRO_PER_STEP) * sf;
+    const step = pick.s0 + 1, played = (pick.s0 + pick.micro / MICRO_PER_STEP) * sf + (pick.wrapped ? len * sf : 0);
     const nudged = Math.abs(played - c.p16) > IMPORT_EXACT;
     if(nudged) lost.nudged.push(c.i);
     taken.add(pick.s0 + ':' + c.n.note);
     count[step] = (count[step] || 0) + 1;
     ev.push({step, micro: pick.micro, note: c.n.note, vel: c.n.vel, prob: c.n.prob, channel: c.n.channel,
-             lenSteps: Math.max(0.125, (c.n.lenSteps || 1) / sf), _t: c.n._t, src: c.i, nudged});
+             lenSteps: Math.max(0.125, c.n.lenSteps || 1), _t: c.n._t, src: c.i, nudged, wrapped: !!pick.wrapped,
+             cond: c.n.cond, swung: !!c.n.swung});
+  }
+  // Repeats a step could not take as notes: as retrigs, where that is exact.
+  const retrigs = {};
+  let viaRetrig = 0, retrigVel = 0;
+  if(o.retrig && lost.dupes.length){
+    const byI = {}; for(const c of cand) byI[c.i] = c;
+    const evBy = {}; for(const e of ev) (evBy[e.step] = evBy[e.step] || []).push(e);
+    const extra = {}, keep = [];
+    for(const i of lost.dupes){
+      const c = byI[i]; let done = false;
+      for(const s0 of (o.micro ? [c.near, c.far] : [c.near])){
+        if(s0 < 0 || s0 + 1 > len) continue;
+        const micro = o.micro ? Math.round((c.pos - s0) * MICRO_PER_STEP) : 0;
+        if(micro < MICRO_MIN || micro > MICRO_MAX) continue;
+        const step = s0 + 1, x = {note: c.n.note, micro, vel: c.n.vel, src: i, c, cond: c.n.cond};
+        const trial = (extra[step] || []).concat([x]);
+        const here = (evBy[step] || []).concat(trial);
+        // a retrig replays the whole trig, and a trig has one condition
+        if(new Set(here.map(y => y.cond === undefined ? null : y.cond)).size > 1) continue;
+        if(importRetrigShape(here)){ extra[step] = trial; done = true; break; }
+      }
+      if(!done) keep.push(i);
+    }
+    lost.dupes = keep;
+    for(const st of Object.keys(extra)){
+      const step = +st, all = (evBy[step] || []).concat(extra[step]);
+      const sh = importRetrigShape(all);
+      // the first onset group stays as the trig's notes; the rest are its repeats
+      const first = new Map((evBy[step] || []).filter(e => e.micro === sh.m0).map(e => [e.note, e]));
+      for(const x of extra[step]) if(x.micro === sh.m0 && !first.has(x.note)){
+        const e = {step, micro: x.micro, note: x.note, vel: x.vel, prob: x.c.n.prob, channel: x.c.n.channel,
+                   lenSteps: Math.max(0.125, x.c.n.lenSteps || 1), _t: x.c.n._t, src: x.src, nudged: false, cond: x.cond};
+        ev.push(e); first.set(x.note, e);
+      }
+      for(let k = ev.length - 1; k >= 0; k--) if(ev[k].step === step && ev[k].micro !== sh.m0) ev.splice(k, 1);
+      // timing of every note the retrig now plays
+      for(const x of all){
+        const c = x.c || byI[x.src];
+        const played = (step - 1 + x.micro / MICRO_PER_STEP) * sf;
+        if(c && Math.abs(played - c.p16) > IMPORT_EXACT && !lost.nudged.includes(x.src)) lost.nudged.push(x.src);
+        if(x.micro !== sh.m0) viaRetrig++;
+        const f = first.get(x.note);
+        if(f && x.micro !== sh.m0 && x.vel !== f.vel) retrigVel++;
+      }
+      count[step] = first.size;
+      // v24.28: the repeats' own velocities, as a retrig velocity FADE
+      if(o.fade){
+        const hits = [];
+        for(let k = 0; k < sh.n; k++){
+          const m = sh.m0 + k * sh.iv, vs = all.filter(y => y.micro === m).map(y => y.vel);
+          hits.push(vs.length ? Math.max(...vs) : 100);
+        }
+        const ft = importFadeFit(hits, sh.iv / MICRO_PER_STEP, LEN_STEPS[sh.rlen]);
+        if(ft){
+          sh.fade = ft.fade;
+          if(ft.scale !== 1) for(const e of first.values()) e.vel = Math.max(1, Math.min(127, Math.round(e.vel * ft.scale)));
+          retrigVel -= ft.fixed;
+        }
+      }
+      retrigs[step] = sh;
+    }
+  }
+  // v24.29 THE HELPER TRACK (the operator): a repeat no step can hold -- no
+  // retrig on a MIDI track, or a retrig that would replay other notes -- goes to
+  // a second track at the same step and micro. On MIDI it sends on the same
+  // channel, on audio it plays a copy of the preset: the same note, at its time.
+  const spill = [];
+  if(o.spill && lost.dupes.length){
+    const byI = {}; for(const c of cand) byI[c.i] = c;
+    const took = new Set(), keep = [];
+    for(const i of lost.dupes){
+      const c = byI[i]; let put = null;
+      // unwrapped first (v24.31), wrapped only when nothing else fits
+      for(const tryWrap of [false, true]){
+        for(let s0 of (o.micro ? [c.near, c.far] : [c.near])){
+          if(s0 < 0) continue;
+          const micro = o.micro ? Math.round((c.pos - s0) * MICRO_PER_STEP) : 0;
+          if(micro < MICRO_MIN || micro > MICRO_MAX) continue;
+          let wrapped = false;
+          if(s0 + 1 > len){ if(!tryWrap || !(loops && s0 - len >= 0 && micro < 0)) continue; s0 -= len; wrapped = true; }
+          if(took.has(s0 + ':' + c.n.note)) continue;
+          put = {s0, micro, wrapped}; break;
+        }
+        if(put) break;
+      }
+      if(!put){ keep.push(i); continue; }
+      took.add(put.s0 + ':' + c.n.note);
+      const played = (put.s0 + put.micro / MICRO_PER_STEP) * sf + (put.wrapped ? len * sf : 0);
+      if(Math.abs(played - c.p16) > IMPORT_EXACT) lost.nudged.push(c.i);
+      spill.push({step: put.s0 + 1, micro: put.micro, note: c.n.note, vel: c.n.vel, prob: c.n.prob, channel: c.n.channel,
+                  lenSteps: Math.max(0.125, c.n.lenSteps || 1), _t: c.n._t, src: c.i, wrapped: put.wrapped, cond: c.n.cond});
+    }
+    lost.dupes = keep;
+  }
+  const spillConds = {};
+  {
+    const bs = {};
+    for(const e of spill) (bs[e.step] = bs[e.step] || []).push(e);
+    for(const st of Object.keys(bs)){
+      const cs = new Set(bs[st].map(e => e.cond === undefined ? null : e.cond));
+      if(cs.size === 1 && [...cs][0] !== null) spillConds[st] = [...cs][0];
+      else if(cs.size === 1 && bs[st].every(e => e.wrapped)) spillConds[st] = COND_NAMES.indexOf('!1ST');
+    }
+  }
+  spill.sort((a, b) => a.step - b.step || a.micro - b.micro || a.note - b.note);
+  // Conditions. A folded repeat (v24.28) carries its own (e.g. 4:4); a trig has
+  // ONE condition, so a step whose notes need different ones cannot be written
+  // -- the plan says so and the fold is not used. Wrapped notes: !1ST where
+  // they have their step to themselves.
+  const conds = {}, wrapShared = [];
+  let wrapped = 0, condConflict = 0;
+  const byStep = {};
+  for(const e of ev){ if(e.wrapped) wrapped++; (byStep[e.step] = byStep[e.step] || []).push(e); }
+  for(const st of Object.keys(byStep)){
+    const cs = new Set(byStep[st].map(e => e.cond === undefined ? null : e.cond));
+    if(cs.size > 1){ condConflict++; continue; }
+    const c = [...cs][0];
+    if(c !== null) conds[st] = c;
+  }
+  for(const st of new Set(ev.filter(e => e.wrapped).map(e => e.step))){
+    const here = byStep[st];
+    if(conds[st] !== undefined) continue;
+    if(here.every(e => e.wrapped) && !retrigs[st]) conds[st] = COND_NAMES.indexOf('!1ST');
+    else wrapShared.push(st);
   }
   ev.sort((a, b) => a.step - b.step || a.micro - b.micro || a.note - b.note);
   const crowded = Object.keys(count).filter(s => count[s] > IMPORT_MAX_CHORD).map(Number);
   const maxPerStep = Object.values(count).reduce((m, v) => Math.max(m, v), 0);
   const dropped = lost.beyond.length + lost.dupes.length;
-  return {speed: o.speed, sf, micro: !!o.micro, dupes: !!o.dupes, len, events: ev, lost, dropped,
-          nudged: lost.nudged.length, maxPerStep, crowded, exact: !dropped && !lost.nudged.length,
+  return {speed: o.speed, sf, micro: !!o.micro, retrig: !!o.retrig, len, events: ev, lost, dropped,
+          placed: src.length - dropped, retrigs, viaRetrig, retrigVel: Math.max(0, retrigVel), wrap: !!o.wrap, loops, wrapped, conds, wrapShared, condConflict,
+          spill, spillConds, spillTrack: o.spill || 0,
+          nudged: lost.nudged.length, maxPerStep, crowded, exact: !dropped && !lost.nudged.length && !loopShort, loopShort, loop16: o.loop16 || 0,
           span16: len * sf};
 }
-// Autofit, exact first: the track's own speed, then IMPORT_SPEED_TRY -- the first that places every
-// note at its own time, micro on, the same pitch never twice on a step. Failing
-// that, the plan that loses least -- and whether allowing repeats would make it
-// exact, so the dialog can say so before anything is imported.
-function importAutofit(src, cur){
-  const order = cur ? [cur.speed, ...IMPORT_SPEED_TRY.filter(s => s !== cur.speed)] : IMPORT_SPEED_TRY;
-  for(const speed of order){
-    const pl = importPlan(src, {speed, micro: true, dupes: false, len: null, cur});
-    if(pl.exact) return {plan: pl, exact: true};
+// ── v24.28 THE ADVANCED TRICKS (the operator: "all of them; Autofit applies
+// all; the major ones have checkboxes") ──
+
+// RETRIG VELOCITY FADE. The repeats' own velocities, as VFAD: the fade ramps
+// the hits across the retrig LENGTH, as the export's Keep retrigs plays it
+// (retrigHits): fade < 0 falls from the trig's velocity, fade > 0 rises to it.
+// The fade that best fits the hits is chosen; for a rising one the trig's
+// notes are raised so the first hit keeps its own velocity. -> {fade, scale,
+// fixed} or null when a flat retrig is as good. H141 checks the curve.
+function importFadeFit(hits, ivSteps, spanSteps){
+  if(hits.length < 2 || hits.every(v => v === hits[0]) || !(spanSteps > 0)) return null;
+  const xs = hits.map((_, i) => Math.min(1, i * ivSteps / spanSteps));
+  const g = (f, x) => f < 0 ? 1 + f / 64 * x : f > 0 ? 1 - f / 64 * (1 - x) : 1;
+  const err = f => {
+    const V = hits[0] / g(f, 0);
+    if(V > 127.5) return Infinity;
+    return hits.reduce((e, h, i) => e + (Math.round(V * g(f, xs[i])) - h) ** 2, 0);
+  };
+  let best = 0, be = err(0);
+  for(let f = -64; f <= 63; f++){ const e = err(f); if(e < be - 1e-9){ be = e; best = f; } }
+  if(best === 0) return null;
+  const V = hits[0] / g(best, 0);
+  const fixed = hits.filter((h, i) => i > 0 && Math.abs(Math.round(V * g(best, xs[i])) - h) <= 2).length;
+  return {fade: best, scale: 1 / g(best, 0), fixed};
+}
+
+// SWING. A file whose off-beat 16ths all sit late by the same amount is swung:
+// the pattern's SWING (50-80 %) plays that, and the notes go back on the grid.
+// The device swings every second step by (swing - 50) / 50 of a step, so this
+// is exact at 1x only. -> {pct, d (16ths), n} or null.
+function importDetectSwing(notes){
+  const off = [];
+  for(const n of notes){
+    const f = ((importPos16(n) % 2) + 2) % 2;
+    if(f > 1 - 1 / 48 && f < 1.7) off.push(f - 1);
   }
-  const score = pl => pl.dropped * 10 + pl.nudged;
+  if(off.length < 4) return null;
+  const q = d => Math.round(d * 48);
+  const tally = {};
+  for(const d of off) tally[q(d)] = (tally[q(d)] || 0) + 1;
+  const [k, c] = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+  const d = +k / 48;
+  if(d <= 1 / 48 || c < off.length * 0.9) return null;
+  const pct = Math.max(51, Math.min(80, Math.round(50 + 50 * d)));
+  return {pct, d, n: c};
+}
+
+// A set of passes (1..k) as a trig condition: A:B plays on pass A of every B,
+// !A:B on all the others. -> a COND_NAMES index, or null if no condition says it.
+function importCondFor(set, k){
+  const has = new Set(set);
+  const name = n => { const i = COND_NAMES.indexOf(n); return i < 0 ? null : i; };
+  for(let b = 2; b <= Math.min(8, k); b++){
+    if(k % b) continue;
+    for(let a = 1; a <= b; a++){
+      let pos = true, neg = true;
+      for(let c = 1; c <= k; c++){
+        const on = (c - 1) % b === a - 1;
+        if(on !== has.has(c)) pos = false;
+        if(on === has.has(c)) neg = false;
+      }
+      if(pos) return name(a + ':' + b);
+      if(neg && b >= 3) return name('!' + a + ':' + b);
+    }
+  }
+  return null;
+}
+
+// LOOPS AND REPEATS. A file that plays the same bars k times (k = 2..8) needs
+// only one copy; where the copies differ, the difference plays under a
+// condition (1:4, !4:4 ...). A note is kept with its position in the loop, its
+// pitch, velocity and length; the passes it sounds on name its condition.
+// Every loop that works, the plainest first (fewest notes under a condition,
+// then the shortest). -> [{P (16ths), k, conds, notes}], each note with `origs`.
+function importFindLoops(notes){
+  const found = [];
+  if(notes.length < 2) return found;
+  const lastOn = notes.reduce((m, n) => Math.max(m, importPos16(n)), 0);
+  const total = Math.ceil((lastOn + 1e-6) / 16) * 16;
+  for(let k = 8; k >= 2; k--){
+    if(total % k) continue;
+    const P = total / k;
+    if(P % 16) continue;
+    const by = new Map();
+    notes.forEach((n, i) => {
+      const t = importPos16(n), c = Math.floor((t + 1e-6) / P);
+      const key = Math.round((t - c * P) * 48) + '|' + n.note + '|' + n.vel + '|' + Math.round((n.lenSteps || 1) * 48);
+      const e = by.get(key) || {n, rel: t - c * P, passes: new Set(), origs: []};
+      e.passes.add(c + 1); e.origs.push(i); by.set(key, e);
+    });
+    const out = [];
+    let ok = true, conds = 0;
+    for(const e of by.values()){
+      const set = [...e.passes].sort((a, b) => a - b);
+      let cond;
+      if(set.length !== k){ cond = importCondFor(set, k); if(cond === null){ ok = false; break; } conds++; }
+      const pos = e.rel, step = Math.floor(pos + 0.5);
+      out.push(Object.assign({}, e.n, {step: step + 1, micro: Math.round((pos - step) * MICRO_PER_STEP), cond, origs: e.origs}));
+    }
+    if(ok) found.push({P, k, conds, notes: out});
+  }
+  return found.sort((a, b) => a.conds - b.conds || a.P - b.P);
+}
+function importFindLoop(notes){ return importFindLoops(notes)[0] || null; }
+
+// What goes into the planner for one source: the loop (when asked and found),
+// the swing (when asked, found and the speed is 1x). Every prepared note keeps
+// `origs`, the source notes it stands for, so the preview can mark them.
+function importPrepare(notes, o, loop){
+  let src = notes.map((n, i) => Object.assign({}, n, {origs: [i]}));
+  let swing = null;
+  if(loop) src = loop.notes;
+  const sw = importDetectSwing(notes);
+  if(o.swing && sw && SPEED_FACTOR[o.speed] === 1){
+    const d2 = (sw.pct - 50) / 50;                         // what the device plays
+    src = src.map(n => {
+      const t = importPos16(n), f = ((t % 2) + 2) % 2;
+      if(!(Math.abs((f - 1) - sw.d) <= 1 / 48)) return n;
+      const u = t - d2, st = Math.floor(u + 0.5);
+      return Object.assign({}, n, {step: st + 1, micro: Math.round((u - st) * MICRO_PER_STEP), swung: true});
+    });
+    swing = sw;
+  }
+  return {src, loop: loop || null, swing, swingFound: sw};
+}
+
+// One source through all of it. A fold that cannot be written (a step whose
+// notes need different conditions) or that loses more than the plain import
+// is dropped, and the plain plan is used.
+function importPlanGroup(notes, o){
+  if(o.loop16 === undefined && notes.loop16) o = Object.assign({}, o, {loop16: notes.loop16});
+  const prep0 = importPrepare(notes, o, null);
+  const base = Object.assign(importPlan(prep0.src, o), {prep: prep0});
+  if(!o.fold) return base;
+  const loops = importFindLoops(notes);
+  if(!loops.length) return base;
+  let refused = null;
+  for(const loop of loops.slice(0, 4)){
+    if(o.loop16 && o.loop16 % loop.P) continue;     // a fold must repeat to the file's own loop
+    const prep = importPrepare(notes, o, loop);
+    const pl = importPlan(prep.src, Object.assign({}, o, {period: loop.P, loop16: 0}));
+    if(pl.condConflict){ refused = refused || 'conditions'; continue; }
+    if(importScore(pl) > importScore(base)){ refused = refused || 'losses'; continue; }
+    return Object.assign(pl, {prep, fold: loop});
+  }
+  return Object.assign(base, {foldRefused: refused});
+}
+const importScore = pl => pl.dropped * 10 + pl.nudged + (pl.loopShort ? 1 : 0);
+// Autofit over every enabled source at once: the track's own speed first, then
+// 1x, finer, coarser; the first speed at which every source is exact wins, else
+// the one that loses least. Every trick on but swing (the operator: micro by
+// default). groups: [{notes, cur, retrig}]
+function importAutofitGroups(groups, base){
+  const order0 = groups.length && groups[0].cur ? groups[0].cur.speed : null;
+  const order = order0 !== null ? [order0, ...IMPORT_SPEED_TRY.filter(s => s !== order0)] : IMPORT_SPEED_TRY;
+  const at = speed => groups.map(g => importPlanGroup(g.notes, Object.assign({}, base, {speed, len: null, cur: g.cur, retrig: !!g.retrig})));
   let best = null;
   for(const speed of order){
-    const pl = importPlan(src, {speed, micro: true, dupes: false, len: null, cur});
-    if(!best || score(pl) < score(best)) best = pl;
+    const plans = at(speed);
+    if(plans.every(pl => pl.exact)) return {speed, plans, exact: true};
+    const sc = plans.reduce((s2, pl) => s2 + importScore(pl), 0);
+    if(!best || sc < best.sc) best = {speed, plans, sc};
   }
-  let withDupes = null;
-  for(const speed of order){
-    const pl = importPlan(src, {speed, micro: true, dupes: true, len: null, cur});
-    if(pl.exact){ withDupes = pl; break; }
-  }
-  return {plan: best, exact: false, withDupes};
+  return {speed: best.speed, plans: best.plans, exact: false};
+}
+// One source (the tests' and the planner's simple entry).
+function importAutofit(src, cur, retrig){
+  const r = importAutofitGroups([{notes: src, cur, retrig}], {micro: true, wrap: true, fade: true, fold: true, swing: false});
+  return {plan: r.plans[0], exact: r.exact};
+}
+// Retrig is an audio-track feature (manual §8) and is written into this
+// pattern's own per-step arrays, so it needs both.
+function importCanRetrig(p, t){
+  try{ return !!(p && p.ok && !isMidiTrack(p, t) && trigAttrFileArrays(p, t)); }catch(e){ return false; }
 }
 // The pattern settings an import needs so the track plays the whole fold.
 function importLayout(p, t, plan){
@@ -14567,69 +15074,119 @@ function importApplyLayout(p, t, plan){
 }
 
 // ── the preview: piano roll over the destination track, one time axis ──
-function importPreviewSvg(src, plan, zoom, track){
-  const lost = new Set([...plan.lost.beyond, ...plan.lost.dupes]), nudged = new Set(plan.lost.nudged);
-  const end16 = src.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 16);
-  // A step's cell is CENTRED on the time it starts, so the dot of an on-beat
-  // note sits under the source note, and a micro offset moves a dot exactly as
-  // far as the note is off the step.
-  const span = Math.max(end16, plan.span16), z = zoom, cw = plan.sf * z, LM = 46 + cw / 2;
-  const W = Math.ceil(span * z + LM + cw / 2) + 4, X = x => LM + x * z;
-  const lo = src.reduce((m, n) => Math.min(m, n.note), 127), hi = src.reduce((m, n) => Math.max(m, n.note), 0);
+// `notes` is the whole source as in the file; `plan.prep.src` is what was
+// planned (one loop of it, swing taken out), each with the source notes it
+// stands for, so a mark lands on the notes as the file has them.
+function importPreviewSvg(notes, plan, zoom, track){
+  const prepSrc = (plan.prep && plan.prep.src) || notes.map((n, i) => Object.assign({}, n, {origs: [i]}));
+  const mark = new Map();
+  const tag = (ids, cls) => { for(const i of ids) for(const o of (prepSrc[i] && prepSrc[i].origs) || []) if(!mark.has(o) || cls === 'ir-lost') mark.set(o, cls); };
+  tag(plan.lost.nudged, 'ir-nudge'); tag([...plan.lost.beyond, ...plan.lost.dupes], 'ir-lost');
+  const fold = plan.fold, P = fold ? fold.P : null;
+  const end16 = notes.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 16);
+  // v24.32 (the operator): a step's cell STARTS at the time the step starts, as
+  // a source note does, so a bar line runs along the cell edges of every lane,
+  // before the trig. A note dot starts where its note starts (on-beat: at the
+  // cell's left edge), and a micro offset moves it as far as the note is off
+  // the step -- an early note reaches back into the cell before.
+  const span = Math.max(end16, plan.span16), z = zoom, cw = plan.sf * z, LM = 46;
+  const W = Math.ceil(span * z + LM + cw) + 4, X = x => LM + x * z;
+  const lo = notes.reduce((m, n) => Math.min(m, n.note), 127), hi = notes.reduce((m, n) => Math.max(m, n.note), 0);
   const rows = hi - lo + 1, rh = Math.max(3, Math.min(9, Math.floor(150 / rows))), RH = rows * rh;
   // v24.23 (operator): the destination reads like the track editor -- TRIG,
   // NOTE and MICRO rows of 21 px, red trig dots, note dots with a ring for a
   // chord, < > <> for microtiming. A step's notes sit where they really play:
   // each onset's dot is offset by its micro, and the dots of one step are
   // joined, so an on-beat and an off-beat note read as one stretched dot.
-  const RW = 21, top = 14, dTop = top + RH + 26, H = dTop + 3 * RW + 16;
-  const yT = dTop, yN = dTop + RW, yM = dTop + 2 * RW;
+  // v24.29: + the helper track; v24.32: whenever one is set, so you see where
+  // each repeat lands (or that none needs it)
+  const lanes = (plan.spill && plan.spill.length) || plan.spillTrack ? 2 : 1;
+  const RW = 21, top = 14, LANE = 3 * RW + 36, dTop0 = top + RH + 26, H = dTop0 + lanes * LANE - 20;
   const out = [`<svg class="impsvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`];
   for(let b = 0; b * 16 <= span; b++){                         // bar lines over the piano roll
     const x = X(b * 16);
     out.push(`<line class="ir-bar" x1="${x}" y1="${top - 2}" x2="${x}" y2="${top + RH + 4}"/>`);
     if(b * 16 < span) out.push(`<text class="ir-lbl" x="${x + 2}" y="${top - 4}">${b + 1}</text>`);
   }
+  // v24.28: a folded loop -- the copies after the first are played by the
+  // loop, drawn faint, with the loop's bounds marked
+  if(fold) for(let c = 1; c < fold.k; c++){
+    const x = X(c * P);
+    out.push(`<rect class="ir-loop" x="${x}" y="${top - 2}" width="${(P * z).toFixed(1)}" height="${RH + 6}"/>`);
+    out.push(`<text class="ir-lbl ir-loopl" x="${x + 3}" y="${top + 8}">loop ${c + 1}/${fold.k}</text>`);
+  }
   for(let k = lo; k <= hi; k++) if(k % 12 === 0)
     out.push(`<text class="ir-lbl" x="2" y="${top + (hi - k) * rh + rh}">${noteName(k)}</text>`);
-  src.forEach((n, i) => {
-    const cls = lost.has(i) ? 'ir-lost' : nudged.has(i) ? 'ir-nudge' : 'ir-note';
+  notes.forEach((n, i) => {
+    const t = importPos16(n);
+    const cls = mark.get(i) || (fold && t >= P - 1e-6 ? 'ir-note ir-dim' : 'ir-note');
     const w = Math.max(1, Math.max(0.25, n.lenSteps || 1) * z - 1);
-    out.push(`<rect class="${cls}" x="${X(importPos16(n)).toFixed(1)}" y="${top + (hi - n.note) * rh}" width="${w.toFixed(1)}" height="${Math.max(2, rh - 1)}"><title>${noteName(n.note)} at 16th ${(importPos16(n) + 1).toFixed(2)}${lost.has(i) ? ' — left out' : nudged.has(i) ? ' — moved' : ''}</title></rect>`);
+    out.push(`<rect class="${cls}" x="${X(t).toFixed(1)}" y="${top + (hi - n.note) * rh}" width="${w.toFixed(1)}" height="${Math.max(2, rh - 1)}"><title>${noteName(n.note)} at 16th ${(t + 1).toFixed(2)}${cls === 'ir-lost' ? ' — left out' : cls === 'ir-nudge' ? ' — moved' : fold && t >= P - 1e-6 ? ' — played by the loop' : ''}</title></rect>`);
   });
-  out.push(`<text class="ir-lbl" x="${X(0)}" y="${dTop - 6}">T${track || ''} · ${SPEED_LABEL[plan.speed]} · ${plan.len} steps</text>`);
+  const sw = plan.prep && plan.prep.swing, swD = sw ? (sw.pct - 50) / 50 : 0;
+  const lane = (laneEv, laneR, laneC, dTop, title) => {
+  const yT = dTop, yN = dTop + RW, yM = dTop + 2 * RW;
+  out.push(`<text class="ir-lbl" x="${X(0)}" y="${dTop - 6}">${title}</text>`);
   for(const [y, l] of [[yT, 'TRIG'], [yN, 'NOTE'], [yM, 'MICRO']])
-    out.push(`<text class="ir-row" x="${LM - cw / 2 - 4}" y="${y + RW / 2 + 3}">${l}</text>`);
+    out.push(`<text class="ir-row" x="${LM - 4}" y="${y + RW / 2 + 3}">${l}</text>`);
   const by = {};
-  for(const e of plan.events) (by[e.step] = by[e.step] || []).push(e);
+  for(const e of laneEv) (by[e.step] = by[e.step] || []).push(e);
   const r = Math.max(1.5, Math.min(5.5, cw * 0.26)), cy = RW / 2;
   for(let s = 1; s <= plan.len; s++){
-    const mid = X((s - 1) * plan.sf), x = mid - cw / 2, es = by[s] || [];
+    const x = X((s - 1) * plan.sf), mid = x + cw / 2, es = by[s] || [];
     const edge = (s - 1) % 16 === 0 ? ' ir-c-bar' : (s - 1) % 4 === 0 ? ' ir-c-beat' : '';
-    const tip = `step ${s}${es.length ? ': ' + es.map(e => noteName(e.note) + (e.micro ? (e.micro > 0 ? ' +' : ' ') + e.micro : '')).join(', ') : ''}`;
+    const R = laneR && laneR[s], C = laneC && laneC[s];
+    const tip = `step ${s}${es.length ? ': ' + es.map(e => noteName(e.note) + (e.micro ? (e.micro > 0 ? ' +' : ' ') + e.micro : '')).join(', ') : ''}`
+      + (R ? ` · retrig ${RETRIG_RATES[R.rate]} × ${R.n} (length ${LEN_LABEL[R.rlen]}${R.fade ? `, fade ${R.fade > 0 ? '+' : ''}${R.fade}` : ''})` : '')
+      + (C !== undefined ? ` · condition ${COND_NAMES[C]}` : '');
     for(const y of [yT, yN, yM])
       out.push(`<rect class="ir-c${edge}" x="${x.toFixed(1)}" y="${y}" width="${Math.max(1, cw).toFixed(1)}" height="${RW}"><title>${tip}</title></rect>`);
     if(!es.length) continue;
-    out.push(`<circle class="${es.length > IMPORT_MAX_CHORD ? 'ir-dot ir-full' : 'ir-dot'}" cx="${mid.toFixed(1)}" cy="${yT + cy}" r="${r.toFixed(1)}"/>`);
-    // NOTE row: one dot per onset, offset by its micro; a ring when it is a chord
+    out.push(`<circle class="${es.length > IMPORT_MAX_CHORD ? 'ir-dot ir-full' : 'ir-dot'}" cx="${(x + r + 0.5).toFixed(1)}" cy="${yT + cy}" r="${r.toFixed(1)}"/>`);
+    // NOTE row: one dot per onset, offset by its micro (and by the swing, on a
+    // swung step); a ring when it is a chord; retrig hits hollow
+    const swung = sw && s % 2 === 0 && es.some(e => e.swung);
+    const sx = swung ? swD * MICRO_PER_STEP : 0;
     const on = {};
     for(const e of es) on[e.micro] = (on[e.micro] || 0) + 1;
-    const ms = Object.keys(on).map(Number).sort((a, b) => a - b);
-    const ox = m => mid + Math.max(-cw / 2 + r, Math.min(cw / 2 - r, m / MICRO_PER_STEP * cw));
+    const rep = R ? Array.from({length: R.n - 1}, (_, k) => R.m0 + (k + 1) * R.iv) : [];
+    const ms = Object.keys(on).map(Number).concat(rep).sort((a, b) => a - b);
+    const ox = m => x + r + 0.5 + Math.max(-cw, Math.min(cw - 2 * r - 1, (m + sx) / MICRO_PER_STEP * cw));
     if(ms.length > 1)
       out.push(`<line class="ir-span" x1="${ox(ms[0]).toFixed(1)}" y1="${yN + cy}" x2="${ox(ms[ms.length - 1]).toFixed(1)}" y2="${yN + cy}" stroke-width="${(2 * r).toFixed(1)}"/>`);
-    for(const m of ms){
-      out.push(`<circle class="ir-nd" cx="${ox(m).toFixed(1)}" cy="${yN + cy}" r="${r.toFixed(1)}"/>`);
-      if(on[m] > 1) out.push(`<circle class="ir-ring" cx="${ox(m).toFixed(1)}" cy="${yN + cy}" r="${(r + Math.min(4, r * 0.7)).toFixed(1)}"/>`);
-    }
-    // MICRO row: < early, > late, <> both (a strum), as the track editor marks it
+    ms.forEach((m, k) => {
+      const isRep = rep.includes(m) && !on[m];      // a retrig hit, not a note record
+      const rr = isRep ? r * 0.8 : r;
+      out.push(`<circle class="${isRep ? 'ir-rep' : 'ir-nd'}${swung ? ' ir-swd' : ''}" cx="${ox(m).toFixed(1)}" cy="${yN + cy}" r="${rr.toFixed(1)}"/>`);
+      if((on[m] || (isRep ? on[R.m0] : 0)) > 1) out.push(`<circle class="ir-ring" cx="${ox(m).toFixed(1)}" cy="${yN + cy}" r="${(r + Math.min(4, r * 0.7)).toFixed(1)}"/>`);
+    });
+    if(R) out.push(`<text class="ir-rt" x="${(mid + cw / 2 - 2).toFixed(1)}" y="${yT + 7}">${RETRIG_RATES[R.rate].replace('1/', '')}${R.fade ? (R.fade < 0 ? '↘' : '↗') : ''}</text>`);
+    if(C !== undefined) out.push(`<text class="ir-cd" x="${(x + 2).toFixed(1)}" y="${yT + RW - 2}">${COND_NAMES[C]}</text>`);
+    if(es.some(e => e.wrapped)) out.push(`<text class="ir-wr" x="${(x + 2).toFixed(1)}" y="${yT + 7}">↻</text>`);
+    // MICRO row: < early, > late, <> both (a strum), as the track editor marks
+    // it; ~ where the pattern's swing moves the step
     const early = ms[0] < 0, late = ms[ms.length - 1] > 0;
-    if(early || late) out.push(`<text class="ir-mm ${early && late ? 'both' : early ? 'early' : 'late'}" x="${mid.toFixed(1)}" y="${yM + cy + 4}">${early && late ? '&lt;&gt;' : early ? '&lt;' : '&gt;'}</text>`);
+    if(swung) out.push(`<text class="ir-mm swing" x="${mid.toFixed(1)}" y="${yM + cy + 4}">~</text>`);
+    else if(early || late) out.push(`<text class="ir-mm ${early && late ? 'both' : early ? 'early' : 'late'}" x="${mid.toFixed(1)}" y="${yM + cy + 4}">${early && late ? '&lt;&gt;' : early ? '&lt;' : '&gt;'}</text>`);
   }
   for(let s = 1; s <= plan.len; s += 16)
-    out.push(`<text class="ir-lbl" x="${X((s - 1) * plan.sf) - cw / 2 + 2}" y="${yM + RW + 11}">${s}</text>`);
-  const endX = X(plan.span16) - cw / 2;
+    out.push(`<text class="ir-lbl" x="${X((s - 1) * plan.sf) + 2}" y="${yM + RW + 11}">${s}</text>`);
+  };
+  lane(plan.events, plan.retrigs, plan.conds, dTop0,
+       `T${track || ''} · ${SPEED_LABEL[plan.speed]} · ${plan.len} steps${fold ? ` · loop ×${fold.k}` : ''}${sw ? ` · swing ${sw.pct}%` : ''}`);
+  if(lanes > 1) lane(plan.spill || [], {}, plan.spillConds, dTop0 + LANE,
+       plan.spill && plan.spill.length ? `T${plan.spillTrack} · helper: ${plan.spill.length} repeat(s), same step and micro`
+                                       : `T${plan.spillTrack} · helper: no repeat needs it`);
+  const yM = dTop0 + (lanes - 1) * LANE + 2 * RW;
+  // v24.32 (the operator): each bar's start as one line through the source and
+  // every destination lane, at its time -- a bar's first step is centred on it
+  for(let b = 0; b * 16 < span; b++){
+    const x = X(b * 16);
+    out.push(`<line class="ir-barx" x1="${x}" y1="${top - 2}" x2="${x}" y2="${yM + RW}"/>`);
+  }
+  const endX = X(plan.span16);
   out.push(`<line class="ir-end" x1="${endX}" y1="${top - 2}" x2="${endX}" y2="${yM + RW}"/>`);
+  if(fold) out.push(`<text class="ir-lbl ir-loopl" x="${endX + 3}" y="${dTop0 + 12}">↺ ×${fold.k}</text>`);
   out.push('</svg>');
   return out.join('');
 }
@@ -14641,28 +15198,54 @@ function showImportDialog(){
     const buf=new Uint8Array(await file.arrayBuffer());
     const isAlc=file.name.toLowerCase().endsWith('.alc');
     let parsed=[];
-    try{parsed=isAlc?await parseALC(buf):parseMIDI(buf); const srcTempo=readMidiTempo(buf); window._impSrcBpm=srcTempo.bpm; if(!isAlc) window._midiEvents=decodeMidiTimeline(buf);}
+    try{parsed=isAlc?await parseALC(buf):parseMIDI(buf); const srcTempo=readMidiTempo(buf); window._impSrcBpm=srcTempo.bpm; window._impSrcBpmFound=!!srcTempo.found&&!isAlc; if(!isAlc) window._midiEvents=decodeMidiTimeline(buf);}
     catch(err){alert('Import failed: '+err.message);return}
     if(!parsed.length){alert('No notes found.');return}
     openImportDialog(file.name, parsed, isAlc);
   };
   inp.click();
 }
+// v24.28: the file's sources -- each MIDI track and channel with notes, or the
+// .alc clip -- each with its notes (positions as in the file) and its CC lanes.
+function importSources(parsed, isAlc){
+  if(isAlc || !parsed.some(n => n.mtrk !== undefined)){
+    const notes = parsed.slice(); notes.ccEnvelopes = parsed.ccEnvelopes; notes.loop16 = parsed.loop16;
+    return [{key: 'all', label: isAlc ? 'clip' : 'notes', notes, cc: parsed.ccEnvelopes || [], ch: null}];
+  }
+  const m = new Map();
+  for(const n of parsed){
+    const key = n.mtrk + ':' + n.channel;
+    if(!m.has(key)){ const ns = []; ns.loop16 = parsed.loop16; m.set(key, {key, mtrk: n.mtrk, ch: n.channel, notes: ns}); }
+    m.get(key).notes.push(n);
+  }
+  const names = parsed.trackNames || {};
+  return [...m.values()].sort((a, b) => a.mtrk - b.mtrk || a.ch - b.ch).map(g => Object.assign(g, {
+    label: `${names[g.mtrk] ? names[g.mtrk] + ' · ' : (m.size > 1 ? 'track ' + (g.mtrk + 1) + ' · ' : '')}ch ${g.ch + 1}`,
+    cc: (parsed.ccBySource || {})[g.key] || []}));
+}
 // The dialog itself, apart from the file picker, so a test can open it.
 function openImportDialog(name, parsed, isAlc){
-  const channels = new Set(parsed.map(n => n.channel || 0));
-  window._impMultiChannel = channels.size > 1;
-  const src = window._impMultiChannel ? parsed.filter(n => (n.channel || 0) === 0) : parsed;
   const cp=curPattern();
   const activeTrk=document.getElementById('trkSel').value;
   const defTrack=activeTrk==='all'?Object.keys(cp.tracks||{}).map(Number)[0]||1:+activeTrk;
-  const end16 = src.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 0);
-  const lo = src.reduce((m, n) => Math.min(m, n.note), 127), hi = src.reduce((m, n) => Math.max(m, n.note), 0);
-  const cur = {speed: importTrackSpeed(cp, defTrack), len: effectiveTrackLength(cp, defTrack)};
-  const fit = importAutofit(src, cur);
-  IMP = {name, parsed, src, isAlc, zoom: null,
-         o: {speed: fit.plan.speed, micro: true, dupes: false, len: null, cur}, fit, autofitNote: ''};
-
+  const groups = importSources(parsed, isAlc);
+  // destinations: one source -> the track in view; several -> channel N to
+  // track N (the operator), the next free track where two share a channel
+  const used = new Set();
+  groups.forEach(g => {
+    let d = groups.length === 1 ? defTrack : (g.ch !== null ? g.ch + 1 : 1);
+    while(used.has(d) && d < 16) d++;
+    used.add(d); g.dest = d; g.on = true;
+    g.type = 'keep'; g.spill = 0; g.speed = null; g.suggest = null;   // v24.29
+  });
+  const all = parsed;
+  const end16 = all.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 0);
+  const lo = all.reduce((m, n) => Math.min(m, n.note), 127), hi = all.reduce((m, n) => Math.max(m, n.note), 0);
+  IMP = {name, parsed, isAlc, groups, focus: 0, zoom: null, wantRetrig: true,
+         fileBpm: window._impSrcBpmFound ? +window._impSrcBpm : null,
+         o: {speed: 2, micro: true, retrig: true, wrap: true, fold: true, fade: true, swing: false,
+             tempo: !!window._impSrcBpmFound, cc: true, len: null, helper: true},
+         autofitNote: ''};
   const patOpts=PATTERNS.map((p,i)=>{
     if (p.notPattern) return '';
     const n = p.records ? p.records.length : 0;
@@ -14670,22 +15253,18 @@ function openImportDialog(name, parsed, isAlc){
     if (p.ok && p.patternName) nm += ` · ${p.patternName}`;
     return '<option value="'+i+'"'+(i===getCurPatternIdx()?' selected':'')+'>'+esc(nm)+' ('+n+' trigs)</option>';
   }).join('');
-  let trkOpts='';
-  for(let t=1;t<=16;t++){
-    const n=cp.tracks&&cp.tracks[t]?cp.tracks[t].length:0;
-    trkOpts+='<option value="'+t+'"'+(t===defTrack?' selected':'')+'>T'+t+(n?' ('+n+' trigs)':' (empty)')+'</option>';
-  }
-  const srcLine = `${src.length} notes · ${(end16 / 16).toFixed(1)} bars · ${noteName(lo)}–${noteName(hi)}`
-    + ` · ${window._impSrcBpm ? (+window._impSrcBpm).toFixed(1) + ' BPM' : ''}`
+  const srcLine = `${all.length} notes · ${(end16 / 16).toFixed(1)} bars · ${noteName(lo)}–${noteName(hi)}`
+    + (IMP.fileBpm ? ` · ${IMP.fileBpm.toFixed(1)} BPM` : '')
     + (isAlc ? '' : ` · ${(window._midiHeader ? window._midiHeader.ppq : 96)} ppq`)
     + (parsed.some(n => n.prob) ? ` · ${parsed.filter(n => n.prob).length} with a chance &lt; 100% → PROB` : '');
+  const chk = (id, label, key, title, extra) => `<label class="impchk" id="${id}L"${title ? ` title="${esc(title)}"` : ''}><input type="checkbox" id="${id}" ${IMP.o[key] ? 'checked' : ''} onchange="${extra || ''}importSet('${key}',this.checked)"> ${label}</label>`;
   const body =
     `<div class="impwrap">
       <div class="impmain">
         <div class="impsrc"><b>SOURCE</b> ${srcLine}</div>
-        ${window._impMultiChannel ? '<div class="impwarn">⚠ Several MIDI channels: only channel 1 is imported.</div>' : ''}
+        <div id="impSources" class="impsources"></div>
         <div class="impzoom"><button class="mini" onclick="importZoom(-1)" title="zoom out">−</button><button class="mini" onclick="importZoom(1)" title="zoom in">+</button><button class="mini" onclick="importZoom(0)" title="the whole file in view, or back to track-editor size">fit</button>
-          <span class="implegend"><i class="ir-k ir-note"></i>note <i class="ir-k ir-nudge"></i>moved <i class="ir-k ir-lost"></i>left out · dots sit where they play: <b class="mm-e">&lt;</b> early <b class="mm-l">&gt;</b> late <b class="mm-b">&lt;&gt;</b> both</span></div>
+          <span class="implegend"><i class="ir-k ir-note"></i>note <i class="ir-k ir-nudge"></i>moved <i class="ir-k ir-lost"></i>left out · dots sit where they play: <b class="mm-e">&lt;</b> early <b class="mm-l">&gt;</b> late <b class="mm-b">&lt;&gt;</b> both <b class="mm-s">~</b> swing · ○ retrig hit · ↻ wrapped</span></div>
         <div id="impView" class="impview"></div>
         <div id="impStat" class="impstat"></div>
         <details class="impraw"><summary>Raw MIDI events</summary><div id="impEvents"></div></details>
@@ -14697,12 +15276,21 @@ function openImportDialog(name, parsed, isAlc){
         <select id="impSpeedSel" onchange="importSet('speed',+this.value)">${SPEED_LABEL.map((l, i) => `<option value="${i}">${l}</option>`).join('')}</select>
         <label>Track length</label>
         <select id="impLenSel" onchange="importSet('len',+this.value||null)"><option value="0">auto</option>${[16,32,48,64,80,96,112,128].map(v => `<option value="${v}">${v} steps</option>`).join('')}</select>
-        <label class="impchk"><input type="checkbox" id="impMicro" checked onchange="importSet('micro',this.checked)"> Off-grid notes as micro</label>
-        <label class="impchk" title="Two records of the same note on one step have not been tried on the device"><input type="checkbox" id="impDupes" onchange="importSet('dupes',this.checked)"> Same note twice on a step (untested)</label>
         <button class="mini accent" id="impAutofit" onclick="importAutofitNow()">Autofit</button>
+        <details class="impadv" id="impAdv"><summary>Advanced</summary>
+          ${chk('impMicro', 'Off-grid notes as micro', 'micro')}
+          ${chk('impRetrig', 'Repeated notes as retrigs', 'retrig', 'The same note twice on a step does not play on the device; a retrig on the trig repeats it instead, where the repeats are evenly spaced', 'IMP.wantRetrig=this.checked;')}
+          ${chk('impFade', 'Retrig velocities as a fade', 'fade', 'The repeats keep their own velocities through the retrig velocity fade (VFAD)')}
+          ${chk('impHelper', 'Repeats on a helper track', 'helper', 'A repeat no step can hold (no retrig on a MIDI track, or a retrig would replay other notes) goes to a second track at the same step and micro: on MIDI the same channel, on audio a copy of the preset. Off: one track only, and such repeats are left out')}
+          ${chk('impWrap', 'Wrap the end to step 1', 'wrap', 'The pattern loops: a note in the file’s last half step goes on step 1, early, as every other bar’s last 16th goes on the next bar’s first step')}
+          ${chk('impFold', 'Repeats as one loop (+ conditions)', 'fold', 'A file that plays the same bars several times is imported once, on a shorter track; where the passes differ, the difference plays under a trig condition (1:4, !4:4 ...)')}
+          <label>Off-beats</label>
+          <div class="impfold impsw"><button class="mini" id="impSwMicro" onclick="importSet('swing',false)">micro</button><button class="mini" id="impSwSwing" onclick="importSet('swing',true)">swing</button></div>
+          ${chk('impTempo', 'Pattern tempo from the file', 'tempo')}
+          ${chk('impCC', 'CC lanes as p-locks', 'cc', 'A controller lane in the file becomes p-locks on the trigs, where the CC drives a parameter of the track (as the .alc import does)')}
+        </details>
         <hr>
         <label>Pattern</label><select id="impPatSel" onchange="refreshImportInfo()">${patOpts}</select>
-        <label>Track</label><select id="impTrkSel" onchange="refreshImportInfo()">${trkOpts}</select>
         <label>Mode</label><select id="impModeSel" onchange="refreshImportInfo()"><option value="replace">Replace</option><option value="merge">Merge</option></select>
         <div id="impLayout" class="implayout"></div>
       </div>
@@ -14717,18 +15305,87 @@ function openImportDialog(name, parsed, isAlc){
     : '<table class="imprawt"><tr><th>Tick</th><th>Δ</th><th>Event</th><th></th></tr>'
       + raw.slice(0, 60).map(l => `<tr><td>${l.tick}</td><td>${l.delta}</td><td>${esc(l.type || '')}</td><td>${esc(l.detail || '')}</td></tr>`).join('')
       + (raw.length > 60 ? `<tr><td colspan="4">… and ${raw.length - 60} more events</td></tr>` : '') + '</table>';
-  IMP.autofitNote = importAutofitText(fit);
-  refreshImportInfo();
+  importAutofitNow();
 }
 let IMP = null;
+// A source's destination as it will be: its type after the import (kept, or
+// switched to audio / MIDI -- v24.29), and whether a retrig can be written.
+function importGroupCtx(g){
+  const p = PATTERNS[+document.getElementById('impPatSel').value];
+  const ok = p && p.ok;
+  const midi = ok && (g.type === 'midi' || (g.type !== 'audio' && isMidiTrack(p, g.dest)));
+  let bytes = false;
+  try{ bytes = ok && !!trigAttrFileArrays(p, g.dest); }catch(e){}
+  return {p, midi, cur: ok ? {speed: importTrackSpeed(p, g.dest), len: effectiveTrackLength(p, g.dest)} : null,
+          canR: ok && !midi && bytes};
+}
+// One source's plan with the dialog's controls, its own speed if it has one.
+function importGroupPlan(g, extra){
+  const c = importGroupCtx(g);
+  return importPlanGroup(g.notes, Object.assign({}, IMP.o, {speed: g.speed !== null && g.speed !== undefined ? g.speed : IMP.o.speed,
+    retrig: IMP.o.retrig && c.canR, cur: c.cur, spill: g.spill || 0}, extra || {}));
+}
+// v24.32: a source made a MIDI track sends on its own channel; one without a
+// channel (an .alc clip) keeps the track's channel, or
+// takes the track's number as the device's default does. Unset is CHAN OFF on
+// the device: the track would play nothing (found on the emulator).
+function importDestMidi(p, g){
+  return g.type === 'midi' || (g.type !== 'audio' && !!(p && p.ok && isMidiTrack(p, g.dest)));
+}
+function importMidiChannel(p, g){
+  if(g.chOut) return g.chOut;                      // v24.33: picked in the matrix's ch column
+  if(g.type !== 'midi' && p && isMidiTrack(p, g.dest) && midiChannel(p, g.dest)) return midiChannel(p, g.dest);
+  if(g.ch !== null && g.ch !== undefined) return g.ch + 1;
+  return midiChannel(p, g.dest) || g.dest;
+}
+// v24.32 (the operator): the helper track follows the plan -- picked whenever
+// repeats need one, dropped when none do -- after any change of destination,
+// type or speed, not only on Autofit. A track picked under "repeats ->" stays.
+function importAutoSpill(p){
+  if(!IMP) return;
+  const avoid = new Set(IMP.groups.filter(g => g.on).map(g => g.dest));
+  for(const g of IMP.groups) if(g.on && g.spillManual && g.spill) avoid.add(g.spill);
+  for(const g of IMP.groups){
+    if(IMP.o.helper === false){ g.spill = 0; continue; }     // v24.33: Advanced -> one track only
+    if(!g.on || g.spillManual) continue;
+    g.spill = 0;
+    const pl = importGroupPlan(g);
+    if(pl.lost.dupes.length){ const t = importFreeTrack(p, avoid); if(t){ g.spill = t; avoid.add(t); } }
+  }
+}
+// A track for repeats: one no source lands on, empty in the pattern if any is.
+function importFreeTrack(p, avoid){
+  const free = t => !avoid.has(t);
+  const empty = t => !(p && p.tracks && p.tracks[t] && p.tracks[t].length);
+  for(let t = 1; t <= 16; t++) if(free(t) && empty(t)) return t;
+  for(let t = 1; t <= 16; t++) if(free(t)) return t;
+  return 0;
+}
+// Option 2 (the operator: "automatically suggested if the source fits"): a
+// finer speed for this track alone, where its repeats land on steps of their
+// own -- exact with no retrig and no helper track.
+function importSuggestSpeed(g, plan){
+  if(!(plan.viaRetrig || (plan.spill && plan.spill.length) || plan.lost.dupes.length)) return null;
+  const sf = SPEED_FACTOR[plan.speed];
+  for(const s2 of [2, 1, 0]){
+    if(!(SPEED_FACTOR[s2] < sf)) continue;
+    const alt = importGroupPlan(g, {speed: s2, retrig: false, spill: 0, len: null});
+    if(alt.exact && !alt.viaRetrig && alt.len <= MAX_STEPS) return s2;
+  }
+  return null;
+}
 function importAutofitText(fit){
-  const pl = fit.plan;
-  if(fit.exact) return `Autofit: ${SPEED_LABEL[pl.speed]}, ${pl.len} steps — every note at its own time.`;
-  return `Autofit found no exact fit. Best: ${SPEED_LABEL[pl.speed]}, ${pl.len} steps — `
-    + [pl.lost.beyond.length && `${pl.lost.beyond.length} past the track's end`,
-       pl.lost.dupes.length && `${pl.lost.dupes.length} repeat a note already on their step`,
-       pl.nudged && `${pl.nudged} moved`].filter(Boolean).join(', ') + ' (red and amber above).'
-    + (fit.withDupes ? ` Ticking “Same note twice on a step” keeps every note at ${SPEED_LABEL[fit.withDupes.speed]} — untested on the device.` : '');
+  const pls = fit.plans.filter(Boolean), pl = pls[0];
+  const sum = k => pls.reduce((s2, x) => s2 + (typeof x[k] === 'number' ? x[k] : 0), 0);
+  const n = k => pls.reduce((s2, x) => s2 + Object.keys(x[k] || {}).length, 0);
+  const tricks = [sum('viaRetrig') && `${sum('viaRetrig')} repeat(s) as retrigs on ${n('retrigs')} step(s)`,
+                  pls.some(x => x.fold) && `loop ×${pls.find(x => x.fold).fold.k}` + (pls.some(x => x.fold && x.fold.conds) ? ' with conditions' : ''),
+                  sum('wrapped') && `${sum('wrapped')} note(s) wrapped to step 1`].filter(Boolean);
+  const rt = tricks.length ? ' ' + tricks.join(', ') + '.' : '';
+  if(fit.exact) return `Autofit: ${SPEED_LABEL[fit.speed]}, ${pl.len} steps — every note at its own time.` + rt;
+  return `Autofit found no exact fit. Best: ${SPEED_LABEL[fit.speed]} — `
+    + [sum('dropped') && `${sum('dropped')} left out`, sum('nudged') && `${sum('nudged')} moved`].filter(Boolean).join(', ')
+    + ' (red and amber above).' + rt;
 }
 function importSet(k, v){
   if(!IMP) return;
@@ -14741,91 +15398,250 @@ function importZoom(d){
   else IMP.zoom = Math.max(4, Math.min(42, (IMP.zoom === 'fit' || !IMP.zoom ? 21 : IMP.zoom) * (d > 0 ? 1.5 : 1 / 1.5)));
   refreshImportInfo();
 }
+function importSource(i, k, v){
+  if(!IMP || !IMP.groups[i]) return;
+  if(k === 'all') IMP.groups.forEach(g => { g.on = v; });
+  else IMP.groups[i][k] = v;
+  if(k === 'spill') IMP.groups[i].spillManual = true;     // your pick stays; otherwise it follows the plan
+  if(k === 'focus') IMP.focus = i;
+  if(k !== 'focus' && k !== 'speed'){
+    const g = IMP.groups[i];
+    if(g) g.suggest = g.on ? importSuggestSpeed(g, importGroupPlan(g)) : null;
+  }
+  IMP.autofitNote = '';
+  refreshImportInfo();
+}
+// Autofit applies every trick (swing stays as set: micro by default).
 function importAutofitNow(){
   if(!IMP) return;
-  const fit = importAutofit(IMP.src, IMP.o.cur);
+  // v24.32 (the operator): Autofit starts over -- every fit setting changed by
+  // hand (speed per track, length, swing, retrig, wrap, fold, fade, tempo, CC,
+  // a helper picked under "repeats ->") goes back to its default first. Where
+  // each source goes (on, track, type) is routing and stays.
+  IMP.wantRetrig = true;
+  Object.assign(IMP.o, {micro: true, retrig: true, wrap: true, fold: true, fade: true, swing: false, len: null,
+                        tempo: !!IMP.fileBpm, cc: true, helper: true});
+  for(const g of IMP.groups){ g.speed = null; g.suggest = null; g.spill = 0; g.spillManual = false; }
+  const on = IMP.groups.filter(g => g.on);
+  const use = on.length ? on : [IMP.groups[IMP.focus]];
+  const fit = importAutofitGroups(use.map(g => { const c = importGroupCtx(g); return {notes: g.notes, cur: c.cur, retrig: IMP.wantRetrig && c.canR}; }),
+    {micro: true, wrap: true, fade: true, fold: true, swing: !!IMP.o.swing});
+  Object.assign(IMP.o, {speed: fit.speed, micro: true, retrig: IMP.wantRetrig, wrap: true, fold: true, fade: true, swing: false, len: null});
+  // repeats nothing else can hold go to a helper track, picked here
+  const p = PATTERNS[+document.getElementById('impPatSel').value];
+  const avoid = new Set(IMP.groups.filter(g => g.on).map(g => g.dest));
+  for(const g of IMP.groups){ g.speed = null; g.spill = 0; g.spillManual = false; }
+  importAutoSpill(p);
+  for(const g of IMP.groups) g.suggest = g.on ? importSuggestSpeed(g, importGroupPlan(g)) : null;
   IMP.fit = fit;
-  IMP.o = {speed: fit.plan.speed, micro: true, dupes: false, len: null, cur: IMP.o.cur};
   IMP.autofitNote = importAutofitText(fit);
   refreshImportInfo();
 }
 
-// Dynamic refresh: the plan, the preview and the numbers follow the controls.
+// Dynamic refresh: the plans, the preview and the numbers follow the controls.
 function refreshImportInfo(){
   if(!IMP || !document.getElementById('impView')) return;
   const pi=+document.getElementById('impPatSel').value;
-  const ti=+document.getElementById('impTrkSel').value||1;
   const md=document.getElementById('impModeSel').value;
   const p=PATTERNS[pi];   // v22.35: impPatSel carries a PATTERNS index
-  if(p && p.ok) IMP.o.cur = {speed: importTrackSpeed(p, ti), len: effectiveTrackLength(p, ti)};
-  const plan = importPlan(IMP.src, IMP.o);
+  importAutoSpill(p);
+  // every source planned with the same controls, onto its own track
+  IMP.plans = IMP.groups.map(g => importGroupPlan(g));
+  IMP.groups.forEach((g, i) => { g.suggest = g.on ? importSuggestSpeed(g, IMP.plans[i]) : null; });
+  const fg = IMP.groups[IMP.focus], plan = IMP.plans[IMP.focus];
   IMP.plan = plan;
   // controls show the plan
-  document.getElementById('impSpeedSel').value = String(plan.speed);
+  document.getElementById('impSpeedSel').value = String(IMP.o.speed);
   document.getElementById('impLenSel').value = String(IMP.o.len || 0);
-  document.getElementById('impMicro').checked = plan.micro;
-  document.getElementById('impDupes').checked = plan.dupes;
-  for(const b of document.querySelectorAll('.impfold button')) b.classList.toggle('on', +b.dataset.speed === plan.speed);
+  for(const [id, k] of [['impMicro', 'micro'], ['impFade', 'fade'], ['impWrap', 'wrap'], ['impFold', 'fold'], ['impTempo', 'tempo'], ['impCC', 'cc'], ['impHelper', 'helper']])
+    document.getElementById(id).checked = !!IMP.o[k];
+  for(const b of document.querySelectorAll('.impfold:not(.impsw) button')) b.classList.toggle('on', +b.dataset.speed === IMP.o.speed);
+  const fctx = importGroupCtx(fg);
+  const rc = document.getElementById('impRetrig');
+  rc.checked = IMP.wantRetrig; rc.disabled = !fctx.canR;
+  document.getElementById('impRetrigL').classList.toggle('dim', !fctx.canR);
+  document.getElementById('impRetrigL').title = fctx.canR ? 'The same note twice on a step does not play on the device; a retrig on the trig repeats it instead, where the repeats are evenly spaced'
+    : fctx.midi ? 'Retrig is not available on a MIDI track (manual §8): repeats go to a helper track instead.' : 'This pattern has no bytes of its own to write a retrig into (load a .dn2prj or a dump).';
+  document.getElementById('impWrapL').classList.toggle('dim', !plan.loops && !plan.wrapped);
+  document.getElementById('impFoldL').classList.toggle('dim', !plan.prep.loop && !importFindLoop(fg.notes));
+  const swf = plan.prep.swingFound, sf1 = SPEED_FACTOR[IMP.o.speed] === 1;
+  document.getElementById('impSwMicro').classList.toggle('on', !IMP.o.swing);
+  document.getElementById('impSwSwing').classList.toggle('on', !!IMP.o.swing);
+  document.getElementById('impSwSwing').textContent = swf ? `swing ${swf.pct}%` : 'swing';
+  document.getElementById('impSwSwing').title = !swf ? 'No consistent swing found in this source.' : !sf1 ? 'Swing is exact at 1x only: the device swings every second STEP.' : `The off-beats sit ${swf.pct}% late: play them with the pattern's SWING instead of micro (affects the whole pattern).`;
+  document.getElementById('impTempoL').title = IMP.fileBpm ? `Set the pattern tempo to ${IMP.fileBpm.toFixed(1)} BPM` : 'The file names no tempo.';
+  document.getElementById('impTempoL').classList.toggle('dim', !IMP.fileBpm);
+  document.getElementById('impCCL').classList.toggle('dim', !IMP.groups.some(g => g.cc && g.cc.length));
+  // the sources -> tracks matrix
+  const trkOpt = (sel) => Array.from({length: 16}, (_, k) => k + 1).map(t => {
+    const n = p && p.tracks && p.tracks[t] ? p.tracks[t].length : 0;
+    return `<option value="${t}"${t === sel ? ' selected' : ''}>T${t}${n ? ' (' + n + ')' : ''}${p && p.ok && isMidiTrack(p, t) ? ' MIDI' : ''}</option>`;
+  }).join('');
+  const dupDest = new Set(), seen = new Set();
+  IMP.groups.forEach(g => { if(g.on){ for(const t of [g.dest, g.spill].filter(Boolean)){ if(seen.has(t)) dupDest.add(t); seen.add(t); } } });
+  const curType = g => p && p.ok ? (isMidiTrack(p, g.dest) ? 'MIDI' : 'audio') : '?';
+  document.getElementById('impSources').innerHTML =
+    `<table class="impsrct"><tr><th><button class="mini" onclick="importSource(0,'all',true)">all</button><button class="mini" onclick="importSource(0,'all',false)">none</button></th><th>source</th><th>notes</th><th>→ track</th><th>as</th><th title="the MIDI channel the track (and its helper) sends on">ch</th><th title="repeats no step can hold (no retrig on MIDI, or a retrig would replay other notes) go to this track, at the same step">repeats →</th><th>result</th><th>show</th></tr>`
+    + IMP.groups.map((g, i) => {
+      const pl = IMP.plans[i];
+      const res = !g.on ? '—' : pl.exact ? `<span class="ok">✓ ${pl.placed}</span>` : `<span class="warn">${pl.placed}/${g.notes.length}</span>`;
+      const sug = g.on && g.suggest !== null && g.suggest !== undefined && g.speed !== g.suggest
+        ? ` <button class="mini impsug" onclick="importSource(${i},'speed',${g.suggest})" title="this source fits exactly at ${SPEED_LABEL[g.suggest]} on its own: every repeat on a step of its own, no retrig, no helper track">fits at ${SPEED_LABEL[g.suggest]} →</button>` : '';
+      const own = g.speed !== null && g.speed !== undefined ? ` <button class="mini" onclick="importSource(${i},'speed',null)" title="back to the dialog's speed">${SPEED_LABEL[g.speed]} ✕</button>` : '';
+      const spillOpt = `<option value="0">off</option>` + Array.from({length: 16}, (_, k) => k + 1).filter(t => t !== g.dest).map(t => `<option value="${t}"${t === g.spill ? ' selected' : ''}>T${t}</option>`).join('');
+      return `<tr class="${i === IMP.focus ? 'foc' : ''}"><td><input type="checkbox" ${g.on ? 'checked' : ''} onchange="importSource(${i},'on',this.checked)"></td>`
+        + `<td>${esc(g.label)}</td><td>${g.notes.length}${g.cc && g.cc.length ? ` · ${g.cc.length} CC` : ''}</td>`
+        + `<td><select id="impDest${i}" onchange="importSource(${i},'dest',+this.value)">${trkOpt(g.dest)}</select>${g.on && dupDest.has(g.dest) ? ' <span class="warn">twice</span>' : ''}</td>`
+        + `<td><select id="impType${i}" onchange="importSource(${i},'type',this.value)"><option value="keep"${g.type === 'keep' ? ' selected' : ''}>keep (${curType(g)})</option><option value="audio"${g.type === 'audio' ? ' selected' : ''}>audio</option><option value="midi"${g.type === 'midi' ? ' selected' : ''}>MIDI${g.ch !== null && g.ch !== undefined ? ' ch ' + (g.ch + 1) : ''}</option></select></td>`
+        + `<td>${importDestMidi(p, g) ? `<select id="impCh${i}" onchange="importSource(${i},'chOut',+this.value)">${Array.from({length: 16}, (_, k) => k + 1).map(c => `<option value="${c}"${c === importMidiChannel(p, g) ? ' selected' : ''}>${c}</option>`).join('')}</select>` : '<span class="muted">—</span>'}</td>`
+        + `<td><select id="impSpill${i}" onchange="importSource(${i},'spill',+this.value)"${IMP.o.helper === false ? ' disabled title="Advanced: Repeats on a helper track is off"' : ''}>${spillOpt}</select>${pl.spill && pl.spill.length ? ` <span class="ok">${pl.spill.length}</span>` : ''}</td>`
+        + `<td>${res}${own}${sug}</td><td><input type="radio" name="impFocus" ${i === IMP.focus ? 'checked' : ''} onchange="importSource(${i},'focus',true)"></td></tr>`;
+    }).join('') + '</table>';
   // zoom is a step width: the track editor's 21 px by default (scroll for the
   // rest), or 'fit' -- the whole file in the view.
   const view = document.getElementById('impView');
-  const end16 = IMP.src.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 16);
+  const end16 = fg.notes.reduce((m, n) => Math.max(m, importPos16(n) + Math.max(0.25, n.lenSteps || 1)), 16);
   const z = IMP.zoom === 'fit' ? Math.max(0.5, ((view.clientWidth || 640) - 52) / Math.max(end16, plan.span16))
                                : (IMP.zoom || 21) / plan.sf;
-  view.innerHTML = importPreviewSvg(IMP.src, plan, z, ti);
-  const total = IMP.src.length, kept = plan.events.length;
+  view.innerHTML = importPreviewSvg(fg.notes, plan, z, fg.dest);
+  const total = fg.notes.length, kept = plan.placed === undefined ? 0 : (plan.fold ? total - plan.lost.beyond.concat(plan.lost.dupes).reduce((s2, i) => s2 + plan.prep.src[i].origs.length, 0) : plan.placed);
   const st = [];
   st.push(plan.exact ? `<span class="ok">✓ ${kept} of ${total} notes on ${plan.len} steps at ${SPEED_LABEL[plan.speed]}, every one at its own time</span>`
                      : `<span class="warn">⚠ ${kept} of ${total} notes placed</span>`);
+  if(plan.fold) st.push(`one loop of ${plan.fold.P / 16} bar(s) plays ×${plan.fold.k}` + (plan.fold.conds ? `, ${Object.keys(plan.conds).length} step(s) under a condition` : ''));
+  if(plan.foldRefused) st.push(`<span class="${plan.exact ? 'muted' : 'warn'}">the file repeats, but ${plan.foldRefused === 'conditions' ? 'its differences share steps with notes that play on every pass (a trig has one condition)' : 'the loop loses more notes'} — imported in full</span>`);
+  if(plan.prep.swing) st.push(`swing ${plan.prep.swing.pct}% instead of micro on ${plan.events.filter(e => e.swung).length} off-beat(s)`);
   if(plan.lost.beyond.length) st.push(`${plan.lost.beyond.length} past the track's end`);
-  if(plan.lost.dupes.length) st.push(`${plan.lost.dupes.length} repeat a note already on their step`);
+  if(plan.viaRetrig) st.push(`${plan.viaRetrig} repeat(s) as retrigs on ${Object.keys(plan.retrigs).length} step(s)`
+    + (Object.values(plan.retrigs).some(R => R.fade) ? `, ${Object.values(plan.retrigs).filter(R => R.fade).length} with a velocity fade` : '')
+    + (plan.retrigVel ? ` (${plan.retrigVel} at another velocity)` : ''));
+  if(plan.spill && plan.spill.length) st.push(`${plan.spill.length} repeat(s) on the helper track T${plan.spillTrack}`);
+  if(plan.lost.dupes.length) st.push(`${plan.lost.dupes.length} repeat a note on a step${plan.retrig ? ' where a retrig cannot play them' : ''} — set a track under “repeats →”`);
+  if(plan.wrapped) st.push(`${plan.wrapped} note(s) wrapped to step 1, early`
+    + (Object.keys(plan.conds).some(k2 => plan.conds[k2] === COND_NAMES.indexOf('!1ST')) ? ' — from the 2nd pass (!1ST)' : '')
+    + (plan.wrapShared.length ? ' — on the first pass from STOP it may sound with step 1 (H139)' : '')
+    + ' — <span class="warn">step 1 may sound twice at each loop (H146); a free helper track avoids it</span>');
+  if(plan.loop16 && !plan.fold) st.push(plan.loopShort ? `<span class="warn">the file loops at ${plan.loop16 / 16} bars, longer than ${MAX_STEPS} steps hold at this speed</span>`
+    : `loops at ${+(plan.loop16 / 16).toFixed(2)} bars, the file's own length`);
   if(plan.nudged) st.push(`${plan.nudged} moved off their time${plan.micro ? ' (further than micro reaches)' : ' (micro is off)'}`);
   st.push(`up to ${plan.maxPerStep} note${plan.maxPerStep === 1 ? '' : 's'} on a step`);
   if(plan.crowded.length) st.push(`<span class="warn">${plan.crowded.length} step(s) hold more than ${IMPORT_MAX_CHORD} notes</span>`);
-  document.getElementById('impStat').innerHTML = st.join(' · ') + (IMP.autofitNote ? `<div class="impfit">${esc(IMP.autofitNote)}</div>` : '');
+  if(fg.cc && fg.cc.length && IMP.o.cc) st.push(`${fg.cc.length} CC lane(s) → p-locks where they drive a parameter`);
+  document.getElementById('impStat').innerHTML = (IMP.groups.length > 1 ? `<b>${esc(fg.label)} → T${fg.dest}</b> · ` : '') + st.join(' · ')
+    + (IMP.autofitNote ? `<div class="impfit">${esc(IMP.autofitNote)}</div>` : '');
   // what the pattern will be told
   const lay = document.getElementById('impLayout');
   if(p && p.ok){
-    const L = importLayout(p, ti, plan), lines = [];
-    if(!L.change) lines.push(`T${ti} already plays ${SPEED_LABEL[plan.speed]} × ${plan.len} steps.`);
-    else {
-      lines.push(`T${ti}: ${SPEED_LABEL[L.curSpd]} × ${L.curLen} → <b>${SPEED_LABEL[plan.speed]} × ${plan.len}</b>`);
-      if(L.toPerTrack) lines.push('Pattern switches to per-track length; the other tracks keep their length and speed.');
-      if(L.master) lines.push(`Master length ${p.patternLength || 16} → <b>${L.master}</b>, so the pattern does not reset before the track ends.`);
-      if(md === 'merge' && p.tracks && p.tracks[ti] && p.tracks[ti].length && plan.speed !== L.curSpd)
-        lines.push(`<span class="warn">Merge: the ${p.tracks[ti].length} trigs already on T${ti} will play at the new speed.</span>`);
-    }
+    const lines = [];
+    IMP.groups.forEach((g, i) => {
+      if(!g.on) return;
+      const pl = IMP.plans[i], L = importLayout(p, g.dest, pl);
+      const was = isMidiTrack(p, g.dest) ? 'midi' : 'audio';
+      if((g.type === 'audio' || g.type === 'midi') && g.type !== was)
+        lines.push(`T${g.dest} becomes <b>${g.type === 'midi' ? 'a MIDI track on channel ' + importMidiChannel(curPattern(), g) : 'an audio track (FM TONE)'}</b>.`);
+      else if(was === 'midi' && g.type !== 'audio' && g.chOut && g.chOut !== midiChannel(p, g.dest))
+        lines.push(`T${g.dest} sends on <b>channel ${g.chOut}</b> (was ${midiChannel(p, g.dest) || 'OFF'}).`);
+      else if(was === 'midi' && g.type !== 'audio' && !midiChannel(p, g.dest))
+        lines.push(`T${g.dest} is a MIDI track with no channel (CHAN OFF, it would play nothing): it gets <b>channel ${importMidiChannel(p, g)}</b>.`);
+      if(g.spill && pl.spill && pl.spill.length)
+        lines.push(`T${g.spill}: helper for ${pl.spill.length} repeat(s) — ${importDestMidi(p, g) ? 'MIDI, channel ' + importMidiChannel(p, g) : 'audio, a copy of the preset'}, same speed and length.`);
+      if(!L.change) lines.push(`T${g.dest} already plays ${SPEED_LABEL[pl.speed]} × ${pl.len} steps.`);
+      else {
+        lines.push(`T${g.dest}: ${SPEED_LABEL[L.curSpd]} × ${L.curLen} → <b>${SPEED_LABEL[pl.speed]} × ${pl.len}</b>`);
+        if(L.toPerTrack) lines.push('Pattern switches to per-track length; the other tracks keep their length and speed.');
+        if(L.master) lines.push(`Master length ${p.patternLength || 16} → <b>${L.master}</b>, so the pattern does not reset before the track ends.`);
+        if(md === 'merge' && p.tracks && p.tracks[g.dest] && p.tracks[g.dest].length && pl.speed !== L.curSpd)
+          lines.push(`<span class="warn">Merge: the ${p.tracks[g.dest].length} trigs already on T${g.dest} will play at the new speed.</span>`);
+      }
+    });
+    if(IMP.o.tempo && IMP.fileBpm && Math.abs((p.bpm || 120) - IMP.fileBpm) > 0.05) lines.push(`Tempo ${(p.bpm || 120).toFixed(1)} → <b>${IMP.fileBpm.toFixed(1)} BPM</b> (the whole pattern).`);
+    const swp = IMP.plans.find((pl, i) => IMP.groups[i].on && pl.prep && pl.prep.swing);
+    if(swp) lines.push(`Swing → <b>${swp.prep.swing.pct}%</b> (the whole pattern).`);
     lay.innerHTML = lines.map(l => `<div>${l}</div>`).join('');
   }
 }
 
 function importCommit(){
-  if(!IMP || !IMP.plan) return;
+  if(!IMP || !IMP.plans) return;
   const pi=+document.getElementById('impPatSel').value;
-  const t=+document.getElementById('impTrkSel').value;
   const md=document.getElementById('impModeSel').value;
-  const plan = IMP.plan;
+  const jobs = IMP.groups.map((g, i) => ({g, plan: IMP.plans[i]})).filter(j => j.g.on);
+  if(!jobs.length){ alert('No source is ticked.'); return; }
   if(pi!==getCurPatternIdx()){ document.getElementById('patSel').value=pi; onPatternChange(); }
   closeModal();
   const p = curPattern(); if(!p || !p.ok) return;
-  markDirty('MIDI import');            // one undo step: layout and notes together
-  const L = importApplyLayout(p, t, plan);
-  importNotes(t, plan.events, md);
-  const msgs = [`${plan.events.length} of ${IMP.src.length} notes imported onto T${t}`
-    + (L.change ? ` at ${SPEED_LABEL[plan.speed]} × ${plan.len} steps` : '')
-    + (L.master ? `, master length ${L.master}` : '')];
-  if(plan.dropped) msgs.push(`${plan.dropped} left out`);
-  if(plan.nudged) msgs.push(`${plan.nudged} moved`);
-  // v23.69: a .alc's CC lanes become p-locks on the imported trigs.
-  IMPORT_CC=importCCAsLocks(curPattern(),t,plan.events,IMP.parsed.ccEnvelopes);
-  if(IMPORT_CC.locks||IMPORT_CC.unmapped.length){
-    msgs.push(`${IMPORT_CC.locks} p-lock(s) on ${IMPORT_CC.lanes} parameter(s) from the clip's CC lanes`
-      +(IMPORT_CC.unmapped.length?` — CC ${IMPORT_CC.unmapped.join(', ')} drive(s) no parameter on this track, left out`:''));
+  markDirty('MIDI import');            // one undo step: every track, layout and notes together
+  const msgs = [];
+  let probSet = 0, swingPct = null;
+  for(const {g, plan} of jobs){
+    const t = g.dest;
+    // v24.29: the track's type, kept or switched; a MIDI track takes the source's channel
+    if(g.type === 'audio' || g.type === 'midi'){
+      setTrackType(p, t, g.type === 'midi');
+    }
+    // a MIDI destination never stays on CHAN OFF (unset) -- it would play nothing
+    if(isMidiTrack(p, t) && (g.type === 'midi' || g.chOut || !midiChannel(p, t))) setMidiChannel(p, t, importMidiChannel(p, g));
+    const L = importApplyLayout(p, t, plan);
+    importNotes(t, plan.events, md, {render: false});
+    probSet += IMPORT_PROB.set || 0;
+    // retrigs (+768 / +640 / +896) and conditions (+256); Replace clears what
+    // the track held, so nothing old fires on, or silences, an imported note
+    let nRt = 0, nCond = 0;
+    const fa = trigAttrFileArrays(p, t);
+    if(fa){
+      const RT = !isMidiTrack(p, t) ? (plan.retrigs || {}) : {}, CD = plan.conds || {};
+      if(md === 'replace') for(let s2 = 1; s2 <= MAX_STEP; s2++){
+        if(!RT[s2] && !isMidiTrack(p, t)) for(const k of ['rrate', 'rlen', 'rfade']) if(trigAttrAt(p, t, k, s2) !== 0xFF) setTrigAttr(p, t, k, s2, 0xFF, fa);
+        for(const k of ['cond', 'fill']) if(!(k === 'cond' && CD[s2] !== undefined) && trigAttrAt(p, t, k, s2) !== 0xFF) setTrigAttr(p, t, k, s2, 0xFF, fa);
+      }
+      for(const [st, R] of Object.entries(RT)){
+        setTrigAttr(p, t, 'rrate', +st, R.rate, fa); setTrigAttr(p, t, 'rlen', +st, R.rlen, fa);
+        setTrigAttr(p, t, 'rfade', +st, R.fade ? R.fade + 64 : 0xFF, fa);
+        nRt++;
+      }
+      for(const [st, c] of Object.entries(CD)){ setTrigAttr(p, t, 'cond', +st, c, fa); nCond++; }
+    }
+    // v24.29: the helper track -- the same type; MIDI on the same channel,
+    // audio with a copy of the preset -- with the repeats at their steps
+    let spillMsg = '';
+    if(g.spill && plan.spill && plan.spill.length){
+      const u = g.spill, midi = isMidiTrack(p, t);
+      setTrackType(p, u, midi);
+      if(midi) setMidiChannel(p, u, midiChannel(p, t));
+      else { try{ loadPresetIntoTrack(p, u, trackPresetNow(p, t)); }catch(e){ spillMsg = ` (preset not copied: ${e.message})`; } }
+      importApplyLayout(p, u, plan);
+      importNotes(u, plan.spill, md, {render: false});
+      const fu = trigAttrFileArrays(p, u);
+      if(fu){
+        if(md === 'replace') for(let s2 = 1; s2 <= MAX_STEP; s2++)
+          for(const k of (midi ? ['cond', 'fill'] : ['cond', 'fill', 'rrate', 'rlen', 'rfade']))
+            if(!(k === 'cond' && plan.spillConds[s2] !== undefined) && trigAttrAt(p, u, k, s2) !== 0xFF) setTrigAttr(p, u, k, s2, 0xFF, fu);
+        for(const [st, c] of Object.entries(plan.spillConds)) setTrigAttr(p, u, 'cond', +st, c, fu);
+      }
+      spillMsg = `, ${plan.spill.length} repeat(s) on T${u}` + spillMsg;
+    }
+    // CC lanes -> p-locks (v23.69 for .alc, v24.28 for .mid)
+    let cc = null;
+    if(IMP.o.cc && g.cc && g.cc.length) cc = importCCAsLocks(p, t, plan.events, g.cc);
+    if(plan.prep && plan.prep.swing) swingPct = swingPct || plan.prep.swing.pct;
+    msgs.push(`T${t}: ${plan.fold ? g.notes.length : plan.placed} of ${g.notes.length} notes`
+      + (L.change ? ` at ${SPEED_LABEL[plan.speed]} × ${plan.len}` : '')
+      + (L.master ? `, master length ${L.master}` : '')
+      + (plan.fold ? `, loop ×${plan.fold.k}` : '')
+      + (nRt ? `, ${nRt} retrig(s)` : '') + (nCond ? `, ${nCond} condition(s)` : '')
+      + (plan.wrapped ? `, ${plan.wrapped} wrapped to step 1` : '') + spillMsg
+      + (g.type === 'audio' || g.type === 'midi' ? `, now ${g.type === 'midi' ? 'MIDI' : 'audio'}` : '')
+      + (plan.dropped ? `, ${plan.dropped} left out` : '') + (plan.nudged ? `, ${plan.nudged} moved` : '')
+      + (cc && cc.locks ? `, ${cc.locks} p-lock(s) from CC` : ''));
   }
-  if(IMPORT_PROB.set) msgs.push(`${IMPORT_PROB.set} step(s) took Live's chance as PROB`
-    +(IMPORT_PROB.merged?` — ${IMPORT_PROB.merged} chord(s) with differing chances took the highest`:''));
-  render();
-  const st=document.getElementById('status'); if(st) st.textContent = msgs.join(' · ');
+  if(IMP.o.tempo && IMP.fileBpm && IMP.fileBpm >= 30 && IMP.fileBpm <= 300){
+    p.bpm = IMP.fileBpm; p.tempoRaw = Math.round(IMP.fileBpm * TEMPO_DIV);
+    msgs.push(`tempo ${IMP.fileBpm.toFixed(1)}`);
+  }
+  if(swingPct){ try{ setPatternSetting(p, 'swing', swingPct); msgs.push(`swing ${swingPct}%`); }catch(e){} }
+  if(probSet) msgs.push(`${probSet} step(s) took Live's chance as PROB`);
+  refreshTrackSel(); updateCurrentPatternInSel(); render();
+  const st=document.getElementById('status'); if(st) st.textContent = 'Imported — ' + msgs.join(' · ');
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -16291,7 +17107,18 @@ function showHelp(){
           the on-beat one. ${K('Autofit')} picks the speed and length that keep every note at its own time, or says what the best
           fit loses (red: left out, amber: moved). The import sets the track's speed and length, and the master length when the
           pattern would reset too early. ${K('replace')} clears the track first, ${K('merge')} keeps what is there.
-          <i>Same note twice on a step</i> is off by default: it has not been tried on the device.</td></tr>
+          The device cannot hold the same note twice on one step; <i>Repeated notes as retrigs</i> plays such a repeat as a retrig
+          on the trig instead (rate and length set for exactly the hits needed), where every hit is the same chord, evenly spaced.
+          <i>Wrap the end to step 1</i>: the pattern loops, so a note in the file's last half step goes on step 1, early, like every other
+          bar's last 16th on the next bar's first step; alone there it gets the condition !1ST (from the second pass).
+          <b>Advanced</b> holds the rest, all applied by Autofit: <i>retrig velocities as a fade</i> (VFAD); <i>repeats as one loop</i> &mdash;
+          a file that plays the same bars several times is imported once on a shorter track, its differences under trig conditions
+          (1:4, !4:4 &hellip;) where each has its trig to itself; <i>off-beats</i> as micro (default) or as the pattern's swing (1x only);
+          the file's tempo; CC lanes as p-locks. A file with several MIDI tracks or channels lists them: each goes to the track you pick
+          (channel N to track N at first), <i>show</i> picks the one the preview draws. <i>as</i> keeps the track's type or switches
+          it to audio or MIDI (a MIDI track takes the source's channel). <i>repeats &rarr;</i> names a helper track for repeats no step can
+          hold &mdash; on a MIDI track there is no retrig: the helper plays them on the same channel (audio: with a copy of the preset).
+          Where a source fits at a finer speed on its own, <i>fits at 1x &rarr;</i> offers that speed for its track instead.</td></tr>
         <tr><td>microtiming</td><td>survives both ways: an off-grid note comes back as a trig plus its offset.</td></tr>
         <tr><td>speed multiplier</td><td>applied to both formats: a 2x track's steps last half as long.</td></tr>
         <tr><td>overlapping notes</td><td>a trig can outlast the gap to the next on the same pitch, which MIDI cannot hold; notes
@@ -16336,6 +17163,15 @@ function showHelp(){
       worked out by observation. The software is provided <b>as is, without warranty of any kind</b>, and its authors accept
       <b>no liability</b> for lost patterns, projects or work.</p>
 
+      <h4>Install as an app</h4>
+      <table class="helptab">
+        <tr><td>Chrome, Edge, Brave</td><td>on a computer, the install icon at the right of the address bar (or the browser menu &rarr;
+          <b>Install SYXGRID</b>) puts SYXGRID in the Dock or Start menu, in its own window. It works offline, opens
+          <b>.dn2prj</b> and <b>.syx</b> files from Finder or Explorer (<b>Open With</b>), and its Dock icon offers Device Read,
+          +Drive Manager and Backup. A new version arrives by itself the next time it starts online.</td></tr>
+        <tr><td>Safari, Firefox, iPhone, iPad</td><td>no Web MIDI with SysEx, so no device: a banner says so once. Files open,
+          edit and save there; for the Digitone use Chrome, Edge or Brave on a computer.</td></tr>
+      </table>
       <h4>Reporting a bug</h4>
       <table class="helptab">
         <tr><td>${K('Report a bug…')}</td><td>below this help: opens the bug form on <b>GitHub</b>
@@ -16609,7 +17445,7 @@ function showPresetPicker(t){
   if(isMidiTrack(p, t)){ showMidiChannel(t); return; }
   PICK = {t, tab: projectPool().named ? 'pool' : 'kits', filter: ''};
   const cur = (p.presetNames && p.presetNames[t - 1]) || ('PRESET ' + t);
-  showModal(`T${t} — load a preset`,
+  showModal(`${trackTag(p, t)} — load a preset`,
     `Now <b>${esc(cur)}</b> (${esc(machineName(p, t))}). The one you pick replaces it on this track — its `+
     `machine and every parameter come with it. Undo takes it back.`,
     [{label: 'Close', desc: '', fn: () => closeModal()}],
@@ -16823,7 +17659,10 @@ function buildSoundMsg(rec, slot){
 // ── The device side ──────────────────────────────────────────────────
 // The Digitone's own ports, chosen by name: the picker and the save dialog are
 // dialogs of their own, so they cannot borrow Tools > A's port selectors.
-async function drivePorts(){
+async function drivePorts(own){
+  // v24.30: any other +Drive work stops the Screen tab's stream first; since
+  // v24.35 that tab is a plugin, and `own` names the plugin asking.
+  await pluginsBeforeDrive(own);
   if(LIVE.on) throw new Error('Live Control is on — +Drive operations do not work while it is. Switch Live Control off first.');
   if(!MIDI_ACCESS) await ensureMidi();
   const {out, inp} = pickPorts();
@@ -17128,7 +17967,7 @@ function showSavePreset(t, keepName){
   SAVEP = {t, rec, name: (keepName && SAVEP && SAVEP.t === t) ? SAVEP.name : presetSaveName(was)};
   const tags = presetTags(rec);
   closeModal();
-  showModal(`T${t} — save the edited preset`,
+  showModal(`${trackTag(p, t)} — save the edited preset`,
     `<b>${esc(was)}</b> (${esc(machineName(p, t))}) is edited. <b>The edit is already in the project</b>: it is `+
     `part of this pattern's kit and goes out with every save of the project, and Undo takes it back. `+
     `To keep the sound on its own as well:`,
@@ -17523,13 +18362,19 @@ function showMidiChannel(t){
   const cur = midiChannel(p, t);
   const opts = ['<option value="">OFF</option>']
     .concat([...Array(16)].map((_, i) => `<option value="${i + 1}"${cur === i + 1 ? ' selected' : ''}>${i + 1}</option>`)).join('');
-  showModal(`T${t} — MIDI channel`, `The channel this MIDI track sends on. <b>OFF</b> keeps the number underneath.`,
+  // v24.34 (the operator): the name too, as the T-number's dialog offers it --
+  // both cells of the track list edit a MIDI track's name and channel.
+  const nm = (p.midiNames && p.midiNames[t - 1]) || '';
+  showModal(`${trackTag(p, t)} — MIDI name and channel`, `The name the device shows, and the channel this MIDI track sends on. <b>OFF</b> keeps the number underneath.`,
     [{label: 'Apply', desc: '', fn: () => {
        const raw = document.getElementById('mcChan').value;
        setMidiChannel(p, t, raw === '' ? null : parseInt(raw, 10));
+       setMidiName(p, t, document.getElementById('mcName').value);
        closeModal(); refreshTrackSel(); render(); }},
      {label: 'Cancel', desc: '', fn: () => closeModal()}],
-    `<label style="font-size:12px;display:flex;align-items:center;gap:7px">Channel
+    `<label style="font-size:12px;display:flex;align-items:center;gap:7px">MIDI name
+       <input id="mcName" class="nname" value="${esc(nm)}" maxlength="${NAME_LEN}" style="width:140px;font-size:13px;padding:5px"></label>
+     <label style="font-size:12px;display:flex;align-items:center;gap:7px;margin-top:9px">Channel
        <select id="mcChan" class="nlen" style="font-size:13px;padding:5px">${opts}</select></label>`);
 }
 
@@ -18590,7 +19435,7 @@ function render(){
     // or the +Drive) on an audio track, the channel on a MIDI track. The track
     // number opens the type; the machine opens the sound's parameters.
     const edit = !known ? ''
-      : isMidi ? ` class="ttedit" onclick="showMidiChannel(${t})" title="Set this MIDI track\u2019s channel"`
+      : isMidi ? ` class="ttedit" onclick="showMidiChannel(${t})" title="Set this MIDI track\u2019s name and channel"`
                : ` class="ttedit" onclick="showPresetPicker(${t})" title="Load a preset onto T${t} — from the pool, a kit, or the +Drive"`;
     // THE MACHINE COLUMN OPENS THE PRESET; the preset/channel column still
     // opens the type editor. Two different questions, two different columns --
@@ -18671,8 +19516,8 @@ function render(){
     // A MIDI track shows its channel: a preset name means nothing there.
     const mach = trackMachine(p,t);
     const headLbl = isMidiTrack(p,t)
-      ? (midiChannel(p,t)==null ? 'CH OFF' : 'CH '+midiChannel(p,t))
-      : (p.presetNames[t-1] || '');
+      ? [trackName(p,t), midiChannel(p,t)==null ? 'CH OFF' : 'CH '+midiChannel(p,t)].filter(Boolean).join(' · ')
+      : trackName(p,t);
     const pn = headLbl ? ` <span class="pname m${mach}">${esc(headLbl)}</span>` : '';
     // Each track renders its OWN length in 'detected' mode; an explicit view
     // size overrides it.
@@ -19059,6 +19904,7 @@ function render(){
   }
 
   main.innerHTML=html;
+  { const pt = pluginTab(RIGHT_TAB); if(pt && pt.tab.afterRender) try{ pt.tab.afterRender(); }catch(e){ console.error(e); } }
   try { updateCurrentPatternInSel(); } catch(e) {}
   try { refreshTrackSel(); } catch(e) {}
   document.getElementById('status').textContent =
@@ -21161,6 +22007,7 @@ function downloadParamIdReport(){
 const RPC_OPCODES = {
   0x01:{name:'Device',       risk:'safe',    src:'ours', note:'advertises the opcode list'},
   0x02:{name:'Version',      risk:'safe',    src:'ours'},
+  0x04:{name:'Screenshot',   risk:'safe',    src:'ours', note:'the screen as a 1-bit frame (v24.30)'},
   0x53:{name:'List',         risk:'safe',    src:'ours', note:'directory listing'},
   0x54:{name:'Open',         risk:'safe',    src:'ours', note:'froze a DN1 three times when malformed'},
   0x55:{name:'Read',         risk:'safe',    src:'ours', note:'by sequence number, not offset'},
@@ -23702,6 +24549,61 @@ function verifyRoundTrip(){
 })();
 document.getElementById('verBadge').textContent=versionLabel();
 try{ midiPill(); }catch(e){}
+// ── v24.25 INSTALLABLE APP (PWA) ─────────────────────────────────────────
+// The site ships a manifest and a service worker (scripts/deploy_site.py adds
+// the <link>s), so Chrome, Edge and Brave offer to install SYXGRID as an app:
+// its own window, offline, and .dn2prj / .syx files open in it from Finder or
+// Explorer. Nothing here runs from file:// or without a service worker.
+//
+// No Web MIDI (Safari, Firefox, all iOS browsers -- WebKit underneath): say so
+// up front, once per browser, instead of failing at the first Device Read.
+// Firefox has a Web MIDI behind a per-site add-on, untested here with SysEx.
+function noMidiBrowser(){
+  const ua = navigator.userAgent || '';
+  if(!navigator.requestMIDIAccess) return /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
+    ? 'an iPhone or iPad — every browser there is Apple’s WebKit' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) && !/Chrom/.test(ua) ? 'Safari' : 'this browser';
+  if(/Firefox\//.test(ua)) return 'Firefox (its Web MIDI needs a site add-on and is untested here)';
+  return null;
+}
+function dismissNoMidi(){
+  try{ localStorage.setItem('syxgrid.noMidiOk', '1'); }catch(e){}
+  const el = document.getElementById('noMidiWarn'); if(el) el.style.display = 'none';
+}
+(function(){
+  const why = noMidiBrowser(); if(!why) return;
+  try{ if(localStorage.getItem('syxgrid.noMidiOk') === '1') return; }catch(e){}
+  const el = document.getElementById('noMidiWarn'), w = document.getElementById('nmWhy');
+  if(w) w.textContent = why;
+  if(el) el.style.display = 'block';
+})();
+// The service worker: network first, so a release is never hidden behind a
+// cached copy; the cache only answers when the network does not.
+(function(){
+  const secure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if(!secure || !('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
+// Files opened with SYXGRID from the desktop (manifest file_handlers). The
+// handle is kept for nothing but naming: saves still go to new files, as they
+// always have, so the original stays untouched until the new one has loaded.
+var FILE_HANDLE = null;    // var: hoisted, so loadFiles() may run before this line
+if('launchQueue' in window && window.launchQueue && typeof window.launchQueue.setConsumer === 'function'){
+  window.launchQueue.setConsumer(async params => {
+    if(!params || !params.files || !params.files.length) return;
+    const files = [];
+    for(const h of params.files){ try{ files.push(await h.getFile()); }catch(e){} }
+    if(!files.length) return;
+    loadFiles(files);
+    FILE_HANDLE = params.files.length === 1 ? params.files[0] : null;
+  });
+}
+// Dock / Start-menu shortcuts (manifest "shortcuts"): ?do=read|drive|backup.
+function pwaShortcut(what){
+  const go = {read: () => showDriveRead(), drive: () => showDriveBrowser(), backup: () => showBackupMenu()}[what];
+  if(go) setTimeout(go, 300);
+  return !!go;
+}
+try{ const q = new URLSearchParams(location.search).get('do'); if(q) pwaShortcut(q); }catch(e){}
 document.getElementById('verBadge').title=`${VIZ_VERSION} (${VIZ_DATE}) — ${VIZ_NOTE}`;
 document.title=`SYXGRID ${versionLabel()} — Digitone II pattern editor`;
 console.log(`SYXGRID ${versionLabel()} (${VIZ_DATE}) — ${VIZ_NOTE}`);

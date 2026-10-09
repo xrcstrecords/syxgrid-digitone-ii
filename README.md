@@ -218,7 +218,7 @@ Digitone.
 | | |
 |---|---|
 | **Export MIDI** | pick **.mid** or **.alc** and which tracks. Files are named slot&ndash;pattern&ndash;track. **All tracks in one file** writes a type-1 .mid with each track on its own channel and the shorter tracks repeated to the longest. |
-| **Import MIDI** | a .mid or .alc onto a chosen track. The dialog draws the file as a piano roll over the track's steps on one time axis, and every control redraws it. **Fold** 2:1, 4:1 or 8:1 sets the track to 1/2x, 1/4x or 1/8x, so 16 bars of 16ths fit 128 steps: an off-beat note goes half a step from its step as microtiming, on the same step as the on-beat one. **Autofit** picks the speed and length that keep every note at its own time, or says what the best fit loses (red: left out, amber: moved). The import sets the track's speed and length, and the master length when the pattern would reset too early. **replace** clears the track first, **merge** keeps what is there. *Same note twice on a step* is off by default: it has not been tried on the device. |
+| **Import MIDI** | a .mid or .alc onto a chosen track. The dialog draws the file as a piano roll over the track's steps on one time axis, and every control redraws it. **Fold** 2:1, 4:1 or 8:1 sets the track to 1/2x, 1/4x or 1/8x, so 16 bars of 16ths fit 128 steps: an off-beat note goes half a step from its step as microtiming, on the same step as the on-beat one. **Autofit** picks the speed and length that keep every note at its own time, or says what the best fit loses (red: left out, amber: moved). The import sets the track's speed and length, and the master length when the pattern would reset too early. **replace** clears the track first, **merge** keeps what is there. The device cannot hold the same note twice on one step; *Repeated notes as retrigs* plays such a repeat as a retrig on the trig instead (rate and length set for exactly the hits needed), where every hit is the same chord, evenly spaced. *Wrap the end to step 1*: the pattern loops, so a note in the file's last half step goes on step 1, early, like every other bar's last 16th on the next bar's first step; alone there it gets the condition !1ST (from the second pass). **Advanced** holds the rest, all applied by Autofit: *retrig velocities as a fade* (VFAD); *repeats as one loop* — a file that plays the same bars several times is imported once on a shorter track, its differences under trig conditions (1:4, !4:4 …) where each has its trig to itself; *off-beats* as micro (default) or as the pattern's swing (1x only); the file's tempo; CC lanes as p-locks. A file with several MIDI tracks or channels lists them: each goes to the track you pick (channel N to track N at first), *show* picks the one the preview draws. *as* keeps the track's type or switches it to audio or MIDI (a MIDI track takes the source's channel). *repeats &rarr;* names a helper track for repeats no step can hold — on a MIDI track there is no retrig: the helper plays them on the same channel (audio: with a copy of the preset). Where a source fits at a finer speed on its own, *fits at 1x &rarr;* offers that speed for its track instead. |
 | microtiming | survives both ways: an off-grid note comes back as a trig plus its offset. |
 | speed multiplier | applied to both formats: a 2x track's steps last half as long. |
 | overlapping notes | a trig can outlast the gap to the next on the same pitch, which MIDI cannot hold; notes are trimmed to stop just before the next one. |
@@ -245,6 +245,13 @@ Digitone.
 | songs | every song's rows, on the **Song** tab. |
 
 ### Before you write to the device
+
+### Install as an app
+
+| | |
+|---|---|
+| Chrome, Edge, Brave | on a computer, the install icon at the right of the address bar (or the browser menu &rarr; **Install SYXGRID**) puts SYXGRID in the Dock or Start menu, in its own window. It works offline, opens **.dn2prj** and **.syx** files from Finder or Explorer (**Open With**), and its Dock icon offers Device Read, +Drive Manager and Backup. A new version arrives by itself the next time it starts online. |
+| Safari, Firefox, iPhone, iPad | no Web MIDI with SysEx, so no device: a banner says so once. Files open, edit and save there; for the Digitone use Chrome, Edge or Brave on a computer. |
 
 ### Reporting a bug
 
@@ -390,7 +397,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v24.24)`, so any copy of the file can be traced back to the
+`v0.1 (dev v24.36)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md). The last v1 release stays online at

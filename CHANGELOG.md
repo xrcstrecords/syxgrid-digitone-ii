@@ -10,6 +10,55 @@ it was built from.
 
 ---
 
+## v2.3 — MIDI import that fits whole clips; track names; install as an app
+
+### MIDI import
+
+- **Repeated notes.** The Digitone II does not play the same note twice on
+  one trig. On an audio track such a repeat becomes a **retrig** (with a
+  velocity fade fitted to the file); on a MIDI track it goes to a **helper
+  track** on the same channel, at the same step and microtiming. Autofit picks
+  a free track for it; the preview draws it as a second lane.
+- **The loop point.** A clip's last note, which belongs just before bar one,
+  goes on the helper track at its own step (or wraps to step 1 when no helper
+  is free).
+- **Repeats as one loop.** A file that plays the same bars 2–8 times is
+  imported once, on a shorter track; where the passes differ, the difference
+  plays under a trig condition (A:B).
+- **Swing instead of micro** where a file's off-beats are all late by the same
+  amount (1x tracks; off by default).
+- **A .mid with several tracks or channels:** a matrix sends each source to a
+  track (channel N to track N first), keeps or switches the track type, and
+  sets the **MIDI channel** of each destination. One Undo takes it all back.
+- The pattern can take the file's tempo; an Ableton clip's CC lanes import as
+  p-locks; the file's own loop (an .alc's loop end, a .mid's end of track)
+  sets the track length.
+- **Note length is a note value.** LEN is not scaled by track speed, on the
+  device or in SYXGRID; import and export now agree with the device.
+- **Autofit** starts over: every fit setting changed by hand goes back to its
+  default, and where each source goes stays.
+
+### Tracks by name
+
+- The track editor's header names the track: a MIDI track by its name and
+  channel (e.g. **JX 16BAR · CH 2**), an audio track by its preset. Every track
+  dialog (swap, copy, copy to, duplicate, clear, delete…) names it the same way.
+- In the track list, a MIDI track's number and name cells both edit its name
+  and channel.
+- **Copy to** can make the destination the same kind as the source: MIDI with
+  the source's channel and name, or audio with its preset, p-locks included.
+
+### Install as an app
+
+- In Chrome, Edge or Brave, SYXGRID installs into the Dock or Start menu and
+  opens in its own window, also offline. `.dn2prj` and `.syx` files open with
+  it from Finder or Explorer; the Dock menu has Device Read, +Drive Manager and
+  Backup.
+- Safari, Firefox and every iPhone/iPad browser have no Web MIDI: a banner says
+  so once, and projects still open and edit.
+
+---
+
 ## v2.2 — MIDI import: fold, fit and preview
 
 - **Import MIDI** draws the file as a piano roll over the destination track, on
