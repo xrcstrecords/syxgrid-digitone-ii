@@ -174,6 +174,7 @@ Digitone.
 | | |
 |---|---|
 | **+ Add track** | create empty tracks; **all** and **none** select in bulk. **MIDI** tracks get a channel picker, with **OFF** as a choice. |
+| **generate…** | write a pad, drone, texture, pluck, arp or bassline into the track, in its key, from a chord progression or the pattern's chord memory. It reads the other tracks first: it can follow their chords, move an octave out of their register and play where they leave gaps. A seed repeats a roll, **Again** rolls a new one; the preview shows it beside the other tracks, and **Write** replaces the track's trigs as one undo step. |
 | **clear** | remove every trig but keep the track, its length, speed and type. |
 | **duplicate** | copy a track's trigs to another track; the picker marks a track that has trigs as *n trigs — will be REPLACED*. |
 | **copy** / **paste** | a track's **preset**, or its **trigs** — notes, conditions, probability, retrig, preset locks, length and speed — onto any track of any pattern. Pasting trigs asks about their **p-locks**: kept when the machines match, left out when they differ. |
@@ -207,7 +208,7 @@ Digitone.
 | **SCALE** | the pattern's scale, or *not set*; click for the Keyboard setup tab. |
 | **PATTERN LENGTH** | 1&ndash;128 steps; per pattern or per track. **Growing** offers empty steps or copies the existing trigs, as the device does; **shrinking** keeps the trigs past the end, silent. |
 | **transpose…** | move the notes of the ticked tracks; a move past 0&ndash;127 is refused whole. |
-| chord memory | the sixteen chords a pattern stores, on the **Chords** tab, named as the CHORD MEMORY screen names them (D4 A4 F5), with the chord's name and its degree in the scale. **Edit chords…** writes them. |
+| chord memory | the sixteen chords a pattern stores, on the **Chords** tab, named as the CHORD MEMORY screen names them (D4 A4 F5), with the chord's name and its degree in the scale. **Edit chords…** writes them; **Generate chords…** fills them from a progression (I to VII, random, ii&ndash;V&ndash;I, i&ndash;&#9837;VI&ndash;&#9837;VII&ndash;iv and more), triads to elevenths, each chord voice-led from the one before. |
 | Keyboard setup tab | MODE, ROOT and SCALE, per pattern or per track, each track's octave, chord SHAPE/TYPE, BASS and CENTER. |
 | Kit setup · FX & mixer tabs | track levels, CONTROL ALL, compressor routing, pattern transpose, track layering and chokes, voice steal and each track's voices; the chorus, delay, reverb, compressor and inputs. |
 | Pool · Song · Stats · Project tabs | the preset pool; every song's rows; the pattern's counts and per-track settings (Euclidean among them); the project settings. |
@@ -217,7 +218,7 @@ Digitone.
 
 | | |
 |---|---|
-| **Export MIDI** | pick **.mid** or **.alc** and which tracks. Files are named slot&ndash;pattern&ndash;track. **All tracks in one file** writes a type-1 .mid with each track on its own channel and the shorter tracks repeated to the longest. |
+| **Export MIDI** | pick **.mid**, **.alc** or both, and which tracks. Files are named slot&ndash;pattern&ndash;track. The dialog lists a row a pattern; **&#9656;** opens one to tick its own tracks. The buttons on top tick this one, all with tracks, a bank, or none. Tick more patterns to export them in one go: each writes the files a single export would, with the same names, all in one .zip. **All tracks in one file** writes a type-1 .mid with each track on its own channel and the shorter tracks repeated to the longest. |
 | **Import MIDI** | a .mid or .alc onto a chosen track. The dialog draws the file as a piano roll over the track's steps on one time axis, and every control redraws it. **Fold** 2:1, 4:1 or 8:1 sets the track to 1/2x, 1/4x or 1/8x, so 16 bars of 16ths fit 128 steps: an off-beat note goes half a step from its step as microtiming, on the same step as the on-beat one. **Autofit** picks the speed and length that keep every note at its own time, or says what the best fit loses (red: left out, amber: moved). The import sets the track's speed and length, and the master length when the pattern would reset too early. **replace** clears the track first, **merge** keeps what is there. The device cannot hold the same note twice on one step; *Repeated notes as retrigs* plays such a repeat as a retrig on the trig instead (rate and length set for exactly the hits needed), where every hit is the same chord, evenly spaced. *Wrap the end to step 1*: the pattern loops, so a note in the file's last half step goes on step 1, early, like every other bar's last 16th on the next bar's first step; alone there it gets the condition !1ST (from the second pass). **Advanced** holds the rest, all applied by Autofit: *retrig velocities as a fade* (VFAD); *repeats as one loop* — a file that plays the same bars several times is imported once on a shorter track, its differences under trig conditions (1:4, !4:4 …) where each has its trig to itself; *off-beats* as micro (default) or as the pattern's swing (1x only); the file's tempo; CC lanes as p-locks. A file with several MIDI tracks or channels lists them: each goes to the track you pick (channel N to track N at first), *show* picks the one the preview draws. *as* keeps the track's type or switches it to audio or MIDI (a MIDI track takes the source's channel). *repeats &rarr;* names a helper track for repeats no step can hold — on a MIDI track there is no retrig: the helper plays them on the same channel (audio: with a copy of the preset). Where a source fits at a finer speed on its own, *fits at 1x &rarr;* offers that speed for its track instead. |
 | microtiming | survives both ways: an off-grid note comes back as a trig plus its offset. |
 | speed multiplier | applied to both formats: a 2x track's steps last half as long. |
@@ -397,7 +398,7 @@ goes with it.
 
 Public releases are numbered `v0.1`, `v0.2`, … Development happens on a
 separate, faster-moving track and the in-app version string carries both, e.g.
-`v0.1 (dev v24.36)`, so any copy of the file can be traced back to the
+`v0.1 (dev v24.38)`, so any copy of the file can be traced back to the
 exact source it was cut from.
 
 See [`CHANGELOG.md`](CHANGELOG.md). The last v1 release stays online at

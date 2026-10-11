@@ -10,6 +10,48 @@ it was built from.
 
 ---
 
+## v2.4 — generate parts and chords; export many patterns at once
+
+### Generate a part for a track
+
+- A **generate…** button on every track writes a part in the track's key:
+  **pad, drone, texture, pluck, arp or bassline**.
+- Chords come from a progression in the key (I to VII in order, random,
+  i–♭VI–♭VII–iv, ii–V–I, I–V–vi–IV and more) or from the pattern's chord
+  memory, from triads to elevenths, voice-led.
+- It listens to the other tracks: it can follow their chords, move an octave
+  out of their register, and play where they leave gaps.
+- Length, speed, quiet to busy, a seed and **Again** for a new roll. A preview
+  draws the new part beside the other tracks before you write it; **Write** is
+  one Undo step. With no SCALE set, it asks for one and sets it.
+- Everything is worked out in the page; nothing is sent anywhere.
+
+### Generate chords into the chord memory
+
+- **Generate chords…** on the Chords tab fills the CHORD MEMORY slots from the
+  same progressions and complexities, named as the device names them, voice-led,
+  from any slot. One Undo step.
+
+### Export several patterns at once
+
+- Export MIDI lists every pattern with trigs, one row a pattern; ▸ opens a
+  pattern to pick its own tracks. **This one**, **All with tracks**,
+  **Bank A–H** and **None** tick patterns in one go.
+- Several patterns are saved as **one .zip**; every file inside is named
+  exactly as a single export names it. A pattern that fails is named in the
+  status line.
+- A new format writes **.mid and .alc** together.
+- With one pattern ticked, export works as before.
+
+### Also
+
+- **Support Me** opened an error page in some browsers ("Misdirected
+  Request"); it now opens the support page on syxgrid.xrcst.com. A small
+  **Ko-fi** cup next to it goes straight to ko-fi.com/xrcst. (Live on the site
+  since 11 October.)
+
+---
+
 ## v2.3 — MIDI import that fits whole clips; track names; install as an app
 
 ### MIDI import

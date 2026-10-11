@@ -223,6 +223,13 @@ button.livebtn.on{box-shadow:0 0 0 2px #04210a inset,0 0 14px #39ff14aa}
 .tsrow .k{color:var(--muted);font-size:11px}
 .tsrow select{font-size:12px;padding:3px}
 .tsprev{color:var(--note);font-family:ui-monospace,Menlo,monospace;font-size:11px}
+/* v24.37 (G4.31): generator lite's preview roll */
+.genprev{margin:6px 0;overflow-x:auto;max-width:100%}
+.glroll{display:block;background:var(--cell);border:1px solid var(--border);border-radius:4px}
+.glroll .glbar{stroke:var(--grid-bar);stroke-width:1}
+.glroll .glthem{fill:var(--dim)}
+.glroll .glus{fill:var(--accent)}
+.glroll .gllbl{fill:var(--muted);font-size:9px;font-family:ui-monospace,Menlo,monospace}
 .addnotes{border-top:1px solid var(--border);margin-top:10px;padding-top:6px}
 button.deftrig.on{border-color:var(--note);color:var(--note)}
 .badge-scale:hover{color:var(--fg);border-bottom-color:var(--fg)}
@@ -242,6 +249,8 @@ button.deftrig.on{border-color:var(--note);color:var(--note)}
 #undoBtn,#redoBtn{min-width:30px;padding:5px 8px;font-size:13px}
 /* the theme switch: the preset editor's toggle, ON = light */
 button.themetog{display:inline-flex;align-items:center;gap:4px;padding:2px 6px}
+button.kofibtn{display:inline-flex;align-items:center;padding:2px 6px}
+button.kofibtn:hover{color:#ff5e5b;border-color:#ff5e5b}
 button.themetog .picon{width:26px;height:17px}
 button.themetog[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
 /* "edited (in memory)" lives in the footer, right of the status line */
@@ -1023,6 +1032,27 @@ select.mini{background:var(--panel2);color:var(--fg);border:1px solid var(--bord
 .trkpick b{color:var(--accent);min-width:30px}
 .trkpick span{color:var(--note);flex:1}
 .trkpick i{color:var(--muted);font-style:normal;font-size:10px}
+/* v24.38 export picker: a row a pattern, opening to its tracks */
+.exptop{display:flex;flex-wrap:nowrap;align-items:center;gap:4px;margin:4px 0 6px;overflow-x:auto}
+.exptop button{flex-shrink:0;white-space:nowrap}
+.exptop span{color:var(--muted);font-size:10px;margin-left:6px}
+.exptop .expbank{min-width:24px;padding-left:5px;padding-right:5px}
+.explist{display:flex;flex-direction:column;gap:3px;max-height:34vh;overflow-y:auto;margin-bottom:6px}
+.exppat{background:var(--panel2);border:1px solid var(--border);border-radius:6px}
+.exppat.cur{border-color:var(--accent)}
+.exppat.off .exphead label{opacity:.6}
+.exphead{display:flex;align-items:center;gap:6px;padding:3px 8px 3px 3px;font-size:11px}
+.exphead label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
+.exphead b{color:var(--accent);min-width:30px}
+.exphead span{color:var(--note);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exphead i{color:var(--muted);font-style:normal;font-size:10px;white-space:nowrap}
+.expx{background:none;border:0;color:var(--muted);width:22px;padding:2px;cursor:pointer;font-size:13px}
+.expick{display:block;margin:10px 0 4px}
+.exptrks{display:flex;flex-direction:column;gap:3px;padding:0 6px 6px 30px}
+.exptrks[hidden]{display:none}
+.expall{display:flex;gap:10px;margin-bottom:2px}
+.expall button{background:none;border:0;padding:0;color:var(--accent);font-size:10px;cursor:pointer;width:auto;text-decoration:underline}
+.exptop button,.expx{width:auto}
 /* v23.33 export options */
 .expopts{display:flex;flex-direction:column;gap:6px;margin:0 0 10px;padding:8px 10px;
   background:var(--panel2);border:1px solid var(--border);border-radius:6px;font-size:11px;line-height:1.45}
@@ -1140,7 +1170,8 @@ option:disabled{color:var(--opt-off)}
   <button id="midiPortBtn" class="midipill" onclick="showMidiPorts()" title="the MIDI port every read, write and +Drive operation uses: click to choose">MIDI</button>
   <span class="demobadge" id="demoBadge" style="display:none">DEMO<button class="demoreset" onclick="loadDemo()" title="discard changes and reload the pristine demo">reload</button></span>
   <span class="dev filebadge" id="fileBadge">no file</span>
-  <button onclick="window.open('https://xrcst.com/support/index.html','_blank','noopener')" title="support this project">Support Me</button>
+  <button onclick="window.open('https://syxgrid.xrcst.com/support.html','_blank','noopener')" title="support this project">Support Me</button>
+  <button class="kofibtn" onclick="window.open('https://ko-fi.com/xrcst','_blank','noopener')" aria-label="Ko-fi" title="buy me a coffee on Ko-fi"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3 7h13v6a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M16 9h2a2.5 2.5 0 0 1 0 5h-2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 14.2l-2.3-2.2a1.3 1.3 0 0 1 2.3-1.1 1.3 1.3 0 0 1 2.3 1.1z" fill="#ff5e5b"/></svg></button>
   <button onclick="window.open('https://github.com/xrcstrecords/syxgrid-digitone-ii','_blank','noopener')" title="source code, format map and issue tracker on GitHub">GitHub</button>
   <button onclick="showHelp()" title="shortcuts and controls (? or H)">Help</button>
   <button id="demoBtn" onclick="loadDemo()" title="load a demo pattern to try the editor without a Digitone II">Demo</button>
@@ -1212,12 +1243,12 @@ function setTheme(t){
 function toggleTheme(){ setTheme(currentTheme() === 'light' ? 'dark' : 'light'); }
 document.addEventListener('DOMContentLoaded', themeLabel);
 
-const VIZ_VERSION = 'v24.36';
-const VIZ_DATE    = '2026-10-09';
+const VIZ_VERSION = 'v24.38';
+const VIZ_DATE    = '2026-10-10';
 // Public release number, shown to users. Empty in dev builds, where the badge
 // falls back to the dev version alone. The release script sets this, giving
 // the "v0.2 (dev v22.16)" form so a bug report names the exact dev build.
-const VIZ_PUBLIC  = 'v2.3';
+const VIZ_PUBLIC  = 'v2.4';
 // v24.20 (the operator): bugs go to GitHub's issue tracker. reportBug() copies
 // the facts a report needs -- version, browser, what is loaded -- and opens the
 // bug-report form (.github/ISSUE_TEMPLATE/bug_report.md) to paste them into.
@@ -1243,7 +1274,7 @@ async function reportBug(){
 function versionLabel(){
   return VIZ_PUBLIC ? `${VIZ_PUBLIC} (dev ${VIZ_VERSION})` : VIZ_VERSION;
 }
-const VIZ_NOTE    = 'Generator: Claude composes patterns through the generator’s tools (private)';
+const VIZ_NOTE    = 'Export dialog: a row a pattern, each opening to its own tracks';
 
 // ═══════════════════════════════════════════════════════════════════
 // Format constants
@@ -6988,7 +7019,11 @@ const CHORD_QUALITIES = [
   ['7', [0,4,7,10]], ['maj7', [0,4,7,11]], ['min7', [0,3,7,10]], ['min7b5', [0,3,6,10]], ['dim7', [0,3,6,9]],
   ['minMaj7', [0,3,7,11]], ['7sus4', [0,5,7,10]], ['6', [0,4,7,9]], ['min6', [0,3,7,9]], ['add9', [0,2,4,7]],
   ['min(add9)', [0,2,3,7]], ['9', [0,2,4,7,10]], ['maj9', [0,2,4,7,11]], ['min9', [0,2,3,7,10]],
-  ['5', [0,7]]];
+  ['5', [0,7]],
+  // v24.37 (G4.31, G4.32): the ninths and elevenths the chord engine stacks
+  // from a scale, so the generators can name them.
+  ['min7b9', [0,1,3,7,10]], ['min7b5b9', [0,1,3,6,10]], ['11', [0,2,4,5,7,10]], ['maj11', [0,2,4,5,7,11]],
+  ['min11', [0,2,3,5,7,10]], ['maj9#11', [0,2,4,6,7,11]], ['min11b9', [0,1,3,5,7,10]], ['min11b5b9', [0,1,3,5,6,10]]];
 // -> {name, root, quality, bass} or null when the notes are no chord in the list.
 // The bass note is tried as the root first, so an inversion reads as one (Dmin/F).
 function chordName(notes){
@@ -7669,7 +7704,8 @@ function chordTabHtml(p){
   const used = cm.slots.filter(x => x.notes.length);
   // G4.24 (v23.49): both editable.
   h += `<div class="kbdedit"><button class="mini expbtn" onclick="setRightTab('keyboard')">Keyboard setup…</button>`
-     + `<button class="mini expbtn" onclick="showChordEditor()">Edit chords…</button></div>`;
+     + `<button class="mini expbtn" onclick="showChordEditor()">Edit chords…</button>`
+     + `<button class="mini expbtn" onclick="showChordGen()" title="fill the slots from a progression in the pattern's key (G4.32)">Generate chords…</button></div>`;
   h += row('Stored', `${used.length} of 16`, used.length ? 'acc' : '');
   if(kb){
     if(kb.scope){
@@ -13195,6 +13231,556 @@ function addNotesFrom(track, step, replaceAll){
 }
 let ANSRC = null;                    // the Add picker remembers its last choice
 
+// ═══════════════════════════════════════════════════════════════════
+// v24.37 (G4.31, G4.32): THE CHORD ENGINE, GENERATOR LITE, AND THE CHORD
+// MEMORY GENERATOR. All in the page, no Claude, no network.
+//
+// The chord engine (shared): a progression is a list of scale degrees; a
+// COMPLEXITY stacks each degree's tones from the scale itself, triads to
+// elevenths; every chord after the first takes the inversion that moves least
+// from the one before (voiceLead, G4.29).
+//
+// Generator lite (G4.31, the operator, 2026-10-09): a chord part, a line or an
+// arp for one track, in the track's key, after a look at the other tracks of
+// the pattern -- their chords (to follow the harmony), their registers (to stay
+// out of them) and their busy steps (to fill the gaps). A style sets the
+// register, the rhythm and the note lengths; a seed makes a roll repeatable,
+// Again rolls a new one. A preview first; Write replaces the track's trigs as
+// one undo step.
+//
+// The chord memory generator (G4.32): the same engine, written into the
+// pattern's sixteen chord memory slots instead of trigs.
+// ═══════════════════════════════════════════════════════════════════
+const CHORD_COMPLEXITY = [
+  // [label, stacks of scale-index offsets; with several, the seed picks one per chord]
+  ['triads', [[0, 2, 4]]],
+  ['sevenths', [[0, 2, 4, 6]]],
+  ['sevenths and add9', [[0, 2, 4, 6], [0, 2, 4, 8]]],
+  ['ninths (m9, maj9)', [[0, 2, 4, 6, 8]]],
+  ['elevenths (m11, maj11)', [[0, 2, 4, 6, 8, 10]]]];
+const CHORD_PROGRESSIONS = [
+  // [id, label, degrees (0-based), or null when worked out]. Named with the
+  // numerals of the key they come from; the chords are stacked from the
+  // pattern's own scale, so in another scale a degree keeps its place and
+  // takes that scale's quality.
+  ['degrees', 'every degree in order (I to VII)', null],
+  ['random', 'random in the scale', null],
+  ['1674', 'i–♭VI–♭VII–iv (1-6-7-4)', [0, 5, 6, 3]],
+  ['251', 'ii–V–I', [1, 4, 0]],
+  ['1564', 'I–V–vi–IV', [0, 4, 5, 3]],
+  ['1645', 'I–vi–IV–V', [0, 5, 3, 4]],
+  ['6415', 'vi–IV–I–V', [5, 3, 0, 4]],
+  ['2516', 'ii–V–I–vi', [1, 4, 0, 5]],
+  ['145', 'i–iv–v', [0, 3, 4]],
+  ['1767', 'i–♭VII–♭VI–♭VII', [0, 6, 5, 6]],
+  ['1473', 'i–iv–♭VII–♭III', [0, 3, 6, 2]],
+  ['6251', 'vi–ii–V–I (round the fifths)', [5, 1, 4, 0]],
+  ['canon', 'I–V–vi–iii–IV–I–IV–V (the canon)', [0, 4, 5, 2, 3, 0, 3, 4]]];
+// A small seeded generator (mulberry32): the same seed rolls the same part.
+function liteRng(seed){
+  let a = seed >>> 0;
+  const r = () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let x = Math.imul(a ^ (a >>> 15), a | 1);
+    x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+  r.int = n => Math.floor(r() * n);
+  r.pick = arr => arr[Math.floor(r() * arr.length)];
+  return r;
+}
+const genNewSeed = () => 1 + Math.floor(Math.random() * 99999);
+const keyOf = (scale, root) => scale === 255 || scale == null || !KBD_SCALE_STEPS[scale] ? null
+  : {scale, root: (root || 0) % 12, steps: KBD_SCALE_STEPS[scale]};
+// The key chord memory is heard in: the track that plays CHORD MEMORY when
+// ROOT and SCALE are per track, else the pattern's (H43, as the Chords tab).
+function chordMemoryKey(p){
+  const kb = patternKeyboardSetup(p); if(!kb) return null;
+  const cmT = kb.tracks.find(x => x.mode === 5);
+  return cmT ? trackKey(p, cmT.t) : keyOf(kb.pattern.scale, kb.pattern.root);
+}
+// The degrees of a progression in a scale of n steps; `count` is the length of
+// a random one.
+function progressionDegrees(id, n, count, rnd){
+  const pr = CHORD_PROGRESSIONS.find(x => x[0] === id) || CHORD_PROGRESSIONS[2];
+  if(pr[0] === 'degrees') return Array.from({length: Math.min(n, CHORD_SLOTS)}, (_, i) => i);
+  if(pr[0] === 'random'){
+    // A walk over the moves progressions are made of -- up a fourth or a
+    // fifth, a step either way, a third -- never the same degree twice running.
+    const moves = [[3, 4], [4, 3], [-1, 2], [1, 2], [5, 2], [2, 1], [-2, 1]];
+    const tot = moves.reduce((a, m) => a + m[1], 0), out = [0];
+    while(out.length < Math.max(1, count)){
+      let x = rnd() * tot, mv = moves[0][0];
+      for(const [m, w] of moves) if((x -= w) < 0){ mv = m; break; }
+      const d = ((out[out.length - 1] + mv) % n + n) % n;
+      if(d !== out[out.length - 1]) out.push(d);
+    }
+    return out;
+  }
+  return pr[2].map(d => d % n);
+}
+// Degree d stacked from the scale with a stack of scale-index offsets; the
+// key's root sits at 12*(oct+1) + its pitch class (oct 4: a C root on C5 = 60).
+function stackChord(key, d, stack, oct){
+  const n = key.steps.length, base = 12 * (oct + 1) + key.root;
+  return stack.map(o => { const i = d + o; return base + key.steps[i % n] + 12 * Math.floor(i / n); });
+}
+// A chord moved by octaves so its middle sits nearest `center`.
+function chordNear(notes, center){
+  const mid = notes.reduce((a, b) => a + b, 0) / notes.length;
+  const sh = 12 * Math.round((center - mid) / 12);
+  return notes.map(x => x + sh);
+}
+// -> [{degree, notes}]: the chords of `degrees` at a complexity, the first
+// centred on `center`, each later one voice-led from the one before.
+function progressionChords(key, degrees, complexity, center, rnd, lead){
+  const cx = CHORD_COMPLEXITY[Math.max(0, Math.min(CHORD_COMPLEXITY.length - 1, complexity | 0))][1];
+  const out = [];
+  let prev = null;
+  for(const d of degrees){
+    let ns = chordNear(stackChord(key, d, cx.length > 1 ? cx[rnd.int(cx.length)] : cx[0], 4), center);
+    if(lead !== false && prev) ns = voiceLead(ns, prev);
+    ns = ns.filter(x => x >= 0 && x <= 127).sort((a, b) => a - b);
+    out.push({degree: d, notes: ns}); prev = ns;
+  }
+  return out;
+}
+// "ii Emin7" in the key, or the notes when the chord has no name in the list.
+function chordLabelIn(key, notes, d){
+  const ch = chordName(notes), deg = ch && key ? chordDegree(ch, key.scale, key.root) : null;
+  const num = deg && !/^outside/.test(deg.text) ? deg.text.split(' in ')[0] : (d != null ? ROMAN[d] || '' : '');
+  return `${num} ${ch ? ch.name : notes.map(noteName).join(' ')}`.trim();
+}
+
+// ── generator lite (G4.31) ──
+const GEN_STYLES = {
+  // center: the register's middle, which moving out of the other tracks' way
+  // keeps within lo..hi; every: the default chord change, in units of the
+  // auto length (a drone changes half as often).
+  pad:      {label: 'pad — held chords', center: 62, lo: 50, hi: 74, every: 1},
+  drone:    {label: 'drone — root and fifth, held', center: 43, lo: 31, hi: 55, every: 2},
+  texture:  {label: 'texture — sparse high tones', center: 76, lo: 67, hi: 86, every: 1},
+  pluck:    {label: 'pluck — short chord stabs', center: 67, lo: 55, hi: 79, every: 1},
+  arp:      {label: 'arp — the chord, broken', center: 64, lo: 52, hi: 76, every: 1},
+  bassline: {label: 'bassline — roots and passing tones', center: 38, lo: 28, hi: 50, every: 1}};
+// Rhythm cells, one bar of 16 steps, quiet to busy.
+const GEN_PLUCK_CELLS = ['1000000010000000', '1000001000001000', '1001001000100100', '1010001010100010', '1011101010111010'];
+const GEN_BASS_CELLS  = ['1000000010000000', '1000001000100000', '1000101000101000', '1010001010100010', '1011001010110010'];
+// What the other tracks play: onsets in 16ths, so tracks at other speeds and
+// lengths line up; pitches; and whether the track carries harmony -- two or
+// more pitch classes (a drum track on one note does not).
+function genNeighbours(p, t){
+  const out = [];
+  for(const u of Object.keys(p.tracks || {}).map(Number)){
+    if(u === t || !(p.tracks[u] || []).length) continue;
+    const sf = speedFactor(p, u), span = Math.max(1, (effectiveTrackLength(p, u) || 16) * sf);
+    const ev = [];
+    for(const s of p.tracks[u])
+      for(const r of (p.notesAt && p.notesAt[u] && p.notesAt[u][s]) || [])
+        if(r.note !== INHERIT) ev.push({pos: (s - 1 + (r.micro || 0) / MICRO_PER_STEP) * sf, note: r.note});
+    out.push({t: u, span, ev, on: new Set(p.tracks[u].map(s => Math.round((s - 1) * sf * 4))),
+              pitched: new Set(ev.map(e => e.note % 12)).size >= 2});
+  }
+  return out;
+}
+// How many other tracks start a trig at this 16th.
+function genBusy(nb, pos16){
+  let n = 0;
+  for(const x of nb){ const q = ((pos16 % x.span) + x.span) % x.span; if(x.on.has(Math.round(q * 4))) n++; }
+  return n;
+}
+// The pitch classes the harmony tracks sound in [a, b) 16ths, each counted.
+function genHarmonyAt(nb, a, b){
+  const w = new Array(12).fill(0);
+  for(const x of nb){
+    if(!x.pitched) continue;
+    for(let k = Math.floor(a / x.span); k * x.span < b; k++)
+      for(const e of x.ev){ const pos = e.pos + k * x.span; if(pos >= a - 1e-6 && pos < b - 1e-6) w[e.note % 12]++; }
+  }
+  return w;
+}
+// An octave up or down when the other tracks crowd [lo, hi]; moving costs a
+// little, so it moves only when that clears most of the overlap.
+function genRegisterShift(nb, lo, hi, ok){
+  const ns = nb.filter(x => x.pitched).flatMap(x => x.ev.map(e => e.note));
+  if(!ns.length) return 0;
+  let best = null;
+  for(const sh of [0, -12, 12]){
+    if(sh && !ok(sh)) continue;
+    const cost = ns.filter(n => n >= lo + sh && n <= hi + sh).length / ns.length + Math.abs(sh) / 40;
+    if(!best || cost < best.cost) best = {sh, cost};
+  }
+  return best ? best.sh : 0;
+}
+// o: {style, src 'scale'|'cm', prog, complexity, every, len, speed, density
+// 0-100, follow, avoid, fill, seed, key (when the track has none)} ->
+// {notes:[{step, note, vel, lenSteps, micro}], chords:[{from, notes, label}],
+// len, speed, seg, info}. Throws why it cannot.
+function genLite(p, t, o){
+  const st = GEN_STYLES[o.style] || GEN_STYLES.pad, rnd = liteRng(o.seed || 1);
+  const key = o.key || trackKey(p, t);
+  const L = Math.max(1, Math.min(MAX_STEPS, o.len || effectiveTrackLength(p, t) || 16));
+  const speed = o.speed == null ? importTrackSpeed(p, t) : o.speed, sf = SPEED_FACTOR[speed] || 1;
+  const dens = Math.max(0, Math.min(1, (o.density == null ? 50 : o.density) / 100));
+  const nb = genNeighbours(p, t), info = [];
+  const auto = [4, 8, 16, 32].filter(x => x <= Math.max(4, L / 4)).pop() * st.every;
+  const seg = Math.max(1, Math.min(L, o.every || auto)), nSeg = Math.ceil(L / seg);
+
+  // The chords, one per segment.
+  let chords;
+  if(o.src === 'cm'){
+    const cm = patternChordMemory(p), used = cm && cm.version !== 2 ? cm.slots.filter(x => x.notes.length) : [];
+    if(!used.length) throw new Error('this pattern has no chords in its chord memory');
+    let prev = null;
+    chords = Array.from({length: nSeg}, (_, k) => {
+      const sl = used[k % used.length];
+      let ns = chordNear([...sl.notes].sort((a, b) => a - b), st.center);
+      if(prev) ns = voiceLead(ns, prev);
+      prev = ns;
+      return {notes: ns, label: `${sl.slot}: ${chordLabelIn(key, ns, null)}`};
+    });
+    if(used.length > nSeg) info.push(`${nSeg} of ${used.length} stored chords fit; a shorter chord change fits more`);
+  } else {
+    if(!key) throw new Error('no SCALE is set for this track — pick one');
+    const pd = progressionDegrees(o.prog || '1674', key.steps.length, nSeg, rnd);
+    const degs = Array.from({length: nSeg}, (_, k) => pd[k % pd.length]);
+    if(pd.length > nSeg) info.push(`${nSeg} of ${pd.length} chords fit; a shorter chord change fits more`);
+    if(o.follow){
+      // The degree whose triad the other tracks sound most in each segment;
+      // the progression's own wins a tie, and a silent segment keeps it.
+      let moved = 0;
+      for(let k = 0; k < nSeg; k++){
+        const w = genHarmonyAt(nb, k * seg * sf, Math.min(L, (k + 1) * seg) * sf);
+        if(!w.some(Boolean)) continue;
+        const score = d => stackChord(key, d, [0, 2, 4], 4).reduce((a, n) => a + w[n % 12], 0);
+        let best = degs[k], bs = score(best);
+        for(let d = 0; d < key.steps.length; d++) if(score(d) > bs){ best = d; bs = score(d); }
+        if(best !== degs[k]){ degs[k] = best; moved++; }
+      }
+      if(moved) info.push(`${moved} chord${moved === 1 ? '' : 's'} changed to follow the other tracks`);
+    }
+    chords = progressionChords(key, degs, o.complexity || 0, st.center, rnd, true)
+      .map(c => ({notes: c.notes, label: chordLabelIn(key, c.notes, c.degree)}));
+  }
+  chords.forEach((c, k) => { c.from = k * seg + 1; c.root = (chordName(c.notes) || {root: c.notes[0] % 12}).root; });
+
+  // The register: the style's, an octave away from the other tracks if asked.
+  let shift = 0;
+  if(o.avoid){
+    const lo = o.style === 'bassline' || o.style === 'drone' ? st.center - 7 : Math.min(...chords.flatMap(c => c.notes));
+    const hi = o.style === 'bassline' || o.style === 'drone' ? st.center + 9 : Math.max(...chords.flatMap(c => c.notes)) + (o.style === 'arp' ? 12 : 0);
+    shift = genRegisterShift(nb, lo, hi, sh => st.center + sh >= st.lo && st.center + sh <= st.hi);
+    if(shift) info.push(`an octave ${shift > 0 ? 'up' : 'down'}, out of the other tracks’ register`);
+  }
+  const center = st.center + shift;
+  if(shift) chords.forEach(c => { c.notes = c.notes.map(n => n + shift).filter(n => n >= 0 && n <= 127); });
+  const rootNear = (pc, c) => pc + 12 * Math.round((c - pc) / 12);
+
+  const at = new Map(), notes = [];
+  const add = (step, ns, vel, lenSteps, micro) => {
+    if(step < 1 || step > L) return;
+    const have = at.get(step) || new Set();
+    for(const n of ns){
+      if(n < 0 || n > 127 || have.has(n)) continue;          // one pitch once a step (H135)
+      have.add(n);
+      notes.push({step, note: n, vel: Math.max(1, Math.min(127, Math.round(vel))), lenSteps: Math.max(0.125, Math.min(127.9, lenSteps)), micro: micro || 0});
+    }
+    at.set(step, have);
+  };
+  const chordAt = s => chords[Math.min(chords.length - 1, Math.floor((s - 1) / seg))];
+  const busyAt = s => genBusy(nb, (s - 1) * sf);
+  const keep = (s, onBeat) => !o.fill || onBeat || rnd() < 1 / (1 + 0.8 * busyAt(s));
+  const cellFor = cells => { const i = Math.min(cells.length - 1, Math.floor(dens * cells.length)); return cells[Math.max(0, Math.min(cells.length - 1, i + rnd.int(3) - 1))]; };
+
+  if(o.style === 'pad'){
+    for(const c of chords){
+      const len = Math.min(seg, L - c.from + 1), twice = dens > 0.66 && len >= 4;
+      add(c.from, c.notes, 80 + rnd.int(16), twice ? len / 2 : len);
+      if(twice) add(c.from + len / 2, c.notes, 70 + rnd.int(16), len / 2);
+    }
+  } else if(o.style === 'drone'){
+    let last = null;
+    for(const c of chords){
+      const r = rootNear(c.root, center), ns = [r].concat(dens > 0.3 ? [r + 7] : [], dens > 0.75 ? [r + 12] : []);
+      const len = Math.min(seg, L - c.from + 1);
+      if(last && last.ns.join() === ns.join()){ for(const n of last.recs) n.lenSteps = Math.min(127.9, n.lenSteps + len); continue; }
+      const k = notes.length;
+      add(c.from, ns, 70 + rnd.int(20), len);
+      last = {ns, recs: notes.slice(k)};
+    }
+  } else if(o.style === 'texture'){
+    for(let s = 1; s <= L; s++){
+      const pc = chordAt(s).notes.map(n => n % 12);
+      let chance = 0.06 + 0.4 * dens;
+      if(o.fill) chance /= 1 + 1.2 * busyAt(s);
+      if(rnd() >= chance) continue;
+      const pool = [...new Set(pc)].map(x => rootNear(x, center + rnd.int(13) - 4));
+      const ns = [rnd.pick(pool)]; if(rnd() < 0.2 * dens) ns.push(rnd.pick(pool) + 12);
+      add(s, ns, 45 + rnd.int(40), 1 + rnd.int(4), rnd.int(17) - 8);
+    }
+  } else if(o.style === 'pluck'){
+    for(let bar = 0; bar * 16 < L; bar++){
+      const cell = cellFor(GEN_PLUCK_CELLS);
+      for(let i = 0; i < 16; i++){
+        const s = bar * 16 + i + 1;
+        if(s > L || cell[i] !== '1' || !keep(s, i === 0)) continue;
+        const ns = chordAt(s).notes, top = ns.slice(-(dens > 0.5 ? 3 : 2));
+        add(s, top, i % 4 === 0 ? 100 + rnd.int(12) : 78 + rnd.int(14), rnd() < 0.5 ? 0.5 : 1);
+      }
+    }
+  } else if(o.style === 'arp'){
+    const rate = dens < 0.25 ? 4 : dens < 0.6 ? 2 : 1, mode = rnd.pick(['up', 'updown', 'down', 'random']);
+    let i = 0;
+    for(let s = 1; s <= L; s += rate, i++){
+      const c = chordAt(s).notes, tones = [...new Set(c.concat(c.map(n => n + 12)))].filter(n => n <= 127).sort((a, b) => a - b);
+      const n = tones.length, per = Math.max(1, 2 * n - 2);
+      const j = mode === 'up' ? i % n : mode === 'down' ? n - 1 - i % n : mode === 'updown' ? (i % per < n ? i % per : per - i % per) : rnd.int(n);
+      if(o.fill && (s - 1) % 16 && busyAt(s) >= 2 && rnd() < 0.4) continue;
+      add(s, [tones[j]], 88 + ((s - 1) % 16 === 0 ? 14 : 0) + rnd.int(10), rate * 0.75);
+    }
+    info.unshift(`${mode}, every ${rate === 1 ? 'step' : rate + ' steps'}`);
+  } else if(o.style === 'bassline'){
+    const hits = [];
+    for(let bar = 0; bar * 16 < L; bar++){
+      const cell = cellFor(GEN_BASS_CELLS);
+      for(let i = 0; i < 16; i++){ const s = bar * 16 + i + 1; if(s <= L && cell[i] === '1') hits.push(s); }
+    }
+    for(const c of chords) if(!hits.includes(c.from)) hits.push(c.from);   // every chord change is played
+    hits.sort((a, b) => a - b);
+    hits.forEach((s, h) => {
+      const c = chordAt(s), r = rootNear(c.root, center), first = (s - 1) % seg === 0;
+      if(!keep(s, first || (s - 1) % 16 === 0)) return;
+      const nx = hits[h + 1], nextChord = nx && chordAt(nx) !== c ? chordAt(nx) : null;
+      let n;
+      if(first) n = r;
+      else if(nextChord && key){
+        // the scale note below the next chord's root, leading into it
+        const nr = rootNear(nextChord.root, center), sc = key.steps.map(x => (x + key.root) % 12);
+        const inScale = x => sc.includes(((x % 12) + 12) % 12);
+        n = inScale(nr - 1) ? nr - 1 : inScale(nr - 2) ? nr - 2 : r;
+      } else { const x = rnd(); n = x < 0.5 ? r : x < 0.7 ? r + 12 : x < 0.85 ? r + 7 : r; }
+      const gap = (nx || L + 1) - s;
+      add(s, [n], 95 + rnd.int(20), Math.min(gap, dens > 0.5 ? 1 : 2) * 0.9);
+    });
+  }
+  notes.sort((a, b) => a.step - b.step || a.note - b.note);
+  return {notes, chords, len: L, speed, seg, info};
+}
+// The roll beside the other tracks: theirs grey, ours in the accent colour,
+// chord names along the top.
+function genLitePreviewSvg(p, t, g){
+  const W = 640, sf = SPEED_FACTOR[g.speed] || 1, span16 = g.len * sf, theirs = [];
+  for(const x of genNeighbours(p, t))
+    for(let k = 0; k * x.span < span16; k++)
+      for(const e of x.ev){ const pos = e.pos + k * x.span; if(pos < span16) theirs.push({pos, note: e.note}); }
+  const all = g.notes.map(n => n.note).concat(theirs.map(e => e.note));
+  if(!all.length) return '';
+  const lo = Math.min(...all) - 1, hi = Math.max(...all) + 1;
+  const rh = Math.max(2, Math.min(6, Math.floor(180 / (hi - lo + 1)))), top = 13, H = top + (hi - lo + 1) * rh + 2;
+  const X = pos => pos / span16 * W, Y = n => top + (hi - n) * rh;
+  let s = `<svg class="glroll" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  for(let b = 0; b <= span16 + 1e-6; b += 16) s += `<line class="glbar" x1="${X(b).toFixed(1)}" x2="${X(b).toFixed(1)}" y1="${top}" y2="${H}"/>`;
+  const w1 = Math.max(1.5, X(1) * 0.8);
+  for(const e of theirs) s += `<rect class="glthem" x="${X(e.pos).toFixed(1)}" y="${Y(e.note)}" width="${w1.toFixed(1)}" height="${rh - 1 || 1}"/>`;
+  for(const n of g.notes){
+    const pos = (n.step - 1 + n.micro / MICRO_PER_STEP) * sf;
+    s += `<rect class="glus" x="${X(pos).toFixed(1)}" y="${Y(n.note)}" width="${Math.max(2, X(n.lenSteps * sf)).toFixed(1)}" height="${rh - 1 || 1}"><title>${noteName(n.note)} on step ${n.step}</title></rect>`;
+  }
+  let lastX = -99;
+  for(const c of g.chords){
+    const x = X((c.from - 1) * sf);
+    if(x - lastX < 46) continue;
+    s += `<text class="gllbl" x="${(x + 2).toFixed(1)}" y="10">${esc(c.label)}</text>`; lastX = x;
+  }
+  return s + '</svg>';
+}
+const GENLITE = {};                 // track -> the settings last written, while the app is open
+let GENLITE_LAST = null;            // the roll the preview shows, which Write writes
+function genLiteDefaults(p, t){
+  return {style: 'pad', src: 'scale', prog: '1674', complexity: 0, every: 0, len: effectiveTrackLength(p, t) || 16,
+          speed: importTrackSpeed(p, t), density: 50, follow: true, avoid: true, fill: true, seed: genNewSeed(), root: 2, scale: 5};
+}
+function genLiteHtml(p, t, c){
+  const key = trackKey(p, t), cm = patternChordMemory(p), used = cm && cm.version !== 2 ? cm.slots.filter(x => x.notes.length).length : 0;
+  const opt = (v, l, cur, dis) => `<option value="${v}"${String(v) === String(cur) ? ' selected' : ''}${dis ? ' disabled' : ''}>${esc(l)}</option>`;
+  const sel = (id, opts, cur) => `<select id="gl${id}">${opts.map(([v, l, d]) => opt(v, l, cur, d)).join('')}</select>`;
+  const box = (id, on, l) => `<label><input type="checkbox" id="gl${id}"${on ? ' checked' : ''}> ${l}</label>`;
+  let h = `<div class="tsrc genlite" id="glBox">`;
+  h += `<div class="tsrow"><span class="k">style</span>${sel('Style', Object.entries(GEN_STYLES).map(([k, s]) => [k, s.label]), c.style)}</div>`;
+  h += `<div class="tsrow"><span class="k">chords</span>${sel('Src', [
+         ['scale', key ? `built from ${NOTE_NAMES[key.root]} ${String(KBD_SCALES[key.scale]).toLowerCase()}` : 'built from a scale'],
+         ['cm', used ? `the pattern’s chord memory (${used} stored, in slot order)` : 'chord memory — none in this pattern', !used]], c.src)}</div>`;
+  if(!key) h += `<div class="tsrow" data-for="scale"><span class="k">no SCALE is set — use</span>${sel('Root', NOTE_NAMES.map((n, i) => [i, n]), c.root)}`
+              + `${sel('Scale', KBD_SCALE_LIST.map((n, i) => [i, n]), c.scale)}<span class="k">(Write sets it on the pattern)</span></div>`;
+  h += `<div class="tsrow" data-for="scale"><span class="k">progression</span>${sel('Prog', CHORD_PROGRESSIONS.map(([k, l]) => [k, l]), c.prog)}`
+     + `<span class="k">complexity</span>${sel('Cx', CHORD_COMPLEXITY.map(([l], i) => [i, l]), c.complexity)}</div>`;
+  h += `<div class="tsrow"><span class="k">chord change</span>${sel('Every', [[0, 'auto'], [4, 'every 4 steps'], [8, 'every 8'], [16, 'every 16'], [32, 'every 32'], [64, 'every 64']], c.every)}`
+     + `<span class="k">length</span>${sel('Len', [...new Set([16, 32, 48, 64, 96, 128, c.len])].sort((a, b) => a - b).map(x => [x, x + ' steps']), c.len)}`
+     + `<span class="k">speed</span>${sel('Spd', SPEED_LABEL.map((l, i) => [i, l]), c.speed)}</div>`;
+  h += `<div class="tsrow"><span class="k">quiet</span><input id="glDens" type="range" min="0" max="100" value="${c.density}" style="width:160px;max-width:50vw"><span class="k">busy</span>`
+     + `<span class="k">seed</span><input id="glSeed" class="nvel" type="number" min="1" max="999999" value="${c.seed}" title="the same seed and settings roll the same part; Again picks a new seed"></div>`;
+  h += `<div class="tsrow" data-for="scale">${box('Follow', c.follow, 'follow the other tracks’ chords')}</div>`;
+  h += `<div class="tsrow">${box('Avoid', c.avoid, 'stay out of their register')}${box('Fill', c.fill, 'fill their gaps')}</div>`;
+  return h + `<div class="genprev" id="glPrev"></div><div class="tsrow tsprev" id="glInfo"></div></div>`;
+}
+function genLiteRead(){
+  const g = id => document.getElementById('gl' + id), v = id => g(id) ? g(id).value : '', on = id => !!(g(id) && g(id).checked);
+  return {style: v('Style') || 'pad', src: v('Src') || 'scale', prog: v('Prog') || '1674', complexity: +v('Cx') || 0,
+          every: +v('Every') || 0, len: +v('Len') || 16, speed: v('Spd') === '' ? 2 : +v('Spd'),
+          density: v('Dens') === '' ? 50 : +v('Dens'), follow: on('Follow'), avoid: on('Avoid'), fill: on('Fill'),
+          seed: Math.max(1, parseInt(v('Seed'), 10) || 1), root: v('Root') === '' ? 2 : +v('Root'), scale: v('Scale') === '' ? 5 : +v('Scale')};
+}
+const genLiteOpts = (p, t, c) => Object.assign({}, c, trackKey(p, t) ? {} : {key: keyOf(c.scale, c.root)});
+function genLiteShow(t){
+  const p = curPattern(), box = document.getElementById('glBox'); if(!p || !box) return;
+  const c = genLiteRead();
+  box.querySelectorAll('.tsrow[data-for]').forEach(r => { r.style.display = r.dataset.for === c.src ? '' : 'none'; });
+  const pv = document.getElementById('glPrev'), inf = document.getElementById('glInfo');
+  try{
+    const g = genLite(p, t, genLiteOpts(p, t, c));
+    GENLITE_LAST = {p, t, c, g};
+    pv.innerHTML = genLitePreviewSvg(p, t, g);
+    inf.textContent = `${g.notes.length} notes on ${new Set(g.notes.map(n => n.step)).size} steps · `
+      + g.chords.slice(0, 16).map(x => x.label).join(' – ') + (g.chords.length > 16 ? ' …' : '') + (g.info.length ? ' · ' + g.info.join(' · ') : '');
+  }catch(e){ GENLITE_LAST = null; pv.innerHTML = ''; inf.textContent = e.message; }
+}
+function showGenLite(t){
+  const p = curPattern(); if(!p || !p.ok) return;
+  const c = Object.assign(genLiteDefaults(p, t), GENLITE[t] || {});
+  const cm = patternChordMemory(p);
+  if(c.src === 'cm' && !(cm && cm.version !== 2 && cm.used)) c.src = 'scale';
+  showModal(`${trackTag(p, t)} · generate`,
+    'A chord part, a line or an arp in the track’s key, after a look at the other tracks of this pattern. '
+    + 'Write replaces this track’s trigs (and its p-locks) with the preview; Undo takes it back.',
+    [{label: 'Write', desc: 'Replace this track’s trigs with the preview.', fn: () => genLiteWrite(t)},
+     {label: 'Again', desc: 'A new roll: the same settings, a new seed.', fn: () => {
+        const s = document.getElementById('glSeed'); if(s){ s.value = genNewSeed(); genLiteShow(t); } }},
+     {label: 'Cancel', desc: '', fn: () => closeModal()}],
+    genLiteHtml(p, t, c));
+  const box = document.getElementById('glBox');
+  box.addEventListener('input', () => genLiteShow(t)); box.addEventListener('change', () => genLiteShow(t));
+  genLiteShow(t);
+}
+// Set the scale a roll was made in, where the track reads it (H43).
+function genSetKey(p, t, scale, root){
+  const kb = patternKeyboardSetup(p), sc = (kb && kb.scope) || {};
+  setPatternKeyboard(p, {scale, root});
+  if(!trkFieldsOld(p)){
+    if(sc.scalePerTrack) setTrackKeyboard(p, t, {scale});
+    if(sc.rootPerTrack) setTrackKeyboard(p, t, {root});
+  }
+}
+// Write the previewed roll: clean trigs (no conditions, retrigs or chance left
+// from the old ones), the track's length and speed, one undo step.
+function genLiteWrite(t){
+  const p = curPattern(), L = GENLITE_LAST;
+  if(!L || L.t !== t || L.p !== p){ alert('Nothing to write: the preview is empty.'); return; }
+  if(!L.g.notes.length){ alert('The preview holds no notes; move the slider towards busy.'); return; }
+  const {c, g} = L;
+  const snap = {steps: [], exists: true, notes: {}, trigless: [], locks: [],
+                arrays: Object.fromEntries(TRACK_STEP_ARRAYS.map(a => [a.key, Array(128).fill(0xFF)]))};
+  for(const n of g.notes){
+    if(!snap.notes[n.step]){ snap.notes[n.step] = []; snap.steps.push(n.step); }
+    snap.notes[n.step].push({note: n.note, vel: n.vel, len: stepToLenCode(n.lenSteps), micro: clampMicro(n.micro)});
+  }
+  try{
+    markDirty('generate');
+    if(c.src === 'scale' && !trackKey(p, t)) genSetKey(p, t, c.scale, c.root);
+    if(g.len !== effectiveTrackLength(p, t) || g.speed !== importTrackSpeed(p, t))
+      importApplyLayout(p, t, {len: g.len, speed: g.speed, span16: g.len * (SPEED_FACTOR[g.speed] || 1)});
+    applyTrackTrigs(p, t, snap, {locks: false});
+  }catch(e){ alert(e.message); render(); return; }
+  GENLITE[t] = c;
+  closeModal(); refreshTrackSel(); updateCurrentPatternInSel(); render();
+  saveStatus(`${trackTag(p, t)}: ${c.style}, ${g.notes.length} notes on ${snap.steps.length} steps (seed ${c.seed}) — Undo takes it back.`);
+}
+
+// ── the chord memory generator (G4.32) ──
+let CHORDGEN = null;                // the last settings, while the app is open
+function chordGenDefaults(){ return {prog: '1674', count: 8, complexity: 0, oct: 4, lead: true, start: 1, clear: false, seed: genNewSeed(), root: 2, scale: 5}; }
+// -> {key, slots:[{slot, notes, label}], info}
+function chordGenRoll(p, c){
+  const key = chordMemoryKey(p) || c.key;
+  if(!key) throw new Error('no SCALE is set — pick one');
+  const rnd = liteRng(c.seed || 1);
+  const degs = progressionDegrees(c.prog, key.steps.length, c.count, rnd);
+  const room = CHORD_SLOTS - (c.start || 1) + 1, info = [];
+  if(degs.length > room) info.push(`${degs.length - room} chord${degs.length - room === 1 ? '' : 's'} past slot 16 left out`);
+  const center = 12 * (c.oct + 1) + key.root + 5;
+  const ch = progressionChords(key, degs.slice(0, room), c.complexity, center, rnd, c.lead);
+  return {key, info, slots: ch.map((x, i) => ({slot: (c.start || 1) + i, notes: x.notes, label: chordLabelIn(key, x.notes, x.degree)}))};
+}
+function chordGenRead(){
+  const g = id => document.getElementById('cg' + id), v = id => g(id) ? g(id).value : '';
+  return {prog: v('Prog') || '1674', count: +v('Count') || 8, complexity: +v('Cx') || 0, oct: v('Oct') === '' ? 4 : +v('Oct'),
+          lead: !!(g('Lead') && g('Lead').checked), start: +v('Start') || 1, clear: !!(g('Clear') && g('Clear').checked),
+          seed: Math.max(1, parseInt(v('Seed'), 10) || 1), root: v('Root') === '' ? 2 : +v('Root'), scale: v('Scale') === '' ? 5 : +v('Scale')};
+}
+let CHORDGEN_LAST = null;
+function chordGenShow(){
+  const p = curPattern(), pv = document.getElementById('cgPrev'); if(!p || !pv) return;
+  const c = chordGenRead();
+  const cnt = document.getElementById('cgCountRow'); if(cnt) cnt.style.display = c.prog === 'random' ? '' : 'none';
+  if(!chordMemoryKey(p)) c.key = keyOf(c.scale, c.root);
+  try{
+    const r = chordGenRoll(p, c);
+    CHORDGEN_LAST = {p, c, r};
+    const all = r.slots.flatMap(x => x.notes);
+    const lo = Math.floor(Math.min(...all) / 12) * 12, hi = Math.max(lo + 23, Math.floor(Math.max(...all) / 12) * 12 + 11);
+    pv.innerHTML = r.slots.map(x => `<div class="chordrow"><span class="cslot">${x.slot}</span>${chordKeyboardSvg(x.notes, lo, hi)}`
+      + `<span class="cinfo"><span class="cnotes">${x.notes.map(n => esc(chordNoteName(n))).join(' ')}</span><span class="cname">${esc(x.label)}</span></span></div>`).join('')
+      + (r.info.length ? `<div class="rnote">${esc(r.info.join(' · '))}</div>` : '');
+  }catch(e){ CHORDGEN_LAST = null; pv.innerHTML = `<div class="rnote">${esc(e.message)}</div>`; }
+}
+function showChordGen(){
+  const p = curPattern(); if(!p || !p.ok) return;
+  const cm = patternChordMemory(p);
+  if(!cm || cm.version === 2){ alert('This pattern stores no chord memory.'); return; }
+  const c = Object.assign(chordGenDefaults(), CHORDGEN || {});
+  const key = chordMemoryKey(p);
+  const opt = (v, l, cur) => `<option value="${v}"${String(v) === String(cur) ? ' selected' : ''}>${esc(l)}</option>`;
+  const sel = (id, opts, cur) => `<select id="cg${id}">${opts.map(([v, l]) => opt(v, l, cur)).join('')}</select>`;
+  let h = `<div class="tsrc" id="cgBox">`;
+  h += key ? `<div class="tsrow"><span class="k">key</span><b>${esc(NOTE_NAMES[key.root] + ' ' + String(KBD_SCALES[key.scale]).toLowerCase())}</b></div>`
+           : `<div class="tsrow"><span class="k">no SCALE is set — use</span>${sel('Root', NOTE_NAMES.map((n, i) => [i, n]), c.root)}${sel('Scale', KBD_SCALE_LIST.map((n, i) => [i, n]), c.scale)}<span class="k">(Write sets it on the pattern)</span></div>`;
+  h += `<div class="tsrow"><span class="k">progression</span>${sel('Prog', CHORD_PROGRESSIONS.map(([k, l]) => [k, l]), c.prog)}</div>`;
+  h += `<div class="tsrow" id="cgCountRow"><span class="k">chords</span>${sel('Count', [4, 6, 8, 12, 16].map(n => [n, String(n)]), c.count)}</div>`;
+  h += `<div class="tsrow"><span class="k">complexity</span>${sel('Cx', CHORD_COMPLEXITY.map(([l], i) => [i, l]), c.complexity)}`
+     + `<span class="k">register</span>${sel('Oct', [2, 3, 4, 5].map(o => [o, `around ${chordNoteName(12 * (o + 1))}`]), c.oct)}</div>`;
+  h += `<div class="tsrow"><span class="k">from slot</span>${sel('Start', Array.from({length: 16}, (_, i) => [i + 1, String(i + 1)]), c.start)}`
+     + `<label><input type="checkbox" id="cgClear"${c.clear ? ' checked' : ''}> empty the other slots</label></div>`;
+  h += `<div class="tsrow"><label><input type="checkbox" id="cgLead"${c.lead ? ' checked' : ''}> voice-led: each chord the inversion that moves least from the one before</label></div>`;
+  h += `<div class="tsrow"><span class="k">seed</span><input id="cgSeed" class="nvel" type="number" min="1" max="999999" value="${c.seed}" title="a random progression, or a mixed complexity, rolls the same with the same seed"></div>`;
+  h += `<div class="patstats" id="cgPrev" style="max-height:40vh;overflow-y:auto"></div></div>`;
+  showModal('Generate chords — ' + (p.slot || p.label),
+    'Fills chord memory slots from a progression in the pattern’s key. Notes are named as the CHORD MEMORY screen names them. '
+    + 'Saved with the pattern; Undo takes it back.',
+    [{label: 'Write', desc: 'Write these chords into the slots.', fn: () => chordGenWrite()},
+     {label: 'Again', desc: 'A new seed (random progressions and mixed complexity).', fn: () => {
+        const s = document.getElementById('cgSeed'); if(s){ s.value = genNewSeed(); chordGenShow(); } }},
+     {label: 'Cancel', desc: '', fn: () => closeModal()}], h);
+  const box = document.getElementById('cgBox');
+  box.addEventListener('input', chordGenShow); box.addEventListener('change', chordGenShow);
+  chordGenShow();
+}
+function chordGenWrite(){
+  const p = curPattern(), L = CHORDGEN_LAST;
+  if(!L || L.p !== p){ alert('Nothing to write.'); return; }
+  const {c, r} = L, mine = new Set(r.slots.map(x => x.slot));
+  try{
+    markDirty('chord memory');
+    if(!chordMemoryKey(p)){
+      const kb = patternKeyboardSetup(p), cmT = kb && kb.tracks.find(x => x.mode === 5);
+      if(cmT) genSetKey(p, cmT.t, c.scale, c.root); else setPatternKeyboard(p, {scale: c.scale, root: c.root});
+    }
+    for(const x of r.slots) setChordSlot(p, x.slot, x.notes);
+    if(c.clear) for(let s = 1; s <= CHORD_SLOTS; s++) if(!mine.has(s)) setChordSlot(p, s, []);
+  }catch(e){ alert(e.message); render(); return; }
+  CHORDGEN = c;
+  closeModal(); render();
+  saveStatus(`Chord memory: ${r.slots.length} chord${r.slots.length === 1 ? '' : 's'} written from slot ${r.slots[0].slot} — Undo takes it back.`);
+}
+
 function openNoteEditor(track,step){
   const p=curPattern();
   const notes=(p.notesAt[track]&&p.notesAt[track][step])||[];
@@ -14096,13 +14682,6 @@ function doExport(){
   const tracks=activeTrackNumbers();
   if(!tracks.length){ alert('This pattern has no active tracks to export.'); return; }
 
-  const rows=tracks.map(t=>{
-    const nm=p.presetNames[t-1]||'';
-    const n=(p.tracks[t]||[]).length;
-    return `<label class="trkpick"><input type="checkbox" class="expTrk" value="${t}" checked> `
-         + `<b>T${t}</b> <span>${esc(nm)}</span> <i>${n} trigs</i></label>`;
-  }).join('');
-
   const cl=conditionLoops(p);
   const at=Object.fromEntries(tracks.map(t=>[t, trigAttrRaw(p,t)]));
   const anyRetrig=tracks.some(t=>!isMidiTrack(p,t) && at[t].rrate && at[t].rrate.size);
@@ -14115,7 +14694,7 @@ function doExport(){
     : `plays the pattern ${cl.loops} times, so every condition comes round (${conds})`
       + (cl.capped ? ` — capped at ${cl.loops}: the full cycle is ${cl.full} passes` : '');
   showModal('Export tracks',
-    'Choose a format and which tracks to export. All active tracks are selected by default.',
+    'Choose a format, then the patterns and tracks to export. The pattern on screen is ticked with all its tracks; ▸ opens a pattern to pick its tracks.',
     [
       {label:'Export', desc:'Write the selected tracks: one file each, or one file for all.', fn:()=>runExport()},
       {label:'Cancel', desc:'', fn:()=>closeModal()},
@@ -14126,6 +14705,7 @@ function doExport(){
          <option value="mid">.mid — Standard MIDI File, one per track</option>
          <option value="mid1">.mid — all tracks in one file (type 1, a channel each)</option>
          <option value="alc">.alc — Ableton Live Clip</option>
+         <option value="both">.mid and .alc — one of each per track</option>
        </select>
      </div>
      <div class="ctl" id="expChRow" style="margin-bottom:10px;display:none">
@@ -14147,46 +14727,203 @@ function doExport(){
          before and after it. In a .alc, each CC is a clip envelope. LFO 3 and MIDI tracks have none.</span></label>
        <p id="expMidWarn" class="expwarn">No probability export possible — a MIDI file has no per-note chance, so every trig is written as if it always plays.</p>
      </div>
-     <div style="display:flex;gap:8px;margin-bottom:8px">
-       <button onclick="pickAllTracks(true)">Select all</button>
-       <button onclick="pickAllTracks(false)">Select none</button>
-     </div>
-     <div class="notelist">${rows}</div>`);
+     ${exportPatternPicker(p)}`);
+  expPatsChanged();
+}
+// v24.37 (G4.33, the operator): several patterns in one export. Ticking more
+// than the pattern on screen writes the same files a single export of each
+// would write -- the same names (exportBaseName: slot, pattern name, track),
+// the same options -- into one .zip, so the browser asks once.
+// v24.38 (G4.34, H156): one row a pattern, each opening to its own tracks;
+// the pattern buttons in one row on top. Each pattern keeps its own track
+// ticks; ticking a pattern ticks all its tracks.
+const exportablePatterns = () => PATTERNS.map((q, i) => ({q, i}))
+  .filter(x => x.q && x.q.ok && !x.q.notPattern && !x.q.sound && Object.keys(x.q.tracks || {}).length);
+function exportPickerEntries(p){
+  const all = exportablePatterns();
+  if(!all.some(x => x.q === p)) all.unshift({q: p, i: PATTERNS.indexOf(p)});
+  return all;
+}
+function exportPatternPicker(p){
+  const all = exportPickerEntries(p);
+  const banks = [...new Set(all.map(x => /^[A-H]/.test(x.q.slot || '') ? x.q.slot[0] : null).filter(Boolean))];
+  const rows = all.map(({q, i}) => {
+    const cur = q === p, tracks = Object.keys(q.tracks || {}).map(Number).sort((a, b) => a - b);
+    const trk = tracks.map(t => `<label class="trkpick"><input type="checkbox" class="expTrk" data-pat="${i}" value="${t}" checked onchange="expTrkChanged(${i})"> `
+      + `<b>T${t}</b> <span>${esc((q.presetNames || [])[t - 1] || '')}</span> <i>${(q.tracks[t] || []).length} trigs</i></label>`).join('');
+    return `<div class="exppat${cur ? ' cur' : ''}" data-pat="${i}">
+      <div class="exphead"><button type="button" class="expx" aria-expanded="${cur}" onclick="expToggle(${i})">${cur ? '▾' : '▸'}</button>
+        <label><input type="checkbox" class="expPat" value="${i}"${cur ? ' checked' : ''} onchange="expPatTicked(${i})">
+        <b>${esc(q.slot || q.label || '#' + (i + 1))}</b> <span>${esc(q.patternName || '')}</span></label>
+        <i class="expcnt"></i></div>
+      <div class="exptrks"${cur ? '' : ' hidden'}>
+        <div class="expall"><button type="button" onclick="pickAllTracks(true,${i})">All tracks</button><button type="button" onclick="pickAllTracks(false,${i})">No tracks</button></div>
+        ${trk}</div></div>`;
+  }).join('');
+  const top = all.length < 2 ? '' : `<div class="exptop">
+       <button type="button" onclick="pickExportPatterns('this')">This one</button><button type="button" onclick="pickExportPatterns('all')">All with tracks</button>
+       ${banks.length ? `<span>Bank</span>${banks.map(b => `<button type="button" class="expbank" onclick="pickExportPatterns('${b}')">${b}</button>`).join('')}` : ''}
+       <button type="button" onclick="pickExportPatterns('none')">None</button></div>`;
+  return `<div class="expick"><label style="font-size:11px;color:var(--muted)">PATTERNS AND TRACKS</label>${top}
+     <div class="explist">${rows}</div>
+     <p class="sub" id="expPatNote" style="margin:4px 0 0"></p></div>`;
+}
+const expRow = i => document.querySelector(`.exppat[data-pat="${i}"]`);
+function expToggle(i, open){
+  const r = expRow(i); if(!r) return;
+  const box = r.querySelector('.exptrks'), x = r.querySelector('.expx');
+  box.hidden = open == null ? !box.hidden : !open;
+  x.textContent = box.hidden ? '▸' : '▾'; x.setAttribute('aria-expanded', String(!box.hidden));
+}
+// Ticking a pattern with no track ticked ticks them all.
+function expPatTicked(i){
+  const r = expRow(i); if(!r) return;
+  const on = r.querySelector('.expPat').checked, trk = [...r.querySelectorAll('.expTrk')];
+  if(on && !trk.some(c => c.checked)) trk.forEach(c => { c.checked = true; });
+  expPatsChanged();
+}
+// A track ticked in a pattern that is not ticks the pattern; the last track
+// unticked unticks it.
+function expTrkChanged(i){
+  const r = expRow(i); if(!r) return;
+  const pc = r.querySelector('.expPat'), any = [...r.querySelectorAll('.expTrk')].some(c => c.checked);
+  if(pc) pc.checked = any;
+  expPatsChanged();
+}
+function pickExportPatterns(what){
+  const p = curPattern(), idx = new Set(exportPickerEntries(p).filter(({q}) =>
+    what === 'all' || (what === 'this' && q === p) || (what.length === 1 && (q.slot || '')[0] === what)).map(x => x.i));
+  document.querySelectorAll('.expPat').forEach(c => {
+    const on = idx.has(+c.value);
+    if(on && !c.checked){ const r = expRow(c.value); r && r.querySelectorAll('.expTrk').forEach(t => { t.checked = true; }); }
+    c.checked = on;
+  });
+  expPatsChanged();
+}
+// The rows say how many tracks each exports; the note sums it up.
+function expPatsChanged(){
+  let pats = 0, files = 0;
+  document.querySelectorAll('.exppat').forEach(r => {
+    const on = r.querySelector('.expPat').checked, trk = [...r.querySelectorAll('.expTrk')], n = trk.filter(c => c.checked).length;
+    r.classList.toggle('off', !on);
+    const c = r.querySelector('.expcnt');
+    if(c) c.textContent = on ? `${n} of ${trk.length} track${trk.length === 1 ? '' : 's'}` : `${trk.length} track${trk.length === 1 ? '' : 's'}`;
+    if(on){ pats++; files += n; }
+  });
+  const p = curPattern(), sel = exportSelection(), n = document.getElementById('expPatNote');
+  if(n) n.textContent = !pats ? 'No pattern ticked.'
+    : sel.batch ? `${pats} patterns, ${files} track${files === 1 ? '' : 's'}: named as a single export names them, all in one .zip.`
+    : 'Tick more patterns to export them in one go: the same files, named as a single export names them, in one .zip.';
+}
+function pickAllTracks(on, i){
+  const r = i == null ? document : expRow(i); if(!r) return;
+  r.querySelectorAll('.expTrk').forEach(c => { c.checked = on; });
+  if(i != null) expTrkChanged(i);
+}
+// What the dialog has ticked: the patterns, and each one's tracks. With no
+// pattern rows (a test's stub) every ticked track is the screen pattern's.
+function exportSelection(){
+  const p = curPattern(), rows = [...document.querySelectorAll('.expPat')];
+  const tracks = new Map();
+  for(const c of document.querySelectorAll('.expTrk')){
+    if(!c.checked) continue;
+    const pi = c.dataset && c.dataset.pat != null ? +c.dataset.pat : PATTERNS.indexOf(p);
+    const q = PATTERNS[pi] || p;
+    if(!tracks.has(q)) tracks.set(q, []);
+    tracks.get(q).push(+c.value);
+  }
+  const pats = rows.length ? rows.filter(c => c.checked).map(c => PATTERNS[+c.value]).filter(Boolean) : [p];
+  return {pats, tracks, picker: rows.length > 0, batch: pats.length > 1 || (pats.length === 1 && pats[0] !== p)};
 }
 // The probability option exists only for .alc; the warning only for .mid.
 function expFmtChanged(){
-  const fmt = (document.getElementById('expFmtModal')||{}).value, alc = fmt === 'alc';
+  const fmt = (document.getElementById('expFmtModal')||{}).value, alc = fmt === 'alc' || fmt === 'both';
   const chr = document.getElementById('expChRow'); if(chr) chr.style.display = fmt === 'mid1' ? '' : 'none';
   const row = document.getElementById('expProbRow'), warn = document.getElementById('expMidWarn');
   if(row) row.hidden = !alc;
-  if(warn) warn.hidden = alc;
+  if(warn) warn.hidden = fmt === 'alc';
 }
-function pickAllTracks(on){
-  document.querySelectorAll('.expTrk').forEach(c=>{c.checked=on;});
-}
-function exportOptions(p, fmt){
+// The dialog's options, read once; exportOptions() turns them into one
+// pattern's (conditions are worked out per pattern).
+function exportFlags(){
   const on = id => { const el = document.getElementById(id); return !!(el && el.checked && !el.disabled); };
-  const opts = {};
-  if(on('expSimCond')){ const cl = conditionLoops(p); opts.loops = cl.loops; opts.plays = simulateConditions(p, cl.loops); }
-  if(on('expRetrig')) opts.retrig = true;
-  if(fmt === 'alc' && on('expProb')) opts.probability = true;
-  if(on('expCC')) opts.cc = true;
+  return {sim: on('expSimCond'), retrig: on('expRetrig'), prob: on('expProb'), cc: on('expCC')};
+}
+function exportOptions(p, fmt, flags){
+  const f = flags || exportFlags(), opts = {};
+  if(f.sim){ const cl = conditionLoops(p); opts.loops = cl.loops; opts.plays = simulateConditions(p, cl.loops); }
+  if(f.retrig) opts.retrig = true;
+  if(fmt === 'alc' && f.prob) opts.probability = true;
+  if(f.cc) opts.cc = true;
   return opts;
+}
+// The type-1 file's name: "A03-NAME-4tracks.mid".
+function exportMultiName(p, n){
+  const nm = (p.patternName||'PATTERN').replace(/[\\/*?:"<>|]/g,'').trim().slice(0,40);
+  return `${p.slot ? p.slot + '-' : ''}${nm}-${n}tracks`.replace(/[^\w\-]+/g,'_') + '.mid';
+}
+// The files a single export of q writes, as [{name, data}]: a batch is these,
+// pattern after pattern. Only the ticked tracks q has.
+async function exportFilesFor(q, fmt, list, flags, mode, stats){
+  const files = [], tracks = (Array.isArray(list) ? list : (list.get(q) || [])).filter(t => q.tracks && q.tracks[t]);
+  if(!tracks.length) return files;
+  if(fmt === 'mid1'){
+    files.push({name: exportMultiName(q, tracks.length), data: buildMIDIMulti(q, tracks, exportOptions(q, 'mid1', flags), stats, mode)});
+    return files;
+  }
+  const mo = fmt !== 'alc' ? exportOptions(q, 'mid', flags) : null, ao = fmt !== 'mid' ? exportOptions(q, 'alc', flags) : null;
+  for(const t of tracks){
+    const base = exportBaseName(q, t);
+    if(mo) files.push({name: base + '.mid', data: buildMIDI(q, t, mo, stats)});
+    if(ao){
+      const xml = buildALC(q, t, ao, stats), gz = await gzipText(xml);
+      files.push(gz ? {name: base + '.alc', data: gz} : {name: base + '.alc.xml', data: new TextEncoder().encode(xml)});
+    }
+  }
+  return files;
+}
+async function runExportBatch(pats, fmt, list, flags, mode){
+  const st = document.getElementById('status'), files = [], failed = [], none = [];
+  const stats = {skipped: 0, retrigs: 0, prob: 0};
+  for(let i = 0; i < pats.length; i++){
+    const q = pats[i], nm = q.slot || q.label || '?';
+    if(st) st.textContent = `Exporting ${i + 1} of ${pats.length}: ${nm}…`;
+    await new Promise(r => setTimeout(r, 0));
+    try{
+      const f = await exportFilesFor(q, fmt, list, flags, mode, stats);
+      if(f.length) files.push(...f); else none.push(nm);
+    }catch(e){ failed.push(`${nm} (${e.message})`); }
+  }
+  const tail = [];
+  if(none.length) tail.push(`none of the ticked tracks in ${none.join(' ')}`);
+  if(failed.length) tail.push(`not exported: ${failed.join(', ')}`);
+  if(!files.length){ if(st) st.textContent = ['Nothing exported'].concat(tail).join(' · '); return {files: [], failed, none}; }
+  // Two patterns with no slot and the same name would write one name twice.
+  const seen = {};
+  for(const f of files){ if(seen[f.name]) f.name = f.name.replace(/(\.[a-z.]+)$/, `_${++seen[f.name]}$1`); else seen[f.name] = 1; }
+  const slots = pats.map(q => q.slot).filter(Boolean);
+  const zipName = (slots.length ? `${slots[0]}-${slots[slots.length - 1]}_` : 'SYXGRID_') + `${pats.length}patterns.zip`;
+  download(await buildZip(files, {date: new Date()}), zipName, 'application/zip');
+  if(st) st.textContent = [`Exported ${files.length} file${files.length === 1 ? '' : 's'} from ${pats.length - failed.length - none.length} pattern${pats.length - failed.length - none.length === 1 ? '' : 's'} into ${zipName}`].concat(tail).join(' · ');
+  return {files: files.map(f => f.name), failed, none, zipName};
 }
 function runExport(){
   const p=curPattern();
   const fmt=document.getElementById('expFmtModal').value;
-  const list=[...document.querySelectorAll('.expTrk')].filter(c=>c.checked).map(c=>+c.value);
-  const opts=exportOptions(p, fmt);
+  const sel=exportSelection(), pats=sel.pats, picker=sel.picker;
+  const list=(sel.tracks.get(p)||[]).sort((a,b)=>a-b);
+  const flags=exportFlags();
+  const chMode=(document.getElementById('expChMode')||{}).value||'track';
+  const opts=exportOptions(p, fmt === 'both' ? 'mid' : fmt, flags);
   closeModal();
+  if(picker && !pats.length){ alert('No patterns selected.'); return; }
+  if(sel.batch) return runExportBatch(pats, fmt, sel.tracks, flags, chMode);
   if(!list.length){ alert('No tracks selected.'); return; }
   const stats={skipped:0, retrigs:0, prob:0};
   const st=document.getElementById('status');
   if(fmt==='mid1'){
-    const mode=(document.getElementById('expChMode')||{}).value||'track';
-    const bytes=buildMIDIMulti(p, list, opts, stats, mode);
-    const nm=(p.patternName||'PATTERN').replace(/[\\/*?:"<>|]/g,'').trim().slice(0,40);
-    download(bytes, `${p.slot ? p.slot + '-' : ''}${nm}-${list.length}tracks`.replace(/[^\w\-]+/g,'_') + '.mid', 'audio/midi');
+    const bytes=buildMIDIMulti(p, list, opts, stats, chMode);
+    download(bytes, exportMultiName(p, list.length), 'audio/midi');
     if(st){
       const parts=[exportSummary(stats.tracksWritten, 'mid', opts, stats).replace(/^Exported (\d+) tracks? as \.mid/, 'Exported $1 tracks into one type-1 .mid')];
       if(stats.noChannel.length) parts.push(`left out, no channel: ${stats.noChannel.map(t=>'T'+t).join(' ')}`);
@@ -14195,19 +14932,20 @@ function runExport(){
     }
     return;
   }
+  const alcOpts = fmt==='both' ? exportOptions(p, 'alc', flags) : opts;
   for(const t of list){
     const base=exportBaseName(p,t);
-    if(fmt==='mid'){
-      download(buildMIDI(p,t,opts,stats), base+'.mid', 'audio/midi');
-    } else {
-      const xml=buildALC(p,t,opts,stats);
+    if(fmt==='mid' || fmt==='both') download(buildMIDI(p,t,opts,stats), base+'.mid', 'audio/midi');
+    if(fmt==='alc' || fmt==='both'){
+      const xml=buildALC(p,t,alcOpts,stats);
       gzipText(xml).then(buf=>{
         if(buf) download(buf, base+'.alc', 'application/gzip');
         else    download(xml, base+'.alc.xml', 'application/xml');
       });
     }
   }
-  if(st && (opts.loops || opts.retrig || opts.probability || opts.cc || stats.projectTempo)) st.textContent = exportSummary(list.length, fmt, opts, stats);
+  if(st && (fmt==='both' || opts.loops || opts.retrig || alcOpts.probability || opts.cc || stats.projectTempo))
+    st.textContent = exportSummary(list.length, fmt==='both' ? 'mid and .alc' : fmt, Object.assign({}, opts, {probability: alcOpts.probability}), stats);
 }
 // One line for the status bar: what the options did.
 function exportSummary(n, fmt, opts, stats){
@@ -17032,6 +17770,10 @@ function showHelp(){
       <table class="helptab">
         <tr><td>${K('+ Add track')}</td><td>create empty tracks; ${K('all')} and ${K('none')} select in bulk. ${M('MIDI',4)}
           tracks get a channel picker, with ${K('OFF')} as a choice.</td></tr>
+        <tr><td>${K('generate…')}</td><td>write a pad, drone, texture, pluck, arp or bassline into the track, in its key, from a
+          chord progression or the pattern's chord memory. It reads the other tracks first: it can follow their chords, move an
+          octave out of their register and play where they leave gaps. A seed repeats a roll, ${K('Again')} rolls a new one;
+          the preview shows it beside the other tracks, and ${K('Write')} replaces the track's trigs as one undo step.</td></tr>
         <tr><td>${K('clear')}</td><td>remove every trig but keep the track, its length, speed and type.</td></tr>
         <tr><td>${K('duplicate')}</td><td>copy a track's trigs to another track; the picker marks a track that has trigs as
           <i>n trigs — will be REPLACED</i>.</td></tr>
@@ -17085,7 +17827,9 @@ function showHelp(){
           copies the existing trigs, as the device does; <b>shrinking</b> keeps the trigs past the end, silent.</td></tr>
         <tr><td>${K('transpose…')}</td><td>move the notes of the ticked tracks; a move past 0&ndash;127 is refused whole.</td></tr>
         <tr><td>chord memory</td><td>the sixteen chords a pattern stores, on the <b>Chords</b> tab, named as the CHORD MEMORY
-          screen names them (D4 A4 F5), with the chord's name and its degree in the scale. ${K('Edit chords…')} writes them.</td></tr>
+          screen names them (D4 A4 F5), with the chord's name and its degree in the scale. ${K('Edit chords…')} writes them;
+          ${K('Generate chords…')} fills them from a progression (I to VII, random, ii&ndash;V&ndash;I, i&ndash;&#9837;VI&ndash;&#9837;VII&ndash;iv and more),
+          triads to elevenths, each chord voice-led from the one before.</td></tr>
         <tr><td>Keyboard setup tab</td><td>MODE, ROOT and SCALE, per pattern or per track, each track's octave, chord SHAPE/TYPE,
           BASS and CENTER.</td></tr>
         <tr><td>Kit setup · FX &amp; mixer tabs</td><td>track levels, CONTROL ALL, compressor routing, pattern transpose, track
@@ -17098,7 +17842,10 @@ function showHelp(){
 
       <h4>Import and export</h4>
       <table class="helptab">
-        <tr><td>${K('Export MIDI')}</td><td>pick <b>.mid</b> or <b>.alc</b> and which tracks. Files are named slot&ndash;pattern&ndash;track.
+        <tr><td>${K('Export MIDI')}</td><td>pick <b>.mid</b>, <b>.alc</b> or both, and which tracks. Files are named slot&ndash;pattern&ndash;track.
+          The dialog lists a row a pattern; <b>&#9656;</b> opens one to tick its own tracks. The buttons on top tick this one,
+          all with tracks, a bank, or none. Tick more patterns to export them in one go: each writes the files a single export would,
+          with the same names, all in one .zip.
           <b>All tracks in one file</b> writes a type-1 .mid with each track on its own channel and the shorter tracks repeated
           to the longest.</td></tr>
         <tr><td>${K('Import MIDI')}</td><td>a .mid or .alc onto a chosen track. The dialog draws the file as a piano roll over the
@@ -19567,8 +20314,10 @@ function render(){
 
     // v23.96 (G4.28): what a click on an empty step places.
     const defBtn = isMidiTrack(p,t) ? '' : `<button class="mini expbtn deftrig${DEFTRIG[t]?' on':''}" onclick="showDefaultTrig(${t})" title="what clicking an empty step places: a note, a chord-memory chord or a chord in the scale, with velocity and length">click: ${esc(trigSourceSummary(p,t,DEFTRIG[t]))}</button>`;
+    // v24.37 (G4.31): generator lite -- a part for this track, in its key.
+    const genBtn = `<button class="mini expbtn genlitebtn" onclick="showGenLite(${t})" title="generate a chord part, a line or an arp for this track, in its key, after a look at the other tracks">generate…</button>`;
     html+=`<div class="gridwrap${isBig?' big':''}" id="trk${t}"><div class="gridtitle"><span class="m${mach}">Track ${t}</span>${pn} <span class="cnt">${steps.length} trigs</span> ${tl}`
-        + ` <span class="tctl">len ${lenSel} speed ${spdSel} ${defBtn} ${typBtn} ${plkBtn} ${tatBtn} ${clrBtn} ${dupBtn} ${cpBtn} ${delBtn} ${expBtn}</span>`
+        + ` <span class="tctl">len ${lenSel} speed ${spdSel} ${defBtn} ${genBtn} ${typBtn} ${plkBtn} ${tatBtn} ${clrBtn} ${dupBtn} ${cpBtn} ${delBtn} ${expBtn}</span>`
         + (beyondN?` <span class="dirty">· ${beyondN} beyond step ${nSteps}</span>`:'') + `</div>`;
     // v23.89 (G3.21): with the EUCLIDEAN generator on, the device plays the
     // generated trigs and hides these -- said here, with the generated steps.
